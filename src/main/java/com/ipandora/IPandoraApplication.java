@@ -1,6 +1,6 @@
 package com.ipandora;
 
-import com.ipandora.resources.FormulaResource;
+import com.ipandora.resources.PredicateResource;
 import io.dropwizard.Application;
 import io.dropwizard.setup.Bootstrap;
 import io.dropwizard.setup.Environment;
@@ -20,7 +20,7 @@ public class IPandoraApplication extends Application<IPandoraConfiguration> {
     public void run(IPandoraConfiguration IPandoraConfiguration,
                     Environment environment) throws Exception {
 
-        FormulaResource resource = new FormulaResource();
+        PredicateResource resource = new PredicateResource();
         environment.jersey().register(resource);
     }
 }
