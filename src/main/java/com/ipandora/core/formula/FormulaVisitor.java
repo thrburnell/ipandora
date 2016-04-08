@@ -4,7 +4,7 @@ import com.ipandora.api.predicate.formula.*;
 
 public interface FormulaVisitor<T> {
 
-    T visitAtomFormula(AtomFormula atomFormula);
+    T visit(Formula formula);
 
     T visitAndFormula(AndFormula andFormula);
     T visitOrFormula(OrFormula orFormula);
@@ -15,8 +15,8 @@ public interface FormulaVisitor<T> {
     T visitTrueFormula(TrueFormula trueFormula);
     T visitFalseFormula(FalseFormula falseFormula);
 
-    T visitIffFormula(IffFormula iffFormula);
     T visitImpliesFormula(ImpliesFormula impliesFormula);
+    T visitIffFormula(IffFormula iffFormula);
 
     T visitNotFormula(NotFormula notFormula);
 

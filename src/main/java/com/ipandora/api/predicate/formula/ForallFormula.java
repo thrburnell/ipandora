@@ -3,6 +3,7 @@ package com.ipandora.api.predicate.formula;
 import com.ipandora.api.predicate.term.Variable;
 import com.ipandora.core.formula.FormulaVisitor;
 
+// TODO: generalise ForallFormula to span over multiple variables
 public class ForallFormula implements Formula {
 
     private final Variable variable;

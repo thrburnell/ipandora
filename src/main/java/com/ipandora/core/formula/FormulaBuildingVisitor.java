@@ -1,8 +1,6 @@
-package com.ipandora.core;
+package com.ipandora.core.formula;
 
 import com.ipandora.api.predicate.formula.*;
-import com.ipandora.api.predicate.term.Constant;
-import com.ipandora.api.predicate.term.Term;
 import com.ipandora.api.predicate.term.Variable;
 import com.ipandora.parser.PredicateLogicBaseVisitor;
 import com.ipandora.parser.PredicateLogicLexer;
@@ -126,24 +124,17 @@ public class FormulaBuildingVisitor extends PredicateLogicBaseVisitor<Formula> {
 
         String predicateName = ctx.name.getText();
 
-        List<Term> params = new ArrayList<Term>();
+        List<Variable> params = new ArrayList<>();
         for (PredicateLogicParser.ArgContext arg : ctx.args.args) {
-            params.add(generateTerm(arg));
+            params.add(generateVariable(arg));
         }
 
         return new PredicateFormula(predicateName, params);
     }
 
-    private Term generateTerm(PredicateLogicParser.ArgContext ctx) {
-
+    private Variable generateVariable(PredicateLogicParser.ArgContext ctx) {
         Token var = ctx.var;
-        Token constant = ctx.constant;
-
-        if (var != null) {
-            return new Variable(var.getText());
-        } else {
-            return new Constant(constant.getText());
-        }
+        return new Variable(var.getText());
     }
 
 }
