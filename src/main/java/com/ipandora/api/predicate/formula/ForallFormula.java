@@ -1,6 +1,7 @@
 package com.ipandora.api.predicate.formula;
 
 import com.ipandora.api.predicate.term.Variable;
+import com.ipandora.core.formula.FormulaVisitor;
 
 public class ForallFormula implements Formula {
 
@@ -15,6 +16,11 @@ public class ForallFormula implements Formula {
     @Override
     public String toString() {
         return String.format("\u2200%s.(%s)", variable, formula);
+    }
+
+    @Override
+    public <T> T accept(FormulaVisitor<T> visitor) {
+        return visitor.visitForallFormula(this);
     }
 
 }

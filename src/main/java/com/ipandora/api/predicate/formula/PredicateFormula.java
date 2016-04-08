@@ -1,6 +1,7 @@
 package com.ipandora.api.predicate.formula;
 
 import com.ipandora.api.predicate.term.Term;
+import com.ipandora.core.formula.FormulaVisitor;
 
 import java.util.List;
 
@@ -26,6 +27,11 @@ public class PredicateFormula implements Formula {
         }
 
         return String.format("%s(%s)", name, sb);
+    }
+
+    @Override
+    public <T> T accept(FormulaVisitor<T> visitor) {
+        return visitor.visitPredicateFormula(this);
     }
 
 }

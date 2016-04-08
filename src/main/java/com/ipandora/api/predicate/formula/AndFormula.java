@@ -1,5 +1,7 @@
 package com.ipandora.api.predicate.formula;
 
+import com.ipandora.core.formula.FormulaVisitor;
+
 public class AndFormula implements Formula {
 
     private Formula left;
@@ -15,4 +17,8 @@ public class AndFormula implements Formula {
         return String.format("(%s) \u2227 (%s)", left, right);
     }
 
+    @Override
+    public <T> T accept(FormulaVisitor<T> visitor) {
+        return visitor.visitAndFormula(this);
+    }
 }

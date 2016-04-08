@@ -1,6 +1,7 @@
 package com.ipandora.api.predicate.formula;
 
 import com.ipandora.api.predicate.term.Variable;
+import com.ipandora.core.formula.FormulaVisitor;
 
 public class ExistsFormula implements Formula {
 
@@ -17,4 +18,8 @@ public class ExistsFormula implements Formula {
         return String.format("\u2203%s.(%s)", variable, formula);
     }
 
+    @Override
+    public <T> T accept(FormulaVisitor<T> visitor) {
+        return visitor.visitExistsFormula(this);
+    }
 }

@@ -1,5 +1,7 @@
 package com.ipandora.api.predicate.formula;
 
+import com.ipandora.core.formula.FormulaVisitor;
+
 public class AtomFormula implements Formula {
 
     private final String identifier;
@@ -8,4 +10,8 @@ public class AtomFormula implements Formula {
         this.identifier = identifier;
     }
 
+    @Override
+    public <T> T accept(FormulaVisitor<T> visitor) {
+        return visitor.visitAtomFormula(this);
+    }
 }
