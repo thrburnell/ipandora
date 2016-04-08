@@ -12,6 +12,14 @@ public class ImpliesFormula implements Formula {
         this.right = right;
     }
 
+    public Formula getLeft() {
+        return left;
+    }
+
+    public Formula getRight() {
+        return right;
+    }
+
     @Override
     public String toString() {
         return String.format("(%s) \u2192 (%s)", left, right);

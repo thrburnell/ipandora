@@ -15,6 +15,14 @@ public class PredicateFormula implements Formula {
         this.params = params;
     }
 
+    public String getName() {
+        return name;
+    }
+
+    public List<Term> getParams() {
+        return params;
+    }
+
     @Override
     public String toString() {
 

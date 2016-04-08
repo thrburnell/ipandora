@@ -10,6 +10,10 @@ public class NotFormula implements Formula {
         this.formula = formula;
     }
 
+    public Formula getFormula() {
+        return formula;
+    }
+
     @Override
     public String toString() {
         return String.format("\u00ac (%s)", formula);

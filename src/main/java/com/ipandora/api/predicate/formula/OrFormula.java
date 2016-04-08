@@ -12,6 +12,14 @@ public class OrFormula implements Formula {
         this.right = right;
     }
 
+    public Formula getLeft() {
+        return left;
+    }
+
+    public Formula getRight() {
+        return right;
+    }
+
     @Override
     public String toString() {
         return String.format("(%s) \u2228 (%s)", left, right);

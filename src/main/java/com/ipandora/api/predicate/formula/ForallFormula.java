@@ -13,6 +13,14 @@ public class ForallFormula implements Formula {
         this.formula = formula;
     }
 
+    public Variable getVariable() {
+        return variable;
+    }
+
+    public Formula getFormula() {
+        return formula;
+    }
+
     @Override
     public String toString() {
         return String.format("\u2200%s.(%s)", variable, formula);

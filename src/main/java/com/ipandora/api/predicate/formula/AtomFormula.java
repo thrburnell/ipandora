@@ -10,6 +10,10 @@ public class AtomFormula implements Formula {
         this.identifier = identifier;
     }
 
+    public String getIdentifier() {
+        return identifier;
+    }
+
     @Override
     public <T> T accept(FormulaVisitor<T> visitor) {
         return visitor.visitAtomFormula(this);
