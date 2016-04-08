@@ -1,6 +1,6 @@
 package com.ipandora.api.predicate.formula;
 
-import com.ipandora.api.predicate.term.Term;
+import com.ipandora.api.predicate.term.Variable;
 import com.ipandora.core.formula.FormulaVisitor;
 
 import java.util.List;
@@ -8,9 +8,9 @@ import java.util.List;
 public class PredicateFormula implements Formula {
 
     private final String name;
-    private final List<Term> params;
+    private final List<Variable> params;
 
-    public PredicateFormula(String name, List<Term> params) {
+    public PredicateFormula(String name, List<Variable> params) {
         this.name = name;
         this.params = params;
     }
@@ -19,7 +19,7 @@ public class PredicateFormula implements Formula {
         return name;
     }
 
-    public List<Term> getParams() {
+    public List<Variable> getParams() {
         return params;
     }
 
