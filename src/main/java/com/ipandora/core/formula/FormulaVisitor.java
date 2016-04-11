@@ -12,8 +12,8 @@ public interface FormulaVisitor<T> {
     T visitForallFormula(ForallFormula forallFormula);
     T visitExistsFormula(ExistsFormula existsFormula);
 
-    T visitTrueFormula(TrueFormula trueFormula);
-    T visitFalseFormula(FalseFormula falseFormula);
+    T visitTruthFormula(TruthFormula truthFormula);
+    T visitFalsityFormula(FalsityFormula falsityFormula);
 
     T visitImpliesFormula(ImpliesFormula impliesFormula);
     T visitIffFormula(IffFormula iffFormula);

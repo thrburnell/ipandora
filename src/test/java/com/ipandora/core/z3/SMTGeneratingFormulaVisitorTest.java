@@ -14,8 +14,8 @@ public class SMTGeneratingFormulaVisitorTest {
     @Test
     public void visitAndFormulaReturnsCorrectCode() {
         // (and true (and false true))
-        AndFormula andFormula = new AndFormula(new TrueFormula(),
-                new AndFormula(new FalseFormula(), new TrueFormula()));
+        AndFormula andFormula = new AndFormula(new TruthFormula(),
+                new AndFormula(new FalsityFormula(), new TruthFormula()));
 
         SMTGeneratingFormulaVisitor visitor = new SMTGeneratingFormulaVisitor();
         String result = visitor.visit(andFormula);
@@ -26,7 +26,7 @@ public class SMTGeneratingFormulaVisitorTest {
     @Test
     public void visitOrFormulaReturnsCorrectCode() {
         // (or (or true false) false)
-        OrFormula orFormula = new OrFormula(new OrFormula(new TrueFormula(), new FalseFormula()), new FalseFormula());
+        OrFormula orFormula = new OrFormula(new OrFormula(new TruthFormula(), new FalsityFormula()), new FalsityFormula());
 
         SMTGeneratingFormulaVisitor visitor = new SMTGeneratingFormulaVisitor();
         String result = visitor.visit(orFormula);
@@ -62,24 +62,24 @@ public class SMTGeneratingFormulaVisitorTest {
 
     @Test
     public void visitTrueFormulaReturnsCorrectCode() {
-        TrueFormula trueFormula = new TrueFormula();
+        TruthFormula truthFormula = new TruthFormula();
         SMTGeneratingFormulaVisitor visitor = new SMTGeneratingFormulaVisitor();
-        String result = visitor.visit(trueFormula);
+        String result = visitor.visit(truthFormula);
         assertThat(result).isEqualTo("true");
     }
 
     @Test
     public void visitFalseFormulaReturnsCorrectCode() {
-        FalseFormula falseFormula = new FalseFormula();
+        FalsityFormula falsityFormula = new FalsityFormula();
         SMTGeneratingFormulaVisitor visitor = new SMTGeneratingFormulaVisitor();
-        String result = visitor.visit(falseFormula);
+        String result = visitor.visit(falsityFormula);
         assertThat(result).isEqualTo("false");
     }
 
     @Test
     public void visitImpliesFormulaReturnsCorrectCode() {
         // (=> false true)
-        ImpliesFormula impliesFormula = new ImpliesFormula(new FalseFormula(), new TrueFormula());
+        ImpliesFormula impliesFormula = new ImpliesFormula(new FalsityFormula(), new TruthFormula());
 
         SMTGeneratingFormulaVisitor visitor = new SMTGeneratingFormulaVisitor();
         String result = visitor.visit(impliesFormula);
@@ -90,7 +90,7 @@ public class SMTGeneratingFormulaVisitorTest {
     @Test
     public void visitIffFormulaReturnsCorrectCode() {
         // (= false false)
-        IffFormula iffFormula = new IffFormula(new FalseFormula(), new FalseFormula());
+        IffFormula iffFormula = new IffFormula(new FalsityFormula(), new FalsityFormula());
 
         SMTGeneratingFormulaVisitor visitor = new SMTGeneratingFormulaVisitor();
         String result = visitor.visit(iffFormula);
@@ -101,7 +101,7 @@ public class SMTGeneratingFormulaVisitorTest {
     @Test
     public void visitNotFormulaReturnsCorrectCode() {
         // (not false)
-        NotFormula notFormula = new NotFormula(new FalseFormula());
+        NotFormula notFormula = new NotFormula(new FalsityFormula());
 
         SMTGeneratingFormulaVisitor visitor = new SMTGeneratingFormulaVisitor();
         String result = visitor.visit(notFormula);
@@ -145,7 +145,7 @@ public class SMTGeneratingFormulaVisitorTest {
     @Test
     public void getTypeDefinitionReturnsEmptyIfNoPredicatesVisited() {
         SMTGeneratingFormulaVisitor visitor = new SMTGeneratingFormulaVisitor();
-        visitor.visit(new TrueFormula());
+        visitor.visit(new TruthFormula());
         String typeDefinition = visitor.getTypeDefinition();
         assertThat(typeDefinition).isEmpty();
     }

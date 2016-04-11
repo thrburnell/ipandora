@@ -71,12 +71,12 @@ public class SMTGeneratingFormulaVisitor implements FormulaVisitor<String> {
     }
 
     @Override
-    public String visitTrueFormula(TrueFormula trueFormula) {
+    public String visitTruthFormula(TruthFormula truthFormula) {
         return "true";
     }
 
     @Override
-    public String visitFalseFormula(FalseFormula falseFormula) {
+    public String visitFalsityFormula(FalsityFormula falsityFormula) {
         return "false";
     }
 

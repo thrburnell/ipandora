@@ -42,4 +42,22 @@ public class PredicateFormula implements Formula {
         return visitor.visitPredicateFormula(this);
     }
 
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+
+        PredicateFormula that = (PredicateFormula) o;
+
+        if (name != null ? !name.equals(that.name) : that.name != null) return false;
+        return !(params != null ? !params.equals(that.params) : that.params != null);
+
+    }
+
+    @Override
+    public int hashCode() {
+        int result = name != null ? name.hashCode() : 0;
+        result = 31 * result + (params != null ? params.hashCode() : 0);
+        return result;
+    }
 }

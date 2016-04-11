@@ -32,4 +32,22 @@ public class ForallFormula implements Formula {
         return visitor.visitForallFormula(this);
     }
 
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+
+        ForallFormula that = (ForallFormula) o;
+
+        if (variable != null ? !variable.equals(that.variable) : that.variable != null) return false;
+        return !(formula != null ? !formula.equals(that.formula) : that.formula != null);
+
+    }
+
+    @Override
+    public int hashCode() {
+        int result = variable != null ? variable.hashCode() : 0;
+        result = 31 * result + (formula != null ? formula.hashCode() : 0);
+        return result;
+    }
 }

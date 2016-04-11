@@ -24,4 +24,19 @@ public class NotFormula implements Formula {
         return visitor.visitNotFormula(this);
     }
 
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+
+        NotFormula that = (NotFormula) o;
+
+        return !(formula != null ? !formula.equals(that.formula) : that.formula != null);
+
+    }
+
+    @Override
+    public int hashCode() {
+        return formula != null ? 31 * formula.hashCode() : 0;
+    }
 }

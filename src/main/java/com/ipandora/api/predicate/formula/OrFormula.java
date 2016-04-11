@@ -30,4 +30,22 @@ public class OrFormula implements Formula {
         return visitor.visitOrFormula(this);
     }
 
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+
+        OrFormula orFormula = (OrFormula) o;
+
+        if (left != null ? !left.equals(orFormula.left) : orFormula.left != null) return false;
+        return !(right != null ? !right.equals(orFormula.right) : orFormula.right != null);
+
+    }
+
+    @Override
+    public int hashCode() {
+        int result = left != null ? left.hashCode() : 0;
+        result = 31 * result + (right != null ? right.hashCode() : 0);
+        return result;
+    }
 }
