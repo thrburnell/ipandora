@@ -5,9 +5,10 @@ import com.ipandora.api.predicate.formula.Formula;
 
 import java.util.List;
 
-public class FormulaConjunctor {
+public class FormulaConjunctionReducer implements FormulaReducer {
 
-    public Formula join(List<Formula> formulas) {
+    @Override
+    public Formula reduce(List<Formula> formulas) {
 
         if (formulas.isEmpty()) {
             return null;
