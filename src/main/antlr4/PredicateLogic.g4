@@ -38,11 +38,10 @@ argList
     ;
 
 arg
-    : var=VARIABLE | constant=CONSTANT
+    : var=VARIABLE
     ;
 
 VARIABLE: '?' ('a'..'z') CHARACTER*;
-CONSTANT: ('a'..'z' ) CHARACTER*;
 PREDICATE: ('A'..'Z') CHARACTER*;
 fragment CHARACTER: LETTER | DIGIT | '_';
 fragment LETTER: ('a'..'z' | 'A'..'Z');

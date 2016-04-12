@@ -13,14 +13,14 @@ import static org.mockito.Matchers.anyString;
 import static org.mockito.Mockito.when;
 
 @RunWith(MockitoJUnitRunner.class)
-public class Z3ClientTest {
+public class Z3ClientImplTest {
 
     @Mock
     private ProcessExecutor processExecutor;
 
     @Test
     public void isSatReturnsTrueWhenOutputBeginsWithSat() throws Exception {
-        Z3Client z3Client = new Z3Client(processExecutor);
+        Z3Client z3Client = new Z3ClientImpl(processExecutor);
 
         when(processExecutor.execute(anyString(), anyInt(), Matchers.<String>anyVararg()))
                 .thenReturn("sat and some more output");
@@ -32,7 +32,7 @@ public class Z3ClientTest {
 
     @Test
     public void isSatReturnsFalseWhenOutputBeginsWithUnsat() throws Exception {
-        Z3Client z3Client = new Z3Client(processExecutor);
+        Z3Client z3Client = new Z3ClientImpl(processExecutor);
 
         when(processExecutor.execute(anyString(), anyInt(), Matchers.<String>anyVararg()))
                 .thenReturn("unsat and some more output");
@@ -44,7 +44,7 @@ public class Z3ClientTest {
 
     @Test(expected = Z3UnrecognisableOutputException.class)
     public void isSatThrowsUnrecognisableOutputExceptionWhenOutputDoesntBeginWithSatOrUnsat() throws Exception {
-        Z3Client z3Client = new Z3Client(processExecutor);
+        Z3Client z3Client = new Z3ClientImpl(processExecutor);
 
         when(processExecutor.execute(anyString(), anyInt(), Matchers.<String>anyVararg()))
                 .thenReturn("output that doesn't begin with sat or unsat");
