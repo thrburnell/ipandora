@@ -1,0 +1,27 @@
+{
+  "name": "ipandora",
+  "version": "1.0.0",
+  "description": "Proof reasoning tool supporting predicate logic and Haskell program reasoning.",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "build": "webpack && cp app/index.html dist/",
+    "clean": "rm -rf dist/"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/thrburnell/ipandora"
+  },
+  "author": "Tom Burnell",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/thrburnell/ipandora/issues"
+  },
+  "homepage": "https://github.com/thrburnell/ipandora",
+  "devDependencies": {
+    "css-loader": "^0.23.1",
+    "style-loader": "^0.13.1",
+    "webpack": "^1.13.0",
+    "webpack-dev-server": "^1.14.1"
+  }
+}

@@ -9,6 +9,7 @@ import com.ipandora.core.z3.Z3ClientImpl;
 import com.ipandora.core.z3.Z3ImpliesChecker;
 import com.ipandora.resources.PredicateResource;
 import io.dropwizard.Application;
+import io.dropwizard.bundles.assets.ConfiguredAssetsBundle;
 import io.dropwizard.configuration.EnvironmentVariableSubstitutor;
 import io.dropwizard.configuration.SubstitutingSourceProvider;
 import io.dropwizard.setup.Bootstrap;
@@ -25,6 +26,8 @@ public class IPandoraApplication extends Application<IPandoraConfiguration> {
         bootstrap.setConfigurationSourceProvider(
                 new SubstitutingSourceProvider(bootstrap.getConfigurationSourceProvider(),
                         new EnvironmentVariableSubstitutor()));
+
+        bootstrap.addBundle(new ConfiguredAssetsBundle("/public", "/", "index.html"));
     }
 
     @Override

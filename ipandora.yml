@@ -5,3 +5,8 @@ server:
   adminConnectors:
     - type: http
       port: 8081
+  rootPath: /api/
+
+assets:
+  overrides:
+    /: web/build
