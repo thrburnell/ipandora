@@ -1,4 +1,5 @@
 const path = require('path');
+const CopyWebpackPlugin = require('copy-webpack-plugin');
 
 const PATHS = {
   app: {
@@ -24,6 +25,9 @@ module.exports = {
         include: PATHS.app.css
       }
     ]
-  }
+  },
+  plugins: [
+    new CopyWebpackPlugin([{ from: 'app/index.html' }])
+  ]
 };
 
