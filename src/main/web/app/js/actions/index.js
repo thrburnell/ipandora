@@ -8,3 +8,13 @@ export const addGiven = (formula) => {
   }
 }
 
+let nextToShowId = 1;
+
+export const addToShow = (formula) => {
+  return {
+    type: 'ADD_TO_SHOW',
+    id: nextToShowId++,
+    formula
+  }
+}
+

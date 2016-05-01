@@ -1,8 +1,10 @@
 import { combineReducers } from 'redux'
 import givens from './givens'
+import toShows from './toshows'
 
 const ipandoraApp = combineReducers({
-  givens
+  givens,
+  toShows
 })
 
 export default ipandoraApp

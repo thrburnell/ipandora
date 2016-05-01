@@ -1,11 +1,15 @@
 import React from 'react'
 import RGivensList from '../containers/RGivensList'
-import AddGiven from './AddGiven'
+import RToShowList from '../containers/RToShowList'
+import RAddGiven from '../containers/RAddGiven'
+import RAddToShow from '../containers/RAddToShow'
 
 const App = () => (
   <div>
-    <RGivensList />
-    <AddGiven />
+    <RGivensList heading="Givens" />
+    <RAddGiven />
+    <RToShowList heading="To Show" />
+    <RAddToShow />
   </div>
 )
 

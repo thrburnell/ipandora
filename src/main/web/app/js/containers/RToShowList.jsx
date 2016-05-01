@@ -3,13 +3,13 @@ import FormulaList from '../components/FormulaList'
 
 const mapStateToProps = (state) => (
   {
-    formulas: state.givens
+    formulas: state.toShows
   }
 )
 
-const RGivensList = connect(
+const RToShowList = connect(
   mapStateToProps
 )(FormulaList)
 
-export default RGivensList
+export default RToShowList
 
