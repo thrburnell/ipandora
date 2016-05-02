@@ -1,12 +1,11 @@
 import React from 'react'
 import Formula from './Formula'
 
-const FormulaList = ({ heading, formulas }) => (
+const FormulaList = ({ formulas }) => (
   <div>
-    <h2>{ heading }</h2>
-    { formulas.map(formula =>
+    { formulas.map((formula, i) =>
       <Formula
-        key={formula.id}
+        key={i}
         {...formula}
       />
     )}

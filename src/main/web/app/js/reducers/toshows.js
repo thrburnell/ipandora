@@ -5,9 +5,11 @@ const toShows = (state = [], action) => {
         ...state,
         {
           id: action.id,
+          uiId: action.uiId,
           formula: action.formula
         }
       ]
+
     default:
       return state
   }

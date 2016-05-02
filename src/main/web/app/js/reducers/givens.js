@@ -3,10 +3,7 @@ const givens = (state = [], action) => {
     case 'ADD_GIVEN':
       return [
         ...state,
-        {
-          id: action.id,
-          formula: action.formula
-        }
+        action.id
       ]
     default:
       return state

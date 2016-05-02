@@ -1,20 +1,34 @@
-let nextGivenId = 1
+let nextProofStepId = 0
+let nextProofStepUiId = 1
 
-export const addGiven = (formula) => {
-  return {
+export const addGiven = (formula) => (
+  {
     type: 'ADD_GIVEN',
-    id: nextGivenId++,
+    id: nextProofStepId++,
+    uiId: nextProofStepUiId++,
     formula
   }
-}
+)
 
-let nextToShowId = 945 // small alpha
+let nextToShowId = 0
+let nextToShowUiId = 945 // small alpha
 
-export const addToShow = (formula) => {
-  return {
+export const addToShow = (formula) => (
+  {
     type: 'ADD_TO_SHOW',
-    id: String.fromCharCode(nextToShowId++),
+    id: nextToShowId++,
+    uiId: String.fromCharCode(nextToShowUiId++),
     formula
   }
-}
+)
+
+export const addProofStep = (formula, justifications) => (
+  {
+    type: 'ADD_PROOF_STEP',
+    id: nextProofStepId++,
+    uiId: nextProofStepUiId++,
+    formula,
+    justifications
+  }
+)
 
