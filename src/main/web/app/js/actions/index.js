@@ -8,12 +8,12 @@ export const addGiven = (formula) => {
   }
 }
 
-let nextToShowId = 1;
+let nextToShowId = 945 // small alpha
 
 export const addToShow = (formula) => {
   return {
     type: 'ADD_TO_SHOW',
-    id: nextToShowId++,
+    id: String.fromCharCode(nextToShowId++),
     formula
   }
 }
