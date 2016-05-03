@@ -1,6 +1,10 @@
 import React from 'react'
 
-let FormulaInput = ({ onEnterPress }) => {
+const FormulaInput = ({ 
+  onEnterPress = () => {}, 
+  onKeyDown = () => {},
+  clearOnEnter = true
+}) => {
 
   let input
 
@@ -10,10 +14,12 @@ let FormulaInput = ({ onEnterPress }) => {
         ref={node => {
           input = node
         }}
-        onKeyPress={e => {
+        onKeyDown={e => {
           if (e.key == 'Enter') {
             onEnterPress(input.value)
-            input.value=''
+            if (clearOnEnter) input.value=''
+          } else {
+            onKeyDown(input.value)
           }
         }}/>
     </div>

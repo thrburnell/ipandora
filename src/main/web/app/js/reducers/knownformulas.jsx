@@ -1,9 +1,7 @@
 const knownFormulas = (state = {}, action) => {
 
   switch (action.type) {
-    // ADD_GIVEN and ADD_PROOF_STEP behave identically
     case 'ADD_GIVEN':
-    case 'ADD_PROOF_STEP':
       return {
         ...state,
         [action.id]: {
@@ -12,6 +10,20 @@ const knownFormulas = (state = {}, action) => {
           formula: action.formula
         }
       }
+    
+    case 'RECEIVE_CHECK_STATUS':
+      if (action.valid) {
+        return {
+          ...state,
+          [action.id]: {
+            id: action.id,
+            uiId: action.uiId,
+            formula: action.formula
+          }
+        }
+      }
+
+      return statue
 
     default:
       return state

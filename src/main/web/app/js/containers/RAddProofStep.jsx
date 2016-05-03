@@ -1,19 +1,27 @@
 import { connect } from 'react-redux'
-import FormulaInput from '../components/FormulaInput'
-import { addProofStep } from '../actions'
+import { checkProofStep } from '../actions'
+import AddProofStep from '../components/AddProofStep'
 
-const mapStateToProps = () => ({})
+const mapStateToProps = (state) => (
+  {
+    justification:
+      state.proofStepJustification.map(id => ({
+        id,
+        uiId: state.knownFormulas[id].uiId
+      }))
+  }
+)
 
 const mapDispatchToProps = (dispatch) => (
   {
-    onEnterPress: (value) => dispatch(addProofStep(value, []))
+    onCheckButtonClick: (formula, justification) => dispatch(checkProofStep(formula, justification))
   }
 )
 
 const RAddProofStep = connect(
   mapStateToProps,
   mapDispatchToProps
-)(FormulaInput)
+)(AddProofStep)
 
 export default RAddProofStep
 

@@ -1,4 +1,15 @@
 {
+
+  // The state of proof step entry
+  // Can be one of 'INACTIVE', 'AWAITING_VALIDITY_CHECK'
+  proofStepState: 'AWAITING_JUSTIFICATION',
+
+  // Keys of formulas which justify the new proof step
+  proofStepJustification: [0, 1],
+
+  // Formula for the next proof step
+  proofStepFormula: "D(x)",
+
   // All known formulas, including givens and derived
   knownFormulas: {
     0: {
@@ -26,7 +37,7 @@
     {
       id: 0,
       uiId: 'alpha',
-      formula: "D(x)"
+      formula: "E(x)"
     }
   ]
 
@@ -34,7 +45,7 @@
   proofSteps: [
     {
       derived: 2,             // formulas[2],   i.e. C(x)
-      justifications: [0, 1]  // formulas[0,1], i.e. A(x) and B(x)
+      justification: [0, 1]   // formulas[0,1], i.e. A(x) and B(x)
     }
   ]
 
