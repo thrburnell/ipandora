@@ -23,7 +23,7 @@ const knownFormulas = (state = {}, action) => {
         }
       }
 
-      return statue
+      return state
 
     default:
       return state

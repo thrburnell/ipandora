@@ -11,7 +11,12 @@ class AddProofStep extends React.Component {
     this.justificationUiIds = this.justificationUiIds.bind(this)
     this.justificationIds = this.justificationIds.bind(this)
     this.state = { formula: '' }
-    this.click = () => onCheckButtonClick(this.state.formula, this.justificationIds())
+    this.click = () => {
+      onCheckButtonClick(this.state.formula, this.justificationIds())
+      if (this.input) {
+        this.input.value = ''
+      }
+    }
   }
 
   justificationUiIds() {
@@ -25,7 +30,9 @@ class AddProofStep extends React.Component {
   render() {
     return (
       <div>
-        <input onChange={ (e) => this.setState({ formula: e.target.value }) } />
+        <input 
+          ref={input => this.input = input}
+          onChange={ (e) => this.setState({ formula: e.target.value }) } />
         <div>
           [from { this.justificationUiIds().join(', ') }]
         </div>

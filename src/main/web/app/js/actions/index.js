@@ -53,7 +53,7 @@ export const checkProofStep = (formula, justification) => {
       .then(json => {
         dispatch(receiveCheckStatus(formula, justification, json.validityPreserved))
       })
-      .catch((err) => {
+      .catch(err => {
         console.log(err)
       })
   }
