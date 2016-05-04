@@ -2,6 +2,7 @@ package com.ipandora;
 
 import com.ipandora.core.formula.FormulaConjunctionReducer;
 import com.ipandora.core.formula.FormulaParser;
+import com.ipandora.core.util.EnvironmentVariableProviderImpl;
 import com.ipandora.core.util.ProcessExecutorImpl;
 import com.ipandora.core.z3.SMTCodeGeneratorImpl;
 import com.ipandora.core.z3.SMTGeneratingFormulaVisitorImpl;
@@ -38,7 +39,8 @@ public class IPandoraApplication extends Application<IPandoraConfiguration> {
 
         Z3ImpliesChecker impliesChecker = new Z3ImpliesChecker(
                 new SMTCodeGeneratorImpl(new SMTGeneratingFormulaVisitorImpl()),
-                new Z3ClientImpl(new ProcessExecutorImpl()), new FormulaConjunctionReducer());
+                new Z3ClientImpl(new ProcessExecutorImpl(), new EnvironmentVariableProviderImpl()),
+                new FormulaConjunctionReducer());
 
         PredicateResource resource = new PredicateResource(formulaParser, impliesChecker);
         environment.jersey().register(resource);
