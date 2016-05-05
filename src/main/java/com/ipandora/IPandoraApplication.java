@@ -4,10 +4,7 @@ import com.ipandora.core.formula.FormulaConjunctionReducer;
 import com.ipandora.core.formula.FormulaParser;
 import com.ipandora.core.util.EnvironmentVariableProviderImpl;
 import com.ipandora.core.util.ProcessExecutorImpl;
-import com.ipandora.core.z3.SMTCodeGeneratorImpl;
-import com.ipandora.core.z3.SMTGeneratingFormulaVisitorImpl;
-import com.ipandora.core.z3.Z3ClientImpl;
-import com.ipandora.core.z3.Z3ImpliesChecker;
+import com.ipandora.core.z3.*;
 import com.ipandora.resources.PredicateResource;
 import io.dropwizard.Application;
 import io.dropwizard.bundles.assets.ConfiguredAssetsBundle;
@@ -38,7 +35,7 @@ public class IPandoraApplication extends Application<IPandoraConfiguration> {
         FormulaParser formulaParser = new FormulaParser();
 
         Z3ImpliesChecker impliesChecker = new Z3ImpliesChecker(
-                new SMTCodeGeneratorImpl(new SMTGeneratingFormulaVisitorImpl()),
+                new SMTCodeGeneratorImpl(new SMTGeneratingFormulaVisitorCreator()),
                 new Z3ClientImpl(new ProcessExecutorImpl(), new EnvironmentVariableProviderImpl()),
                 new FormulaConjunctionReducer());
 

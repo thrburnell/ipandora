@@ -122,14 +122,20 @@ public class FormulaBuildingVisitor extends PredicateLogicBaseVisitor<Formula> {
     @Override
     public Formula visitPredicate(PredicateLogicParser.PredicateContext ctx) {
 
-        String predicateName = ctx.name.getText();
+        String name = ctx.name.getText();
+
+        PredicateLogicParser.ArgListContext argList = ctx.args;
+
+        if (argList == null) {
+            return new PropositionFormula(name);
+        }
 
         List<Variable> params = new ArrayList<>();
-        for (PredicateLogicParser.ArgContext arg : ctx.args.args) {
+        for (PredicateLogicParser.ArgContext arg : argList.args) {
             params.add(generateVariable(arg));
         }
 
-        return new PredicateFormula(predicateName, params);
+        return new PredicateFormula(name, params);
     }
 
     private Variable generateVariable(PredicateLogicParser.ArgContext ctx) {

@@ -29,12 +29,13 @@ quantified
     : quant=(FORALL | EXISTS) var=VARIABLE elem=negElement
     ;
 
+// Optional argList; when missing, predicate is a propositional variable
 predicate
-    : name=PREDICATE LPAREN args=argList RPAREN
+    : name=PREDICATE args=argList?
     ;
 
 argList
-    : args+=arg (',' args+=arg)*
+    : LPAREN args+=arg (',' args+=arg)* RPAREN
     ;
 
 arg

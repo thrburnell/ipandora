@@ -20,6 +20,7 @@ public interface FormulaVisitor<T> {
 
     T visitNotFormula(NotFormula notFormula);
 
+    T visitPropositionFormula(PropositionFormula propositionFormula);
     T visitPredicateFormula(PredicateFormula predicateFormula);
 
 }

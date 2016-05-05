@@ -1,21 +1,25 @@
 package com.ipandora.core.z3;
 
 import com.ipandora.api.predicate.formula.Formula;
+import com.ipandora.core.util.Creator;
 
 public class SMTCodeGeneratorImpl implements SMTCodeGenerator {
 
-    private final SMTGeneratingFormulaVisitor visitor;
+    private final Creator<SMTGeneratingFormulaVisitor> visitorCreator;
 
-    public SMTCodeGeneratorImpl(SMTGeneratingFormulaVisitor visitor) {
-        this.visitor = visitor;
+    public SMTCodeGeneratorImpl(Creator<SMTGeneratingFormulaVisitor> visitorCreator) {
+        this.visitorCreator = visitorCreator;
     }
 
     @Override
     public String generateCheckSatCode(Formula formula) {
+        SMTGeneratingFormulaVisitor visitor = visitorCreator.create();
         String formulaCode = visitor.visit(formula);
         String typeDefinition = visitor.getTypeDefinition();
         String predicateDefinitions = visitor.getPredicateDefinitions();
-        return typeDefinition + predicateDefinitions + "(assert " + formulaCode + ")" + "(check-sat)";
+        String propositionDefinitions = visitor.getPropositionDefinitions();
+        return typeDefinition + predicateDefinitions + propositionDefinitions +
+                "(assert " + formulaCode + ")" + "(check-sat)";
     }
 
 }

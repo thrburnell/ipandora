@@ -4,15 +4,14 @@ import com.ipandora.api.predicate.formula.*;
 import com.ipandora.api.predicate.term.Variable;
 import org.apache.commons.lang3.StringUtils;
 
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 public class SMTGeneratingFormulaVisitorImpl implements SMTGeneratingFormulaVisitor {
 
     private static final String TYPE_NAME = "Type";
 
     private Map<String, Integer> predicates = new HashMap<>();
+    private Set<String> propositions = new HashSet<>();
 
     @Override
     public String getPredicateDefinitions() {
@@ -29,6 +28,17 @@ public class SMTGeneratingFormulaVisitorImpl implements SMTGeneratingFormulaVisi
     @Override
     public String getTypeDefinition() {
         return predicates.isEmpty() ? "" : "(declare-sort Type)";
+    }
+
+    @Override
+    public String getPropositionDefinitions() {
+        StringBuilder sb = new StringBuilder();
+
+        for (String proposition : propositions) {
+            sb.append(String.format("(declare-const %s Bool)", proposition));
+        }
+
+        return sb.toString();
     }
 
     @Override
@@ -99,6 +109,13 @@ public class SMTGeneratingFormulaVisitorImpl implements SMTGeneratingFormulaVisi
     public String visitNotFormula(NotFormula notFormula) {
         Formula formula = notFormula.getFormula();
         return "(not " + visit(formula) + ")";
+    }
+
+    @Override
+    public String visitPropositionFormula(PropositionFormula propositionFormula) {
+        String name = propositionFormula.getName();
+        propositions.add(name);
+        return name;
     }
 
     @Override

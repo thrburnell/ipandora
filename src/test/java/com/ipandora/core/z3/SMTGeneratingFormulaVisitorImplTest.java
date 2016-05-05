@@ -110,6 +110,16 @@ public class SMTGeneratingFormulaVisitorImplTest {
     }
 
     @Test
+    public void visitPropositionFormulaReturnsCorrectCode() {
+        // P
+        PropositionFormula p = new PropositionFormula("P");
+        SMTGeneratingFormulaVisitorImpl visitor = new SMTGeneratingFormulaVisitorImpl();
+        String result = visitor.visit(p);
+
+        assertThat(result).isEqualTo("P");
+    }
+
+    @Test
     public void visitPredicateFormulaReturnsCorrectCode() {
         // (Foo x y z)
         Variable x = new Variable("x");
@@ -160,6 +170,24 @@ public class SMTGeneratingFormulaVisitorImplTest {
         String typeDefinition = visitor.getTypeDefinition();
 
         assertThat(typeDefinition).isEqualTo("(declare-sort Type)");
+    }
+
+    @Test
+    public void getPropositionDefinitionsReturnsCorrectCode() {
+
+        // P AND Q AND R
+        PropositionFormula p = new PropositionFormula("P");
+        PropositionFormula q = new PropositionFormula("Q");
+        PropositionFormula r = new PropositionFormula("R");
+        AndFormula andFormula = new AndFormula(p, new OrFormula(q, r));
+
+        SMTGeneratingFormulaVisitorImpl visitor = new SMTGeneratingFormulaVisitorImpl();
+        visitor.visit(andFormula);
+        String propositionDefinitions = visitor.getPropositionDefinitions();
+
+        assertThat(propositionDefinitions).contains("(declare-const P Bool)");
+        assertThat(propositionDefinitions).contains("(declare-const Q Bool)");
+        assertThat(propositionDefinitions).contains("(declare-const R Bool)");
     }
 
 }
