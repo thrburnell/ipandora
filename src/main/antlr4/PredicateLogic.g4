@@ -5,16 +5,16 @@ package com.ipandora.parser;
 }
 
 formula
-    : lhs=iffElement (IFF rhs=iffElement)?;
+    : lhs=iffElement (IFF rhs=formula)?;
 
 iffElement
-    : lhs=impliesElement (IMPLIES rhs=impliesElement)?;
+    : lhs=impliesElement (IMPLIES rhs=iffElement)?;
 
 impliesElement
-    : lhs=conjunction (OR rhs=conjunction)?;
+    : lhs=conjunction (OR rhs=impliesElement)?;
 
 conjunction
-    : lhs=negElement (AND rhs=negElement)?;
+    : lhs=negElement (AND rhs=conjunction)?;
 
 negElement
     : (not=NOT)? elem=element;

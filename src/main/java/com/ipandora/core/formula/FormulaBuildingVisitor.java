@@ -16,7 +16,7 @@ public class FormulaBuildingVisitor extends PredicateLogicBaseVisitor<Formula> {
     public Formula visitFormula(PredicateLogicParser.FormulaContext ctx) {
 
         PredicateLogicParser.IffElementContext lhs = ctx.lhs;
-        PredicateLogicParser.IffElementContext rhs = ctx.rhs;
+        PredicateLogicParser.FormulaContext rhs = ctx.rhs;
 
         Formula lhsFormula = visit(lhs);
 
@@ -32,7 +32,7 @@ public class FormulaBuildingVisitor extends PredicateLogicBaseVisitor<Formula> {
     public Formula visitIffElement(PredicateLogicParser.IffElementContext ctx) {
 
         PredicateLogicParser.ImpliesElementContext lhs = ctx.lhs;
-        PredicateLogicParser.ImpliesElementContext rhs = ctx.rhs;
+        PredicateLogicParser.IffElementContext rhs = ctx.rhs;
 
         Formula lhsFormula = visit(lhs);
 
@@ -48,7 +48,7 @@ public class FormulaBuildingVisitor extends PredicateLogicBaseVisitor<Formula> {
     public Formula visitImpliesElement(PredicateLogicParser.ImpliesElementContext ctx) {
 
         PredicateLogicParser.ConjunctionContext lhs = ctx.lhs;
-        PredicateLogicParser.ConjunctionContext rhs = ctx.rhs;
+        PredicateLogicParser.ImpliesElementContext rhs = ctx.rhs;
 
         Formula lhsFormula = visit(lhs);
 
@@ -64,7 +64,7 @@ public class FormulaBuildingVisitor extends PredicateLogicBaseVisitor<Formula> {
     public Formula visitConjunction(PredicateLogicParser.ConjunctionContext ctx) {
 
         PredicateLogicParser.NegElementContext lhs = ctx.lhs;
-        PredicateLogicParser.NegElementContext rhs = ctx.rhs;
+        PredicateLogicParser.ConjunctionContext rhs = ctx.rhs;
 
         Formula lhsFormula = visit(lhs);
 
