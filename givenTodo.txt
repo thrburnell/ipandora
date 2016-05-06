@@ -1,0 +1,6 @@
+# GIVEN
+\FORALL ?x (Foo(?x) -> Bar(?x))
+\EXISTS ?x (Foo(?x))
+
+# TO SHOW
+\EXISTS ?x (Bar(?x))

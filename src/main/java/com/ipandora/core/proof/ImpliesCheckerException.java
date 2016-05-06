@@ -1,4 +1,4 @@
-package com.ipandora.core.formula;
+package com.ipandora.core.proof;
 
 public class ImpliesCheckerException extends Exception {
 

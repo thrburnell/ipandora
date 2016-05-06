@@ -1,4 +1,4 @@
-package com.ipandora.core.formula;
+package com.ipandora.core.proof;
 
 import com.ipandora.api.predicate.formula.Formula;
 

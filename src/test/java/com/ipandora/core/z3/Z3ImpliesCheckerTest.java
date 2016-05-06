@@ -3,7 +3,7 @@ package com.ipandora.core.z3;
 import com.ipandora.api.predicate.formula.*;
 import com.ipandora.api.predicate.term.Variable;
 import com.ipandora.core.formula.FormulaReducer;
-import com.ipandora.core.formula.ImpliesCheckerException;
+import com.ipandora.core.proof.ImpliesCheckerException;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;

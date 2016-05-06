@@ -4,8 +4,8 @@ import com.ipandora.api.predicate.formula.Formula;
 import com.ipandora.api.predicate.formula.ImpliesFormula;
 import com.ipandora.api.predicate.formula.NotFormula;
 import com.ipandora.core.formula.FormulaReducer;
-import com.ipandora.core.formula.ImpliesChecker;
-import com.ipandora.core.formula.ImpliesCheckerException;
+import com.ipandora.core.proof.ImpliesChecker;
+import com.ipandora.core.proof.ImpliesCheckerException;
 import com.ipandora.core.util.ProcessTimeoutException;
 
 import java.io.IOException;
