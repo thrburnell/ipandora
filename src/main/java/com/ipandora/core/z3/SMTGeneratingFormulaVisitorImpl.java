@@ -1,6 +1,7 @@
 package com.ipandora.core.z3;
 
 import com.ipandora.api.predicate.formula.*;
+import com.ipandora.api.predicate.term.Term;
 import com.ipandora.api.predicate.term.Variable;
 import org.apache.commons.lang3.StringUtils;
 
@@ -10,8 +11,14 @@ public class SMTGeneratingFormulaVisitorImpl implements SMTGeneratingFormulaVisi
 
     private static final String TYPE_NAME = "Type";
 
-    private Map<String, Integer> predicates = new HashMap<>();
-    private Set<String> propositions = new HashSet<>();
+    private final Map<String, Integer> predicates = new HashMap<>();
+    private final Set<String> propositions = new HashSet<>();
+
+    private final SMTGeneratingTermVisitor termVisitor;
+
+    public SMTGeneratingFormulaVisitorImpl(SMTGeneratingTermVisitor termVisitor) {
+        this.termVisitor = termVisitor;
+    }
 
     @Override
     public String getPredicateDefinitions() {
@@ -36,6 +43,17 @@ public class SMTGeneratingFormulaVisitorImpl implements SMTGeneratingFormulaVisi
 
         for (String proposition : propositions) {
             sb.append(String.format("(declare-const %s Bool)", proposition));
+        }
+
+        return sb.toString();
+    }
+
+    @Override
+    public String getConstantDefinitions() {
+        StringBuilder sb = new StringBuilder();
+
+        for (String constant : termVisitor.getConstants()) {
+            sb.append(String.format("(declare-const %s %s)", constant, TYPE_NAME));
         }
 
         return sb.toString();
@@ -121,19 +139,24 @@ public class SMTGeneratingFormulaVisitorImpl implements SMTGeneratingFormulaVisi
     @Override
     public String visitPredicateFormula(PredicateFormula predicateFormula) {
         String name = predicateFormula.getName();
-        List<Variable> params = predicateFormula.getParams();
+        List<Term> params = predicateFormula.getParams();
 
         predicates.put(name, params.size());
 
-        String paramsString = getSpaceDelimitedVariableNames(params);
+        for (Term term : params) {
+            // termVisitor later called for any relevant constant/function definitions from Terms
+            termVisitor.visit(term);
+        }
+
+        String paramsString = getSpaceDelimitedParams(params);
         return "(" + name + " " + paramsString + ")";
     }
 
-    private String getSpaceDelimitedVariableNames(List<Variable> params) {
-        StringBuilder paramsString = new StringBuilder(params.get(0).getName());
+    private String getSpaceDelimitedParams(List<Term> params) {
+        StringBuilder paramsString = new StringBuilder(termVisitor.visit(params.get(0)));
 
         for (int i = 1; i < params.size(); i++) {
-            paramsString.append(" ").append(params.get(i).getName());
+            paramsString.append(" ").append(termVisitor.visit(params.get(i)));
         }
 
         return paramsString.toString();

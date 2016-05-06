@@ -2,11 +2,11 @@ package com.ipandora.api.predicate.term;
 
 import com.ipandora.core.term.TermVisitor;
 
-public class Variable implements Term {
+public class Constant implements Term {
 
     private final String name;
 
-    public Variable(String name) {
+    public Constant(String name) {
         this.name = name;
     }
 
@@ -16,7 +16,7 @@ public class Variable implements Term {
 
     @Override
     public <T> T accept(TermVisitor<T> visitor) {
-        return visitor.visitVariable(this);
+        return visitor.visitConstant(this);
     }
 
     @Override
@@ -29,14 +29,14 @@ public class Variable implements Term {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
 
-        Variable variable = (Variable) o;
+        Constant constant = (Constant) o;
 
-        return !(name != null ? !name.equals(variable.name) : variable.name != null);
-
+        return name.equals(constant.name);
     }
 
     @Override
     public int hashCode() {
-        return name != null ? name.hashCode() : 0;
+        return name.hashCode();
     }
+
 }

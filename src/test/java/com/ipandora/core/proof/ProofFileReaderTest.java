@@ -21,22 +21,22 @@ import static org.mockito.Mockito.when;
 public class ProofFileReaderTest {
 
     @Mock
-    private BufferedReaderGenerator bufferedReaderGenerator;
+    private BufferedReaderGenerator mockBufferedReaderGenerator;
 
     @Mock
-    private BufferedReader loadedBufferedReader;
+    private BufferedReader mockLoadedBufferedReader;
 
     @Mock
-    private BufferedReader emptyBufferedReader;
+    private BufferedReader mockEmptyBufferedReader;
 
     @Before
     public void before() throws IOException {
         loadBufferedReader();
-        when(emptyBufferedReader.readLine()).thenReturn(null);
+        when(mockEmptyBufferedReader.readLine()).thenReturn(null);
     }
 
     private void loadBufferedReader() throws IOException {
-        when(loadedBufferedReader.readLine())
+        when(mockLoadedBufferedReader.readLine())
                 .thenReturn("# GIVEN")
                 .thenReturn("A")
                 .thenReturn("B")
@@ -50,21 +50,21 @@ public class ProofFileReaderTest {
     @Test
     public void loadShouldRequestABufferedReaderFromInputStream() throws IOException {
 
-        when(bufferedReaderGenerator.fromInputStream(any(InputStream.class))).thenReturn(emptyBufferedReader);
+        when(mockBufferedReaderGenerator.fromInputStream(any(InputStream.class))).thenReturn(mockEmptyBufferedReader);
 
         InputStream inputStream = getInputStream();
-        ProofStreamReaderImpl proofStreamReader = new ProofStreamReaderImpl(bufferedReaderGenerator);
+        ProofStreamReaderImpl proofStreamReader = new ProofStreamReaderImpl(mockBufferedReaderGenerator);
         proofStreamReader.load(inputStream);
 
-        verify(bufferedReaderGenerator).fromInputStream(inputStream);
+        verify(mockBufferedReaderGenerator).fromInputStream(inputStream);
     }
 
     @Test
     public void getGivenShouldReturnAllGivensFromStream() throws IOException {
 
-        when(bufferedReaderGenerator.fromInputStream(any(InputStream.class))).thenReturn(loadedBufferedReader);
+        when(mockBufferedReaderGenerator.fromInputStream(any(InputStream.class))).thenReturn(mockLoadedBufferedReader);
 
-        ProofStreamReaderImpl proofStreamReader = new ProofStreamReaderImpl(bufferedReaderGenerator);
+        ProofStreamReaderImpl proofStreamReader = new ProofStreamReaderImpl(mockBufferedReaderGenerator);
         proofStreamReader.load(getInputStream());
         List<String> given = proofStreamReader.getGiven();
 
@@ -75,9 +75,9 @@ public class ProofFileReaderTest {
     @Test
     public void getToShowShouldReturnAllToShowsFromStream() throws IOException {
 
-        when(bufferedReaderGenerator.fromInputStream(any(InputStream.class))).thenReturn(loadedBufferedReader);
+        when(mockBufferedReaderGenerator.fromInputStream(any(InputStream.class))).thenReturn(mockLoadedBufferedReader);
 
-        ProofStreamReaderImpl proofStreamReader = new ProofStreamReaderImpl(bufferedReaderGenerator);
+        ProofStreamReaderImpl proofStreamReader = new ProofStreamReaderImpl(mockBufferedReaderGenerator);
         proofStreamReader.load(getInputStream());
         List<String> toShow = proofStreamReader.getToShow();
 

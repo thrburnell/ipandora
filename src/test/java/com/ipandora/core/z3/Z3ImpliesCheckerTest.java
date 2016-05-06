@@ -1,6 +1,7 @@
 package com.ipandora.core.z3;
 
 import com.ipandora.api.predicate.formula.*;
+import com.ipandora.api.predicate.term.Term;
 import com.ipandora.api.predicate.term.Variable;
 import com.ipandora.core.formula.FormulaReducer;
 import com.ipandora.core.proof.ImpliesCheckerException;
@@ -47,7 +48,7 @@ public class Z3ImpliesCheckerTest {
     @Test
     public void checkReducesGivenAssumptions() throws Exception {
         AndFormula andFormula = new AndFormula(
-                new PredicateFormula("Foo", Collections.singletonList(new Variable("x"))), new TruthFormula());
+                new PredicateFormula("Foo", Collections.<Term>singletonList(new Variable("x"))), new TruthFormula());
         FalsityFormula falsityFormula = new FalsityFormula();
 
         List<Formula> assumptions = Arrays.asList(andFormula, falsityFormula);

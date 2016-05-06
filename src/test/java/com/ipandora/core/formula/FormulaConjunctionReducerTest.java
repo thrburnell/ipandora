@@ -3,6 +3,7 @@ package com.ipandora.core.formula;
 import com.ipandora.api.predicate.formula.AndFormula;
 import com.ipandora.api.predicate.formula.Formula;
 import com.ipandora.api.predicate.formula.PredicateFormula;
+import com.ipandora.api.predicate.term.Term;
 import com.ipandora.api.predicate.term.Variable;
 import org.junit.Test;
 
@@ -23,7 +24,7 @@ public class FormulaConjunctionReducerTest {
     @Test
     public void reduceReturnsSingleFormulaIfSingletonListGiven() {
         FormulaConjunctionReducer formulaConjunctionReducer = new FormulaConjunctionReducer();
-        Formula givenFormula = new PredicateFormula("Foo", Collections.singletonList(new Variable("x")));
+        Formula givenFormula = new PredicateFormula("Foo", Collections.<Term>singletonList(new Variable("x")));
         Formula join = formulaConjunctionReducer.reduce(Collections.singletonList(givenFormula));
         assertThat(join).isEqualTo(givenFormula);
     }
@@ -31,8 +32,8 @@ public class FormulaConjunctionReducerTest {
     @Test
     public void reduceReturnsAndOfTwoGivenFormulas() {
         FormulaConjunctionReducer formulaConjunctionReducer = new FormulaConjunctionReducer();
-        PredicateFormula left = new PredicateFormula("Foo", Collections.singletonList(new Variable("x")));
-        PredicateFormula right = new PredicateFormula("Bar", Collections.singletonList(new Variable("y")));
+        PredicateFormula left = new PredicateFormula("Foo", Collections.<Term>singletonList(new Variable("x")));
+        PredicateFormula right = new PredicateFormula("Bar", Collections.<Term>singletonList(new Variable("y")));
         Formula join = formulaConjunctionReducer.reduce(Arrays.<Formula>asList(left, right));
         assertThat(join).isEqualTo(new AndFormula(left, right));
     }
@@ -40,9 +41,9 @@ public class FormulaConjunctionReducerTest {
     @Test
     public void reduceReturnsAndOfThreeGivenFormulasUsingLeftAssociativity() {
         FormulaConjunctionReducer formulaConjunctionReducer = new FormulaConjunctionReducer();
-        PredicateFormula foo = new PredicateFormula("Foo", Collections.singletonList(new Variable("x")));
-        PredicateFormula bar = new PredicateFormula("Bar", Collections.singletonList(new Variable("y")));
-        PredicateFormula baz = new PredicateFormula("Baz", Collections.singletonList(new Variable("z")));
+        PredicateFormula foo = new PredicateFormula("Foo", Collections.<Term>singletonList(new Variable("x")));
+        PredicateFormula bar = new PredicateFormula("Bar", Collections.<Term>singletonList(new Variable("y")));
+        PredicateFormula baz = new PredicateFormula("Baz", Collections.<Term>singletonList(new Variable("z")));
         Formula join = formulaConjunctionReducer.reduce(Arrays.<Formula>asList(foo, bar, baz));
         assertThat(join).isEqualTo(new AndFormula(new AndFormula(foo, bar), baz));
     }

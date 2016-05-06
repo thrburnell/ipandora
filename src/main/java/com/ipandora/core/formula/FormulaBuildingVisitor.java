@@ -1,16 +1,23 @@
 package com.ipandora.core.formula;
 
 import com.ipandora.api.predicate.formula.*;
+import com.ipandora.api.predicate.term.Term;
 import com.ipandora.api.predicate.term.Variable;
+import com.ipandora.core.term.TermBuildingVisitor;
 import com.ipandora.parser.PredicateLogicBaseVisitor;
 import com.ipandora.parser.PredicateLogicLexer;
 import com.ipandora.parser.PredicateLogicParser;
-import org.antlr.v4.runtime.Token;
 
 import java.util.ArrayList;
 import java.util.List;
 
 public class FormulaBuildingVisitor extends PredicateLogicBaseVisitor<Formula> {
+
+    private final TermBuildingVisitor termBuildingVisitor;
+
+    public FormulaBuildingVisitor(TermBuildingVisitor termBuildingVisitor) {
+        this.termBuildingVisitor = termBuildingVisitor;
+    }
 
     @Override
     public Formula visitFormula(PredicateLogicParser.FormulaContext ctx) {
@@ -130,17 +137,12 @@ public class FormulaBuildingVisitor extends PredicateLogicBaseVisitor<Formula> {
             return new PropositionFormula(name);
         }
 
-        List<Variable> params = new ArrayList<>();
+        List<Term> params = new ArrayList<>();
         for (PredicateLogicParser.ArgContext arg : argList.args) {
-            params.add(generateVariable(arg));
+            params.add(termBuildingVisitor.visit(arg));
         }
 
         return new PredicateFormula(name, params);
-    }
-
-    private Variable generateVariable(PredicateLogicParser.ArgContext ctx) {
-        Token var = ctx.var;
-        return new Variable(var.getText());
     }
 
 }

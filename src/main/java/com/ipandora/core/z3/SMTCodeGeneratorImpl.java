@@ -18,7 +18,8 @@ public class SMTCodeGeneratorImpl implements SMTCodeGenerator {
         String typeDefinition = visitor.getTypeDefinition();
         String predicateDefinitions = visitor.getPredicateDefinitions();
         String propositionDefinitions = visitor.getPropositionDefinitions();
-        return typeDefinition + predicateDefinitions + propositionDefinitions +
+        String constantDefinitions = visitor.getConstantDefinitions();
+        return typeDefinition + predicateDefinitions + propositionDefinitions + constantDefinitions +
                 "(assert " + formulaCode + ")" + "(check-sat)";
     }
 

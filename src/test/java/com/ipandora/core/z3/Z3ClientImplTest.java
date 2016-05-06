@@ -18,21 +18,21 @@ import static org.mockito.Mockito.when;
 public class Z3ClientImplTest {
 
     @Mock
-    private ProcessExecutor processExecutor;
+    private ProcessExecutor mockProcessExecutor;
 
     @Mock
-    private EnvironmentVariableProvider environmentVariableProvider;
+    private EnvironmentVariableProvider mockEnvironmentVariableProvider;
 
     @Before
     public void before() {
-        when(environmentVariableProvider.getValue(anyString())).thenReturn("DUMMY_NON_NULL_VALUE");
+        when(mockEnvironmentVariableProvider.getValue(anyString())).thenReturn("DUMMY_NON_NULL_VALUE");
     }
 
     @Test
     public void isSatReturnsTrueWhenOutputBeginsWithSat() throws Exception {
-        Z3Client z3Client = new Z3ClientImpl(processExecutor, environmentVariableProvider);
+        Z3Client z3Client = new Z3ClientImpl(mockProcessExecutor, mockEnvironmentVariableProvider);
 
-        when(processExecutor.execute(anyString(), anyInt(), Matchers.<String>anyVararg()))
+        when(mockProcessExecutor.execute(anyString(), anyInt(), Matchers.<String>anyVararg()))
                 .thenReturn("sat and some more output");
 
         boolean isSat = z3Client.isSat("Demo program");
@@ -42,9 +42,9 @@ public class Z3ClientImplTest {
 
     @Test
     public void isSatReturnsFalseWhenOutputBeginsWithUnsat() throws Exception {
-        Z3Client z3Client = new Z3ClientImpl(processExecutor, environmentVariableProvider);
+        Z3Client z3Client = new Z3ClientImpl(mockProcessExecutor, mockEnvironmentVariableProvider);
 
-        when(processExecutor.execute(anyString(), anyInt(), Matchers.<String>anyVararg()))
+        when(mockProcessExecutor.execute(anyString(), anyInt(), Matchers.<String>anyVararg()))
                 .thenReturn("unsat and some more output");
 
         boolean isSat = z3Client.isSat("Demo program");
@@ -54,9 +54,9 @@ public class Z3ClientImplTest {
 
     @Test(expected = Z3UnrecognisableOutputException.class)
     public void isSatThrowsUnrecognisableOutputExceptionWhenOutputDoesntBeginWithSatOrUnsat() throws Exception {
-        Z3Client z3Client = new Z3ClientImpl(processExecutor, environmentVariableProvider);
+        Z3Client z3Client = new Z3ClientImpl(mockProcessExecutor, mockEnvironmentVariableProvider);
 
-        when(processExecutor.execute(anyString(), anyInt(), Matchers.<String>anyVararg()))
+        when(mockProcessExecutor.execute(anyString(), anyInt(), Matchers.<String>anyVararg()))
                 .thenReturn("output that doesn't begin with sat or unsat");
 
         z3Client.isSat("Demo program");

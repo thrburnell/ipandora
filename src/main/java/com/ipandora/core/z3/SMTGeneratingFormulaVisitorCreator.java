@@ -6,7 +6,7 @@ public class SMTGeneratingFormulaVisitorCreator implements Creator<SMTGenerating
 
     @Override
     public SMTGeneratingFormulaVisitor create() {
-        return new SMTGeneratingFormulaVisitorImpl();
+        return new SMTGeneratingFormulaVisitorImpl(new SMTGeneratingTermVisitor());
     }
 
 }

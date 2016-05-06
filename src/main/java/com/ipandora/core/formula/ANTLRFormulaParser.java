@@ -1,6 +1,7 @@
 package com.ipandora.core.formula;
 
 import com.ipandora.api.predicate.formula.Formula;
+import com.ipandora.core.term.TermBuildingVisitor;
 import com.ipandora.parser.PredicateLogicLexer;
 import com.ipandora.parser.PredicateLogicParser;
 import org.antlr.v4.runtime.ANTLRInputStream;
@@ -15,7 +16,7 @@ public class ANTLRFormulaParser implements FormulaParser {
         CommonTokenStream tokens = new CommonTokenStream(lexer);
         PredicateLogicParser parser = new PredicateLogicParser(tokens);
         PredicateLogicParser.FormulaContext formulaCtx = parser.formula();
-        FormulaBuildingVisitor visitor = new FormulaBuildingVisitor();
+        FormulaBuildingVisitor visitor = new FormulaBuildingVisitor(new TermBuildingVisitor());
         return visitor.visit(formulaCtx);
     }
 
