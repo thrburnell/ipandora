@@ -14,6 +14,9 @@ const proofStepJustification = (state = [], action) => {
     case 'RECEIVE_CHECK_STATUS':
       return action.valid ? [] : state
 
+    case 'CLEAR_PROOF':
+      return []
+
     default:
       return state
   }

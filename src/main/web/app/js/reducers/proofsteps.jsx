@@ -15,6 +15,9 @@ const proofSteps = (state = [], action) => {
 
       return state
 
+    case 'CLEAR_PROOF':
+      return []
+
     default:
       return state
   }

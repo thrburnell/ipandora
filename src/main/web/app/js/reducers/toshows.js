@@ -10,6 +10,9 @@ const toShows = (state = [], action) => {
         }
       ]
 
+    case 'CLEAR_PROOF':
+      return []
+
     default:
       return state
   }

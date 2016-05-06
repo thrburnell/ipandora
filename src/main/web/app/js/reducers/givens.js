@@ -5,6 +5,10 @@ const givens = (state = [], action) => {
         ...state,
         action.id
       ]
+
+    case 'CLEAR_PROOF':
+      return []
+
     default:
       return state
   }
