@@ -86,4 +86,18 @@ public class SMTGeneratingTermVisitor implements TermVisitor<String> {
         return String.format("(%s %s)", name, argString);
     }
 
+    @Override
+    public String visitPower(Power power) {
+        Term base = power.getBase();
+        int exponent = power.getExponent();
+        String baseString = visit(base);
+
+        return String.format("(^ %s %d)", baseString, exponent);
+    }
+
+    @Override
+    public String visitSummation(Summation summar) {
+        throw new RuntimeException("visitSummation() not yet implemented");
+    }
+
 }

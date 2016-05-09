@@ -15,7 +15,7 @@ public class TermBuildingVisitor extends PredicateLogicBaseVisitor<Term> {
     @Override
     public Term visitMathExpr(PredicateLogicParser.MathExprContext ctx) {
 
-        PredicateLogicParser.MathTermContext term = ctx.term;
+        PredicateLogicParser.SumExprContext term = ctx.term;
         if (term != null) {
             return visit(term);
         }
@@ -31,9 +31,25 @@ public class TermBuildingVisitor extends PredicateLogicBaseVisitor<Term> {
     }
 
     @Override
+    public Term visitSumExpr(PredicateLogicParser.SumExprContext ctx) {
+
+        PredicateLogicParser.MathTermContext term = ctx.term;
+        if (term != null) {
+            return visit(term);
+        }
+
+        Variable var = new Variable(ctx.var.getText());
+        Term lower = visit(ctx.lower);
+        Term upper = visit(ctx.upper);
+        Term elem = visit(ctx.elem);
+
+        return new Summation(var, lower, upper, elem);
+    }
+
+    @Override
     public Term visitMathTerm(PredicateLogicParser.MathTermContext ctx) {
 
-        PredicateLogicParser.LeafTermContext term = ctx.term;
+        PredicateLogicParser.PowerTermContext term = ctx.term;
         if (term != null) {
             return visit(term);
         }
@@ -46,6 +62,21 @@ public class TermBuildingVisitor extends PredicateLogicBaseVisitor<Term> {
         } else {
             return new Division(left, right);
         }
+    }
+
+    @Override
+    public Term visitPowerTerm(PredicateLogicParser.PowerTermContext ctx) {
+
+        PredicateLogicParser.LeafTermContext term = ctx.term;
+        if (term != null) {
+            return visit(term);
+        }
+
+        PredicateLogicParser.PowerTermContext base = ctx.base;
+        Token exponentTok = ctx.exponent;
+
+        int exponent = Integer.parseInt(exponentTok.getText());
+        return new Power(visit(base), exponent);
     }
 
     @Override

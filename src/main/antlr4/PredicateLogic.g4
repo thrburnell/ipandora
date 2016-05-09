@@ -40,11 +40,21 @@ argList
 
 mathExpr
     : lhs=mathExpr op=(PLUS | MINUS) rhs=mathTerm
+    | term=sumExpr
+    ;
+
+sumExpr
+    : SUM var=VARIABLE lower=mathExpr upper=mathExpr elem=sumExpr
     | term=mathTerm
     ;
 
 mathTerm
-    : lhs=mathTerm op=(MULTIPLY | DIVIDE) rhs=leafTerm
+    : lhs=mathTerm op=(MULTIPLY | DIVIDE) rhs=powerTerm
+    | term=powerTerm
+    ;
+
+powerTerm
+    : base=powerTerm POWER exponent=NUMBER
     | term=leafTerm
     ;
 
@@ -84,5 +94,7 @@ PLUS: '+';
 MINUS: '-';
 MULTIPLY: '*';
 DIVIDE: '/';
+POWER: '^';
+SUM: '\\SUM';
 
 WS: (' ' | '\t' | '\r' | '\n')+ -> skip;

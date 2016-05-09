@@ -139,4 +139,20 @@ public class SMTGeneratingTermVisitorTest {
         assertThat(result).isEqualTo("(g x (f x y))");
     }
 
+    @Test
+    public void visitPowerReturnsCorrectCode() {
+        SMTGeneratingTermVisitor visitor = new SMTGeneratingTermVisitor();
+        Power power = new Power(new Variable("x"), 3);
+        String result = visitor.visit(power);
+        assertThat(result).isEqualTo("(^ x 3)");
+    }
+
+    @Test
+    public void visitPowerReturnsCorrectCodeForNestedPowers() {
+        SMTGeneratingTermVisitor visitor = new SMTGeneratingTermVisitor();
+        Power power = new Power(new Power(new Variable("x"), 2), 3);
+        String result = visitor.visit(power);
+        assertThat(result).isEqualTo("(^ (^ x 2) 3)");
+    }
+
 }

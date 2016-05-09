@@ -14,5 +14,7 @@ public interface TermVisitor<T> {
     T visitDivision(Division division);
     T visitNumber(Number number);
     T visitFunction(Function function);
+    T visitPower(Power power);
+    T visitSummation(Summation summar);
 
 }
