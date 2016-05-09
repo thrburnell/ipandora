@@ -3,16 +3,21 @@ package com.ipandora.core.z3;
 import com.ipandora.api.predicate.term.*;
 import com.ipandora.api.predicate.term.Number;
 import com.ipandora.core.term.TermVisitor;
+import org.apache.commons.lang3.StringUtils;
 
-import java.util.HashSet;
-import java.util.Set;
+import java.util.*;
 
 public class SMTGeneratingTermVisitor implements TermVisitor<String> {
 
     private final Set<String> constants = new HashSet<>();
+    private final Map<String, Integer> functions = new HashMap<>();
 
     public Set<String> getConstants() {
         return constants;
+    }
+
+    public Map<String, Integer> getFunctions() {
+        return functions;
     }
 
     @Override
@@ -63,6 +68,22 @@ public class SMTGeneratingTermVisitor implements TermVisitor<String> {
     @Override
     public String visitNumber(Number number) {
         return String.valueOf(number.getNumber());
+    }
+
+    @Override
+    public String visitFunction(Function function) {
+        String name = function.getName();
+        List<Term> args = function.getArgs();
+        functions.put(name, args.size());
+
+        List<String> argStrings = new ArrayList<>();
+        for (Term arg : args) {
+            argStrings.add(visit(arg));
+        }
+
+        String argString = StringUtils.join(argStrings, " ");
+
+        return String.format("(%s %s)", name, argString);
     }
 
 }

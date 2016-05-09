@@ -8,9 +8,7 @@ import org.junit.runner.RunWith;
 import org.mockito.Mock;
 import org.mockito.runners.MockitoJUnitRunner;
 
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.HashSet;
+import java.util.*;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.when;
@@ -222,6 +220,23 @@ public class SMTGeneratingFormulaVisitorImplTest {
         assertThat(constantDefinitions).contains("(declare-const x Type)");
         assertThat(constantDefinitions).contains("(declare-const z Type)");
         assertThat(constantDefinitions).contains("(declare-const q Type)");
+    }
+
+    @Test
+    public void getFunctionDefinitionsReturnsCorrectCode() {
+
+        Map<String, Integer> functions = new HashMap<>();
+        functions.put("f", 3);
+        functions.put("g", 2);
+
+        when(mockTermVisitor.getFunctions()).thenReturn(functions);
+
+        SMTGeneratingFormulaVisitorImpl visitor = new SMTGeneratingFormulaVisitorImpl(mockTermVisitor);
+        visitor.visit(new TruthFormula());
+        String functionDefinitions = visitor.getFunctionDefinitions();
+
+        assertThat(functionDefinitions).contains("(declare-fun f (Type Type Type) Type)");
+        assertThat(functionDefinitions).contains("(declare-fun g (Type Type) Type)");
     }
 
 }

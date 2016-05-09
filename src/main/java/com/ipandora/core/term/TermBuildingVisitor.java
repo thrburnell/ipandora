@@ -7,6 +7,9 @@ import com.ipandora.parser.PredicateLogicLexer;
 import com.ipandora.parser.PredicateLogicParser;
 import org.antlr.v4.runtime.Token;
 
+import java.util.ArrayList;
+import java.util.List;
+
 public class TermBuildingVisitor extends PredicateLogicBaseVisitor<Term> {
 
     @Override
@@ -65,7 +68,25 @@ public class TermBuildingVisitor extends PredicateLogicBaseVisitor<Term> {
         }
 
         PredicateLogicParser.MathExprContext expr = ctx.expr;
-        return visit(expr);
+        if (expr != null) {
+            return visit(expr);
+        }
+
+        PredicateLogicParser.FunctionContext func = ctx.func;
+        return visit(func);
+    }
+
+    @Override
+    public Term visitFunction(PredicateLogicParser.FunctionContext ctx) {
+
+        String name = ctx.name.getText();
+
+        List<Term> args = new ArrayList<>();
+        for (PredicateLogicParser.MathExprContext arg : ctx.args.args) {
+            args.add(visit(arg));
+        }
+
+        return new Function(name, args);
     }
     
 }

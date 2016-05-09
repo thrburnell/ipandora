@@ -60,6 +60,19 @@ public class SMTGeneratingFormulaVisitorImpl implements SMTGeneratingFormulaVisi
     }
 
     @Override
+    public String getFunctionDefinitions() {
+        StringBuilder sb = new StringBuilder();
+
+        for (Map.Entry<String, Integer> function : termVisitor.getFunctions().entrySet()) {
+            String name = function.getKey();
+            String params = StringUtils.repeat("Type", " ", function.getValue());
+            sb.append(String.format("(declare-fun %s (%s) Type)", name, params));
+        }
+
+        return sb.toString();
+    }
+
+    @Override
     public String visit(Formula formula) {
         return formula.accept(this);
     }
@@ -143,23 +156,13 @@ public class SMTGeneratingFormulaVisitorImpl implements SMTGeneratingFormulaVisi
 
         predicates.put(name, params.size());
 
+        ArrayList<String> paramStrings = new ArrayList<>();
         for (Term term : params) {
-            // termVisitor later called for any relevant constant/function definitions from Terms
-            termVisitor.visit(term);
+            paramStrings.add(termVisitor.visit(term));
         }
 
-        String paramsString = getSpaceDelimitedParams(params);
+        String paramsString = StringUtils.join(paramStrings, " ");
         return "(" + name + " " + paramsString + ")";
-    }
-
-    private String getSpaceDelimitedParams(List<Term> params) {
-        StringBuilder paramsString = new StringBuilder(termVisitor.visit(params.get(0)));
-
-        for (int i = 1; i < params.size(); i++) {
-            paramsString.append(" ").append(termVisitor.visit(params.get(i)));
-        }
-
-        return paramsString.toString();
     }
 
 }

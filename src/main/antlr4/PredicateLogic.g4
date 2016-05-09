@@ -31,7 +31,7 @@ quantified
 
 // Optional argList; when missing, predicate is a propositional variable
 predicate
-    : name=PREDICATE args=argList?
+    : name=NAME args=argList?
     ;
 
 argList
@@ -49,16 +49,20 @@ mathTerm
     ;
 
 leafTerm
-    : var=VARIABLE
-    | constant=CONSTANT
+    : func=function
+    | var=VARIABLE
+    | constant=NAME
     | number=NUMBER
     | LPAREN expr=mathExpr RPAREN
     ;
 
+function
+    : name=NAME args=argList
+    ;
+
 
 VARIABLE: '?' ('a'..'z') CHARACTER*;
-CONSTANT: ('a'..'z') CHARACTER*;
-PREDICATE: ('A'..'Z') CHARACTER*;
+NAME: LETTER CHARACTER*;
 NUMBER: DIGIT+;
 fragment CHARACTER: LETTER | DIGIT | '_';
 fragment LETTER: ('a'..'z' | 'A'..'Z');

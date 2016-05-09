@@ -8,5 +8,6 @@ public interface SMTGeneratingFormulaVisitor extends FormulaVisitor<String> {
     String getTypeDefinition();
     String getPropositionDefinitions();
     String getConstantDefinitions();
+    String getFunctionDefinitions();
 
 }

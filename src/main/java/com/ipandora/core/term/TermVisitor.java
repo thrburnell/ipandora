@@ -13,5 +13,6 @@ public interface TermVisitor<T> {
     T visitMultiplication(Multiplication multiplication);
     T visitDivision(Division division);
     T visitNumber(Number number);
+    T visitFunction(Function function);
 
 }
