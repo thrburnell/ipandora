@@ -1,6 +1,7 @@
 package com.ipandora.core.term;
 
 import com.ipandora.api.predicate.term.*;
+import com.ipandora.api.predicate.term.Number;
 import com.ipandora.parser.PredicateLogicBaseVisitor;
 import com.ipandora.parser.PredicateLogicLexer;
 import com.ipandora.parser.PredicateLogicParser;
@@ -54,6 +55,13 @@ public class TermBuildingVisitor extends PredicateLogicBaseVisitor<Term> {
         Token constant = ctx.constant;
         if (constant != null) {
             return new Constant(constant.getText());
+        }
+
+        Token number = ctx.number;
+        if (number != null) {
+            String numberString = number.getText();
+            int numberInt = Integer.parseInt(numberString);
+            return new Number(numberInt);
         }
 
         PredicateLogicParser.MathExprContext expr = ctx.expr;

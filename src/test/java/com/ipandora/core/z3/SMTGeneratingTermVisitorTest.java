@@ -1,6 +1,7 @@
 package com.ipandora.core.z3;
 
 import com.ipandora.api.predicate.term.*;
+import com.ipandora.api.predicate.term.Number;
 import org.junit.Test;
 
 import java.util.Set;
@@ -111,6 +112,13 @@ public class SMTGeneratingTermVisitorTest {
         Division addition = new Division(new Division(new Variable("x"), new Variable("y")), new Constant("z"));
         String result = visitor.visit(addition);
         assertThat(result).isEqualTo("(/ (/ x y) z)");
+    }
+
+    @Test
+    public void visitNumberReturnsNumber() {
+        SMTGeneratingTermVisitor visitor = new SMTGeneratingTermVisitor();
+        String result = visitor.visit(new Number(13));
+        assertThat(result).isEqualTo("13");
     }
 
 }

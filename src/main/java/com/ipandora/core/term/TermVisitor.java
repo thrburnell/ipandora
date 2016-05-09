@@ -1,6 +1,7 @@
 package com.ipandora.core.term;
 
 import com.ipandora.api.predicate.term.*;
+import com.ipandora.api.predicate.term.Number;
 
 public interface TermVisitor<T> {
 
@@ -11,5 +12,6 @@ public interface TermVisitor<T> {
     T visitSubtraction(Subtraction subtraction);
     T visitMultiplication(Multiplication multiplication);
     T visitDivision(Division division);
+    T visitNumber(Number number);
 
 }

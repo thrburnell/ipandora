@@ -1,6 +1,7 @@
 package com.ipandora.core.z3;
 
 import com.ipandora.api.predicate.term.*;
+import com.ipandora.api.predicate.term.Number;
 import com.ipandora.core.term.TermVisitor;
 
 import java.util.HashSet;
@@ -57,6 +58,11 @@ public class SMTGeneratingTermVisitor implements TermVisitor<String> {
         String left = visit(division.getLeft());
         String right = visit(division.getRight());
         return String.format("(/ %s %s)", left, right);
+    }
+
+    @Override
+    public String visitNumber(Number number) {
+        return String.valueOf(number.getNumber());
     }
 
 }
