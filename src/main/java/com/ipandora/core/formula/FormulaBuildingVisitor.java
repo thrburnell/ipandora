@@ -107,6 +107,7 @@ public class FormulaBuildingVisitor extends PredicateLogicBaseVisitor<Formula> {
             return visit(ctx.pred);
         }
 
+        // TODO: this is about to change...
         // An element is either quant, pred or form
         return visit(ctx.form);
     }
@@ -138,7 +139,7 @@ public class FormulaBuildingVisitor extends PredicateLogicBaseVisitor<Formula> {
         }
 
         List<Term> params = new ArrayList<>();
-        for (PredicateLogicParser.ArgContext arg : argList.args) {
+        for (PredicateLogicParser.MathExprContext arg : argList.args) {
             params.add(termBuildingVisitor.visit(arg));
         }
 

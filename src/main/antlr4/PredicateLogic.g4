@@ -35,13 +35,25 @@ predicate
     ;
 
 argList
-    : LPAREN args+=arg (',' args+=arg)* RPAREN
+    : LPAREN args+=mathExpr (',' args+=mathExpr)* RPAREN
     ;
 
-arg
+mathExpr
+    : lhs=mathExpr op=(PLUS | MINUS) rhs=mathTerm
+    | term=mathTerm
+    ;
+
+mathTerm
+    : lhs=mathTerm op=(MULTIPLY | DIVIDE) rhs=leafTerm
+    | term=leafTerm
+    ;
+
+leafTerm
     : var=VARIABLE
     | constant=CONSTANT
-    ;
+    | LPAREN expr=mathExpr RPAREN
+    ; // TODO add support for number
+
 
 VARIABLE: '?' ('a'..'z') CHARACTER*;
 CONSTANT: ('a'..'z') CHARACTER*;
@@ -50,6 +62,7 @@ fragment CHARACTER: LETTER | DIGIT | '_';
 fragment LETTER: ('a'..'z' | 'A'..'Z');
 fragment DIGIT: ('0'..'9');
 
+// Connectives
 NOT: '!';
 AND: '&';
 OR : '|';
@@ -59,4 +72,11 @@ LPAREN: '(';
 RPAREN: ')';
 FORALL: '\\FORALL';
 EXISTS: '\\EXISTS';
+
+// Mathematical expressions
+PLUS: '+';
+MINUS: '-';
+MULTIPLY: '*';
+DIVIDE: '/';
+
 WS: (' ' | '\t' | '\r' | '\n')+ -> skip;
