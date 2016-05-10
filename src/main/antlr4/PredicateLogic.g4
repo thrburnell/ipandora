@@ -22,6 +22,7 @@ negElement
 element
     : quant=quantified
     | pred=predicate
+    | expr=boolExpr
     | LPAREN form=formula RPAREN
     ;
 
@@ -32,6 +33,10 @@ quantified
 // Optional argList; when missing, predicate is a propositional variable
 predicate
     : name=NAME args=argList?
+    ;
+
+boolExpr
+    : lhs=mathExpr op=(ET | GT | LT | GTE | LTE) rhs=mathExpr
     ;
 
 argList
@@ -96,5 +101,12 @@ MULTIPLY: '*';
 DIVIDE: '/';
 POWER: '^';
 SUM: '\\SUM';
+
+// Boolean operators
+ET: '=';
+GT: '>';
+LT: '<';
+GTE: '>=';
+LTE: '<=';
 
 WS: (' ' | '\t' | '\r' | '\n')+ -> skip;

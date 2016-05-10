@@ -23,4 +23,10 @@ public interface FormulaVisitor<T> {
     T visitPropositionFormula(PropositionFormula propositionFormula);
     T visitPredicateFormula(PredicateFormula predicateFormula);
 
+    T visitEqualToFormula(EqualToFormula equalToFormula);
+    T visitGreaterThanFormula(GreaterThanFormula greaterThanFormula);
+    T visitLessThanFormula(LessThanFormula lessThanFormula);
+    T visitGreaterThanEqualFormula(GreaterThanEqualFormula greaterThanEqualFormula);
+    T visitLessThanEqualFormula(LessThanEqualFormula lessThanEqualFormula);
+
 }

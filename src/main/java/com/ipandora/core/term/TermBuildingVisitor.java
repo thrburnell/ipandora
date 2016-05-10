@@ -2,6 +2,7 @@ package com.ipandora.core.term;
 
 import com.ipandora.api.predicate.term.*;
 import com.ipandora.api.predicate.term.Number;
+import com.ipandora.core.formula.FormulaParsingException;
 import com.ipandora.parser.PredicateLogicBaseVisitor;
 import com.ipandora.parser.PredicateLogicLexer;
 import com.ipandora.parser.PredicateLogicParser;
@@ -23,11 +24,14 @@ public class TermBuildingVisitor extends PredicateLogicBaseVisitor<Term> {
         Term left = visit(ctx.lhs);
         Term right = visit(ctx.rhs);
 
-        if (ctx.op.getType() == PredicateLogicLexer.PLUS) {
-            return new Addition(left, right);
-        } else {
-            return new Subtraction(left, right);
+        switch (ctx.op.getType()) {
+            case PredicateLogicLexer.PLUS:
+                return new Addition(left, right);
+            case PredicateLogicLexer.MINUS:
+                return new Subtraction(left, right);
         }
+
+        throw new FormulaParsingException("Unknown mathematical operator " + ctx.op.getText());
     }
 
     @Override
@@ -57,11 +61,14 @@ public class TermBuildingVisitor extends PredicateLogicBaseVisitor<Term> {
         Term left = visit(ctx.lhs);
         Term right = visit(ctx.rhs);
 
-        if (ctx.op.getType() == PredicateLogicLexer.MULTIPLY) {
-            return new Multiplication(left, right);
-        } else {
-            return new Division(left, right);
+        switch (ctx.op.getType()) {
+            case PredicateLogicLexer.MULTIPLY:
+                return new Multiplication(left, right);
+            case PredicateLogicLexer.DIVIDE:
+                return new Division(left, right);
         }
+
+        throw new FormulaParsingException("Unknown mathematical operator " + ctx.op.getText());
     }
 
     @Override
@@ -104,7 +111,11 @@ public class TermBuildingVisitor extends PredicateLogicBaseVisitor<Term> {
         }
 
         PredicateLogicParser.FunctionContext func = ctx.func;
-        return visit(func);
+        if (func != null) {
+            return visit(func);
+        }
+
+        throw new FormulaParsingException("Leaf term contained no var, constant, number, expr or func");
     }
 
     @Override

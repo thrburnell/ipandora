@@ -81,34 +81,29 @@ public class SMTGeneratingFormulaVisitorImpl implements SMTGeneratingFormulaVisi
     public String visitAndFormula(AndFormula andFormula) {
         Formula left = andFormula.getLeft();
         Formula right = andFormula.getRight();
-        return "(and " + visit(left) + " " + visit(right) + ")";
+        return String.format("(and %s %s)", visit(left), visit(right));
     }
 
     @Override
     public String visitOrFormula(OrFormula orFormula) {
         Formula left = orFormula.getLeft();
         Formula right = orFormula.getRight();
-        return "(or " + visit(left) + " " + visit(right) + ")";
+        return String.format("(or %s %s)", visit(left), visit(right));
     }
 
     @Override
     public String visitForallFormula(ForallFormula forallFormula) {
         String variableName = forallFormula.getVariable().getName();
         Formula formula = forallFormula.getFormula();
-
-        return "(forall ((" + variableName + " " + TYPE_NAME + ")) " + visit(formula) + ")";
+        return String.format("(forall ((%s %s)) %s)", variableName, TYPE_NAME, visit(formula));
     }
 
     @Override
     public String visitExistsFormula(ExistsFormula existsFormula) {
-
         // Z3 only supports forall. Use equivalence (exists x. foo) === (!(forall x. !foo))
-
         Variable variable = existsFormula.getVariable();
         Formula formula = existsFormula.getFormula();
-
         NotFormula equivalent = new NotFormula(new ForallFormula(variable, new NotFormula(formula)));
-
         return visit(equivalent);
     }
 
@@ -126,20 +121,20 @@ public class SMTGeneratingFormulaVisitorImpl implements SMTGeneratingFormulaVisi
     public String visitImpliesFormula(ImpliesFormula impliesFormula) {
         Formula left = impliesFormula.getLeft();
         Formula right = impliesFormula.getRight();
-        return "(=> " + visit(left) + " " + visit(right) + ")";
+        return String.format("(=> %s %s)", visit(left), visit(right));
     }
 
     @Override
     public String visitIffFormula(IffFormula iffFormula) {
         Formula left = iffFormula.getLeft();
         Formula right = iffFormula.getRight();
-        return "(= " + visit(left) + " " + visit(right) + ")";
+        return String.format("(= %s %s)", visit(left), visit(right));
     }
 
     @Override
     public String visitNotFormula(NotFormula notFormula) {
         Formula formula = notFormula.getFormula();
-        return "(not " + visit(formula) + ")";
+        return String.format("(not %s)", visit(formula));
     }
 
     @Override
@@ -162,7 +157,42 @@ public class SMTGeneratingFormulaVisitorImpl implements SMTGeneratingFormulaVisi
         }
 
         String paramsString = StringUtils.join(paramStrings, " ");
-        return "(" + name + " " + paramsString + ")";
+        return String.format("(%s %s)", name, paramsString);
+    }
+
+    @Override
+    public String visitEqualToFormula(EqualToFormula equalToFormula) {
+        Term left = equalToFormula.getLeft();
+        Term right = equalToFormula.getRight();
+        return String.format("(= %s %s)", termVisitor.visit(left), termVisitor.visit(right));
+    }
+
+    @Override
+    public String visitGreaterThanFormula(GreaterThanFormula greaterThanFormula) {
+        Term left = greaterThanFormula.getLeft();
+        Term right = greaterThanFormula.getRight();
+        return String.format("(> %s %s)", termVisitor.visit(left), termVisitor.visit(right));
+    }
+
+    @Override
+    public String visitLessThanFormula(LessThanFormula lessThanFormula) {
+        Term left = lessThanFormula.getLeft();
+        Term right = lessThanFormula.getRight();
+        return String.format("(< %s %s)", termVisitor.visit(left), termVisitor.visit(right));
+    }
+
+    @Override
+    public String visitGreaterThanEqualFormula(GreaterThanEqualFormula greaterThanEqualFormula) {
+        Term left = greaterThanEqualFormula.getLeft();
+        Term right = greaterThanEqualFormula.getRight();
+        return String.format("(>= %s %s)", termVisitor.visit(left), termVisitor.visit(right));
+    }
+
+    @Override
+    public String visitLessThanEqualFormula(LessThanEqualFormula lessThanEqualFormula) {
+        Term left = lessThanEqualFormula.getLeft();
+        Term right = lessThanEqualFormula.getRight();
+        return String.format("(<= %s %s)", termVisitor.visit(left), termVisitor.visit(right));
     }
 
 }

@@ -107,9 +107,15 @@ public class FormulaBuildingVisitor extends PredicateLogicBaseVisitor<Formula> {
             return visit(ctx.pred);
         }
 
-        // TODO: this is about to change...
-        // An element is either quant, pred or form
-        return visit(ctx.form);
+        if (ctx.expr != null) {
+            return visit(ctx.expr);
+        }
+
+        if (ctx.form != null) {
+            return visit(ctx.form);
+        }
+
+        throw new FormulaParsingException("Element contained no quant, pred, expr or form: " + ctx);
     }
 
     @Override
@@ -120,11 +126,14 @@ public class FormulaBuildingVisitor extends PredicateLogicBaseVisitor<Formula> {
 
         Formula formula = visit(ctx.elem);
 
-        if (ctx.quant.getType() == PredicateLogicLexer.FORALL) {
-            return new ForallFormula(variable, formula);
-        } else {
-            return new ExistsFormula(variable, formula);
+        switch (ctx.quant.getType()) {
+            case PredicateLogicLexer.FORALL:
+                return new ForallFormula(variable, formula);
+            case PredicateLogicLexer.EXISTS:
+                return new ExistsFormula(variable, formula);
         }
+
+        throw new FormulaParsingException("Unknown quantifier " + ctx.quant.getText());
     }
 
     @Override
@@ -144,6 +153,28 @@ public class FormulaBuildingVisitor extends PredicateLogicBaseVisitor<Formula> {
         }
 
         return new PredicateFormula(name, params);
+    }
+
+    @Override
+    public Formula visitBoolExpr(PredicateLogicParser.BoolExprContext ctx) {
+
+        Term lhs = termBuildingVisitor.visit(ctx.lhs);
+        Term rhs = termBuildingVisitor.visit(ctx.rhs);
+
+        switch (ctx.op.getType()) {
+            case PredicateLogicLexer.ET:
+                return new EqualToFormula(lhs, rhs);
+            case PredicateLogicLexer.GT:
+                return new GreaterThanFormula(lhs, rhs);
+            case PredicateLogicLexer.LT:
+                return new LessThanFormula(lhs, rhs);
+            case PredicateLogicLexer.GTE:
+                return new GreaterThanEqualFormula(lhs, rhs);
+            case PredicateLogicLexer.LTE:
+                return new LessThanEqualFormula(lhs, rhs);
+        }
+
+        throw new FormulaParsingException("Unknown boolean operator " + ctx.op.getText());
     }
 
 }

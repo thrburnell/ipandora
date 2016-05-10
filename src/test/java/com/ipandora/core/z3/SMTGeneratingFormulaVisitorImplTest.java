@@ -1,6 +1,8 @@
 package com.ipandora.core.z3;
 
 import com.ipandora.api.predicate.formula.*;
+import com.ipandora.api.predicate.term.Constant;
+import com.ipandora.api.predicate.term.Number;
 import com.ipandora.api.predicate.term.Term;
 import com.ipandora.api.predicate.term.Variable;
 import org.junit.Test;
@@ -146,6 +148,61 @@ public class SMTGeneratingFormulaVisitorImplTest {
         String result = visitor.visit(predicateFormula);
 
         assertThat(result).isEqualTo("(Foo x y z)");
+    }
+
+    @Test
+    public void visitEqualToFormulaReturnsCorrectCode() {
+        EqualToFormula equalToFormula = new EqualToFormula(new Variable("x"), new Number(3));
+
+        SMTGeneratingTermVisitor termVisitor = new SMTGeneratingTermVisitor();
+        SMTGeneratingFormulaVisitorImpl visitor = new SMTGeneratingFormulaVisitorImpl(termVisitor);
+        String result = visitor.visit(equalToFormula);
+
+        assertThat(result).isEqualTo("(= x 3)");
+    }
+
+    @Test
+    public void visitGreaterThanFormulaReturnsCorrectCode() {
+        GreaterThanFormula greaterThanFormula = new GreaterThanFormula(new Variable("x"), new Constant("y"));
+
+        SMTGeneratingTermVisitor termVisitor = new SMTGeneratingTermVisitor();
+        SMTGeneratingFormulaVisitorImpl visitor = new SMTGeneratingFormulaVisitorImpl(termVisitor);
+        String result = visitor.visit(greaterThanFormula);
+
+        assertThat(result).isEqualTo("(> x y)");
+    }
+
+    @Test
+    public void visitLessThanFormulaReturnsCorrectCode() {
+        LessThanFormula lessThanFormula = new LessThanFormula(new Variable("x"), new Number(13));
+
+        SMTGeneratingTermVisitor termVisitor = new SMTGeneratingTermVisitor();
+        SMTGeneratingFormulaVisitorImpl visitor = new SMTGeneratingFormulaVisitorImpl(termVisitor);
+        String result = visitor.visit(lessThanFormula);
+
+        assertThat(result).isEqualTo("(< x 13)");
+    }
+
+    @Test
+    public void visitGreaterThanEqualFormulaReturnsCorrectCode() {
+        GreaterThanEqualFormula greaterThanEqualFormula = new GreaterThanEqualFormula(new Variable("x"), new Number(3));
+
+        SMTGeneratingTermVisitor termVisitor = new SMTGeneratingTermVisitor();
+        SMTGeneratingFormulaVisitorImpl visitor = new SMTGeneratingFormulaVisitorImpl(termVisitor);
+        String result = visitor.visit(greaterThanEqualFormula);
+
+        assertThat(result).isEqualTo("(>= x 3)");
+    }
+
+    @Test
+    public void visitLessThanEqualFormulaReturnsCorrectCode() {
+        LessThanEqualFormula lessThanEqualFormula = new LessThanEqualFormula(new Variable("z"), new Variable("m"));
+
+        SMTGeneratingTermVisitor termVisitor = new SMTGeneratingTermVisitor();
+        SMTGeneratingFormulaVisitorImpl visitor = new SMTGeneratingFormulaVisitorImpl(termVisitor);
+        String result = visitor.visit(lessThanEqualFormula);
+
+        assertThat(result).isEqualTo("(<= z m)");
     }
 
     @Test
