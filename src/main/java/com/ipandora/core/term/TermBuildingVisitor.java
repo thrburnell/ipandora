@@ -2,7 +2,8 @@ package com.ipandora.core.term;
 
 import com.ipandora.api.predicate.term.*;
 import com.ipandora.api.predicate.term.Number;
-import com.ipandora.core.formula.FormulaParsingException;
+import com.ipandora.core.formula.IllegalFormulaException;
+import com.ipandora.core.util.Creator;
 import com.ipandora.parser.PredicateLogicBaseVisitor;
 import com.ipandora.parser.PredicateLogicLexer;
 import com.ipandora.parser.PredicateLogicParser;
@@ -12,6 +13,14 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class TermBuildingVisitor extends PredicateLogicBaseVisitor<Term> {
+
+    private final Creator<SymbolTable> symbolTableCreator;
+    private SymbolTable symbolTable;
+
+    public TermBuildingVisitor(Creator<SymbolTable> symbolTableCreator) {
+        this.symbolTableCreator = symbolTableCreator;
+        this.symbolTable = symbolTableCreator.create();
+    }
 
     @Override
     public Term visitMathExpr(PredicateLogicParser.MathExprContext ctx) {
@@ -31,7 +40,7 @@ public class TermBuildingVisitor extends PredicateLogicBaseVisitor<Term> {
                 return new Subtraction(left, right);
         }
 
-        throw new FormulaParsingException("Unknown mathematical operator " + ctx.op.getText());
+        throw new IllegalFormulaException("Unknown mathematical operator " + ctx.op.getText());
     }
 
     @Override
@@ -42,10 +51,17 @@ public class TermBuildingVisitor extends PredicateLogicBaseVisitor<Term> {
             return visit(term);
         }
 
-        Variable var = new Variable(ctx.var.getText());
+        // Variable bound by summation is the index, so always has type Nat
+        String varName = ctx.var.getText();
+        Variable var = new Variable(varName, Type.NAT);
         Term lower = visit(ctx.lower);
         Term upper = visit(ctx.upper);
+
+        // Sum is a function, so introduces a new scope for its summing element
+        enterNewScope();
+        addTypeMapping(varName, Type.NAT);
         Term elem = visit(ctx.elem);
+        exitScope();
 
         return new Summation(var, lower, upper, elem);
     }
@@ -68,7 +84,7 @@ public class TermBuildingVisitor extends PredicateLogicBaseVisitor<Term> {
                 return new Division(left, right);
         }
 
-        throw new FormulaParsingException("Unknown mathematical operator " + ctx.op.getText());
+        throw new IllegalFormulaException("Unknown mathematical operator " + ctx.op.getText());
     }
 
     @Override
@@ -90,7 +106,7 @@ public class TermBuildingVisitor extends PredicateLogicBaseVisitor<Term> {
     public Term visitLeafTerm(PredicateLogicParser.LeafTermContext ctx) {
         Token var = ctx.var;
         if (var != null) {
-            return new Variable(var.getText());
+            return createTypedVariable(var.getText());
         }
 
         Token constant = ctx.constant;
@@ -115,7 +131,7 @@ public class TermBuildingVisitor extends PredicateLogicBaseVisitor<Term> {
             return visit(func);
         }
 
-        throw new FormulaParsingException("Leaf term contained no var, constant, number, expr or func");
+        throw new IllegalFormulaException("Leaf term contained no var, constant, number, expr or func");
     }
 
     @Override
@@ -130,5 +146,23 @@ public class TermBuildingVisitor extends PredicateLogicBaseVisitor<Term> {
 
         return new Function(name, args);
     }
-    
+
+    private Variable createTypedVariable(String varName) {
+        Type type = symbolTable.getType(varName);
+        return new Variable(varName, type);
+    }
+
+    public void enterNewScope() {
+        SymbolTable childTable = symbolTableCreator.create();
+        childTable.setParent(symbolTable);
+        symbolTable = childTable;
+    }
+
+    public void exitScope() {
+        symbolTable = symbolTable.getParent();
+    }
+
+    public void addTypeMapping(String variableName, Type type) {
+        symbolTable.addMapping(variableName, type);
+    }
 }

@@ -1,5 +1,6 @@
 package com.ipandora.api.predicate.formula;
 
+import com.ipandora.api.predicate.term.Type;
 import com.ipandora.api.predicate.term.Variable;
 import com.ipandora.core.formula.FormulaVisitor;
 
@@ -24,7 +25,9 @@ public class ForallFormula implements Formula {
 
     @Override
     public String toString() {
-        return String.format("\u2200%s.(%s)", variable, formula);
+        Type type = variable.getType();
+        String typeString = type == null ? "" : String.format("\u2208%s", type);
+        return String.format("\u2200%s%s.(%s)", variable, typeString, formula);
     }
 
     @Override

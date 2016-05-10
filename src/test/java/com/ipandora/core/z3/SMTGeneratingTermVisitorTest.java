@@ -53,35 +53,36 @@ public class SMTGeneratingTermVisitorTest {
     @Test
     public void visitAdditionReturnsCorrectCode() {
         SMTGeneratingTermVisitor visitor = new SMTGeneratingTermVisitor();
-        String result = visitor.visit(new Addition(new Variable("x"), new Constant("y")));
+        String result = visitor.visit(new Addition(Variable.withTypeNat("x"), Variable.withTypeNat("y")));
         assertThat(result).isEqualTo("(+ x y)");
     }
 
     @Test
     public void visitSubtractionReturnsCorrectCode() {
         SMTGeneratingTermVisitor visitor = new SMTGeneratingTermVisitor();
-        String result = visitor.visit(new Subtraction(new Variable("x"), new Constant("y")));
+        String result = visitor.visit(new Subtraction(Variable.withTypeNat("x"), Variable.withTypeNat("y")));
         assertThat(result).isEqualTo("(- x y)");
     }
 
     @Test
     public void visitMultiplicationReturnsCorrectCode() {
         SMTGeneratingTermVisitor visitor = new SMTGeneratingTermVisitor();
-        String result = visitor.visit(new Multiplication(new Variable("x"), new Constant("y")));
+        String result = visitor.visit(new Multiplication(Variable.withTypeNat("x"), Variable.withTypeNat("y")));
         assertThat(result).isEqualTo("(* x y)");
     }
 
     @Test
     public void visitDivisionReturnsCorrectCode() {
         SMTGeneratingTermVisitor visitor = new SMTGeneratingTermVisitor();
-        String result = visitor.visit(new Division(new Variable("x"), new Constant("y")));
+        String result = visitor.visit(new Division(Variable.withTypeNat("x"), Variable.withTypeNat("y")));
         assertThat(result).isEqualTo("(/ x y)");
     }
 
     @Test
     public void visitAdditionReturnsCorrectCodeForNestedTerms() {
         SMTGeneratingTermVisitor visitor = new SMTGeneratingTermVisitor();
-        Addition addition = new Addition(new Addition(new Variable("x"), new Variable("y")), new Constant("z"));
+        Addition addition = new Addition(new Addition(Variable.withTypeNat("x"), Variable.withTypeNat("y")),
+                Variable.withTypeNat("z"));
         String result = visitor.visit(addition);
         assertThat(result).isEqualTo("(+ (+ x y) z)");
     }
@@ -89,8 +90,8 @@ public class SMTGeneratingTermVisitorTest {
     @Test
     public void visitSubtractionReturnsCorrectCodeForNestedTerms() {
         SMTGeneratingTermVisitor visitor = new SMTGeneratingTermVisitor();
-        Subtraction addition = new Subtraction(new Variable("x"),
-                new Subtraction(new Variable("y"), new Constant("z")));
+        Subtraction addition = new Subtraction(Variable.withTypeNat("x"),
+                new Subtraction(Variable.withTypeNat("y"), Variable.withTypeNat("z")));
 
         String result = visitor.visit(addition);
         assertThat(result).isEqualTo("(- x (- y z))");
@@ -100,8 +101,8 @@ public class SMTGeneratingTermVisitorTest {
     public void visitMultiplicationReturnsCorrectCodeForNestedTerms() {
         SMTGeneratingTermVisitor visitor = new SMTGeneratingTermVisitor();
         Multiplication addition = new Multiplication(
-                new Multiplication(new Variable("x"), new Variable("y")),
-                new Multiplication(new Variable("m"), new Variable("n")));
+                new Multiplication(Variable.withTypeNat("x"), Variable.withTypeNat("y")),
+                new Multiplication(Variable.withTypeNat("m"), Variable.withTypeNat("n")));
 
         String result = visitor.visit(addition);
         assertThat(result).isEqualTo("(* (* x y) (* m n))");
@@ -110,7 +111,8 @@ public class SMTGeneratingTermVisitorTest {
     @Test
     public void visitDivisionReturnsCorrectCodeForNestedTerms() {
         SMTGeneratingTermVisitor visitor = new SMTGeneratingTermVisitor();
-        Division addition = new Division(new Division(new Variable("x"), new Variable("y")), new Constant("z"));
+        Division addition = new Division(new Division(Variable.withTypeNat("x"), Variable.withTypeNat("y")),
+                Variable.withTypeNat("z"));
         String result = visitor.visit(addition);
         assertThat(result).isEqualTo("(/ (/ x y) z)");
     }
@@ -142,7 +144,7 @@ public class SMTGeneratingTermVisitorTest {
     @Test
     public void visitPowerReturnsCorrectCode() {
         SMTGeneratingTermVisitor visitor = new SMTGeneratingTermVisitor();
-        Power power = new Power(new Variable("x"), 3);
+        Power power = new Power(Variable.withTypeNat("x"), 3);
         String result = visitor.visit(power);
         assertThat(result).isEqualTo("(^ x 3)");
     }
@@ -150,7 +152,7 @@ public class SMTGeneratingTermVisitorTest {
     @Test
     public void visitPowerReturnsCorrectCodeForNestedPowers() {
         SMTGeneratingTermVisitor visitor = new SMTGeneratingTermVisitor();
-        Power power = new Power(new Power(new Variable("x"), 2), 3);
+        Power power = new Power(new Power(Variable.withTypeNat("x"), 2), 3);
         String result = visitor.visit(power);
         assertThat(result).isEqualTo("(^ (^ x 2) 3)");
     }

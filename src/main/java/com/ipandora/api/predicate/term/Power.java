@@ -6,10 +6,16 @@ public class Power implements Term {
 
     private final Term base;
     private final int exponent;
+    private final Type type;
 
     public Power(Term base, int exponent) {
+        if (base.getType() != Type.NAT) {
+            throw new TypeMismatchException("Base not of type Nat: " + base);
+        }
+
         this.base = base;
         this.exponent = exponent;
+        this.type = Type.NAT;
     }
 
     public Term getBase() {
@@ -26,6 +32,11 @@ public class Power implements Term {
     }
 
     @Override
+    public Type getType() {
+        return type;
+    }
+
+    @Override
     public String toString() {
         return String.format("(%s ^ %d)", base, exponent);
     }
@@ -35,16 +46,18 @@ public class Power implements Term {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
 
-        Power power1 = (Power) o;
+        Power power = (Power) o;
 
-        if (exponent != power1.exponent) return false;
-        return base.equals(power1.base);
+        if (exponent != power.exponent) return false;
+        if (!base.equals(power.base)) return false;
+        return type == power.type;
     }
 
     @Override
     public int hashCode() {
         int result = base.hashCode();
         result = 31 * result + exponent;
+        result = 31 * result + type.hashCode();
         return result;
     }
 

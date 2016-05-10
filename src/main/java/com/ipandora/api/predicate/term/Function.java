@@ -8,10 +8,16 @@ public class Function implements Term {
 
     private final String name;
     private final List<Term> args;
+    private final Type type;
 
     public Function(String name, List<Term> args) {
+        this(name, args, Type.UNKNOWN);
+    }
+
+    public Function(String name, List<Term> args, Type type) {
         this.name = name;
         this.args = args;
+        this.type = type;
     }
 
     public String getName() {
@@ -25,6 +31,11 @@ public class Function implements Term {
     @Override
     public <T> T accept(TermVisitor<T> visitor) {
         return visitor.visitFunction(this);
+    }
+
+    @Override
+    public Type getType() {
+        return type;
     }
 
     @Override
@@ -48,13 +59,15 @@ public class Function implements Term {
         Function function = (Function) o;
 
         if (!name.equals(function.name)) return false;
-        return args.equals(function.args);
+        if (!args.equals(function.args)) return false;
+        return type == function.type;
     }
 
     @Override
     public int hashCode() {
         int result = name.hashCode();
         result = 31 * result + args.hashCode();
+        result = 31 * result + type.hashCode();
         return result;
     }
 

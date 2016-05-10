@@ -5,9 +5,11 @@ import com.ipandora.core.term.TermVisitor;
 public class Number implements Term {
 
     private final int number;
+    private final Type type;
 
     public Number(int number) {
         this.number = number;
+        this.type = Type.NAT;
     }
 
     public int getNumber() {
@@ -17,6 +19,11 @@ public class Number implements Term {
     @Override
     public <T> T accept(TermVisitor<T> visitor) {
         return visitor.visitNumber(this);
+    }
+
+    @Override
+    public Type getType() {
+        return type;
     }
 
     @Override
@@ -31,12 +38,14 @@ public class Number implements Term {
 
         Number number1 = (Number) o;
 
-        return number == number1.number;
+        if (number != number1.number) return false;
+        return type == number1.type;
     }
 
     @Override
     public int hashCode() {
-        return number;
+        int result = number;
+        result = 31 * result + type.hashCode();
+        return result;
     }
-
 }

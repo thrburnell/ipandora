@@ -8,17 +8,37 @@ public class Summation implements Term {
     private final Term lowerBound;
     private final Term upperBound;
     private final Term element;
+    private final Type type;
 
     public Summation(Variable variable, Term lowerBound, Term upperBound, Term element) {
+        if (variable.getType() != Type.NAT) {
+            throw new TypeMismatchException("Variable not of type Nat: " + variable);
+        }
+        if (lowerBound.getType() != Type.NAT) {
+            throw new TypeMismatchException("Lower bound not of type Nat: " + lowerBound);
+        }
+        if (upperBound.getType() != Type.NAT) {
+            throw new TypeMismatchException("Upper bound not of type Nat: " + upperBound);
+        }
+        if (element.getType() != Type.NAT) {
+            throw new TypeMismatchException("Element not of type Nat: " + element);
+        }
+
         this.variable = variable;
         this.lowerBound = lowerBound;
         this.upperBound = upperBound;
         this.element = element;
+        this.type = Type.NAT;
     }
 
     @Override
     public <T> T accept(TermVisitor<T> visitor) {
         return visitor.visitSummation(this);
+    }
+
+    @Override
+    public Type getType() {
+        return type;
     }
 
     @Override
@@ -36,7 +56,8 @@ public class Summation implements Term {
         if (!variable.equals(summation.variable)) return false;
         if (!lowerBound.equals(summation.lowerBound)) return false;
         if (!upperBound.equals(summation.upperBound)) return false;
-        return element.equals(summation.element);
+        if (!element.equals(summation.element)) return false;
+        return type == summation.type;
     }
 
     @Override
@@ -45,6 +66,7 @@ public class Summation implements Term {
         result = 31 * result + lowerBound.hashCode();
         result = 31 * result + upperBound.hashCode();
         result = 31 * result + element.hashCode();
+        result = 31 * result + type.hashCode();
         return result;
     }
 

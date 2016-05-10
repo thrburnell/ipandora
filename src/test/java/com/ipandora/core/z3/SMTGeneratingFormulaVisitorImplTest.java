@@ -1,7 +1,6 @@
 package com.ipandora.core.z3;
 
 import com.ipandora.api.predicate.formula.*;
-import com.ipandora.api.predicate.term.Constant;
 import com.ipandora.api.predicate.term.Number;
 import com.ipandora.api.predicate.term.Term;
 import com.ipandora.api.predicate.term.Variable;
@@ -152,7 +151,7 @@ public class SMTGeneratingFormulaVisitorImplTest {
 
     @Test
     public void visitEqualToFormulaReturnsCorrectCode() {
-        EqualToFormula equalToFormula = new EqualToFormula(new Variable("x"), new Number(3));
+        EqualToFormula equalToFormula = new EqualToFormula(Variable.withTypeNat("x"), new Number(3));
 
         SMTGeneratingTermVisitor termVisitor = new SMTGeneratingTermVisitor();
         SMTGeneratingFormulaVisitorImpl visitor = new SMTGeneratingFormulaVisitorImpl(termVisitor);
@@ -163,18 +162,18 @@ public class SMTGeneratingFormulaVisitorImplTest {
 
     @Test
     public void visitGreaterThanFormulaReturnsCorrectCode() {
-        GreaterThanFormula greaterThanFormula = new GreaterThanFormula(new Variable("x"), new Constant("y"));
+        GreaterThanFormula greaterThanFormula = new GreaterThanFormula(Variable.withTypeNat("x"), new Number(2));
 
         SMTGeneratingTermVisitor termVisitor = new SMTGeneratingTermVisitor();
         SMTGeneratingFormulaVisitorImpl visitor = new SMTGeneratingFormulaVisitorImpl(termVisitor);
         String result = visitor.visit(greaterThanFormula);
 
-        assertThat(result).isEqualTo("(> x y)");
+        assertThat(result).isEqualTo("(> x 2)");
     }
 
     @Test
     public void visitLessThanFormulaReturnsCorrectCode() {
-        LessThanFormula lessThanFormula = new LessThanFormula(new Variable("x"), new Number(13));
+        LessThanFormula lessThanFormula = new LessThanFormula(Variable.withTypeNat("x"), new Number(13));
 
         SMTGeneratingTermVisitor termVisitor = new SMTGeneratingTermVisitor();
         SMTGeneratingFormulaVisitorImpl visitor = new SMTGeneratingFormulaVisitorImpl(termVisitor);
@@ -185,7 +184,7 @@ public class SMTGeneratingFormulaVisitorImplTest {
 
     @Test
     public void visitGreaterThanEqualFormulaReturnsCorrectCode() {
-        GreaterThanEqualFormula greaterThanEqualFormula = new GreaterThanEqualFormula(new Variable("x"), new Number(3));
+        GreaterThanEqualFormula greaterThanEqualFormula = new GreaterThanEqualFormula(Variable.withTypeNat("x"), new Number(3));
 
         SMTGeneratingTermVisitor termVisitor = new SMTGeneratingTermVisitor();
         SMTGeneratingFormulaVisitorImpl visitor = new SMTGeneratingFormulaVisitorImpl(termVisitor);
@@ -196,7 +195,7 @@ public class SMTGeneratingFormulaVisitorImplTest {
 
     @Test
     public void visitLessThanEqualFormulaReturnsCorrectCode() {
-        LessThanEqualFormula lessThanEqualFormula = new LessThanEqualFormula(new Variable("z"), new Variable("m"));
+        LessThanEqualFormula lessThanEqualFormula = new LessThanEqualFormula(Variable.withTypeNat("z"), Variable.withTypeNat("m"));
 
         SMTGeneratingTermVisitor termVisitor = new SMTGeneratingTermVisitor();
         SMTGeneratingFormulaVisitorImpl visitor = new SMTGeneratingFormulaVisitorImpl(termVisitor);

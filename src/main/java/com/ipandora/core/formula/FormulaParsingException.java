@@ -1,13 +1,9 @@
 package com.ipandora.core.formula;
 
-public class FormulaParsingException extends RuntimeException {
+public class FormulaParsingException extends Exception {
 
-    public FormulaParsingException() {
-        super();
-    }
-
-    public FormulaParsingException(String message) {
-        super(message);
+    public FormulaParsingException(Throwable cause) {
+        super(cause);
     }
 
 }

@@ -27,7 +27,11 @@ element
     ;
 
 quantified
-    : quant=(FORALL | EXISTS) var=VARIABLE elem=negElement
+    : quant=(FORALL | EXISTS) var=VARIABLE (dom=domain)? elem=negElement
+    ;
+
+domain
+    : IN type=NAT
     ;
 
 // Optional argList; when missing, predicate is a propositional variable
@@ -76,13 +80,6 @@ function
     ;
 
 
-VARIABLE: '?' ('a'..'z') CHARACTER*;
-NAME: LETTER CHARACTER*;
-NUMBER: DIGIT+;
-fragment CHARACTER: LETTER | DIGIT | '_';
-fragment LETTER: ('a'..'z' | 'A'..'Z');
-fragment DIGIT: ('0'..'9');
-
 // Connectives
 NOT: '!';
 AND: '&';
@@ -108,5 +105,17 @@ GT: '>';
 LT: '<';
 GTE: '>=';
 LTE: '<=';
+
+// Types
+IN: 'in';
+NAT: 'Nat';
+
+// These need to be at the end so string literals above take precedence
+VARIABLE: '?' ('a'..'z') CHARACTER*;
+NAME: LETTER CHARACTER*;
+NUMBER: DIGIT+;
+fragment CHARACTER: LETTER | DIGIT | '_';
+fragment LETTER: ('a'..'z' | 'A'..'Z');
+fragment DIGIT: ('0'..'9');
 
 WS: (' ' | '\t' | '\r' | '\n')+ -> skip;

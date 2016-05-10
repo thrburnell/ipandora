@@ -7,6 +7,7 @@ import com.ipandora.api.predicate.read.ReadResponse;
 import com.ipandora.api.predicate.validate.ValidateRequest;
 import com.ipandora.api.predicate.validate.ValidateResponse;
 import com.ipandora.core.formula.FormulaParser;
+import com.ipandora.core.formula.FormulaParsingException;
 import com.ipandora.core.proof.ImpliesChecker;
 import com.ipandora.core.proof.ImpliesCheckerException;
 import com.ipandora.core.proof.ProofStreamReader;
@@ -53,7 +54,8 @@ public class PredicateResource {
 
     @POST
     @Path("/step")
-    public StepResponse checkProofStep(StepRequest stepRequest) throws ImpliesCheckerException {
+    public StepResponse checkProofStep(StepRequest stepRequest)
+            throws ImpliesCheckerException, FormulaParsingException {
 
         List<String> assumptions = stepRequest.getAssumptions();
 

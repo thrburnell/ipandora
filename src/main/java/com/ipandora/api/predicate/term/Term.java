@@ -5,5 +5,6 @@ import com.ipandora.core.term.TermVisitor;
 public interface Term {
 
     <T> T accept(TermVisitor<T> visitor);
+    Type getType();
 
 }

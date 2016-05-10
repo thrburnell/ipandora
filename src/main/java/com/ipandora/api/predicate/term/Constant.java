@@ -5,9 +5,11 @@ import com.ipandora.core.term.TermVisitor;
 public class Constant implements Term {
 
     private final String name;
+    private final Type type;
 
     public Constant(String name) {
         this.name = name;
+        this.type = Type.UNKNOWN;
     }
 
     public String getName() {
@@ -17,6 +19,11 @@ public class Constant implements Term {
     @Override
     public <T> T accept(TermVisitor<T> visitor) {
         return visitor.visitConstant(this);
+    }
+
+    @Override
+    public Type getType() {
+        return type;
     }
 
     @Override
@@ -31,12 +38,15 @@ public class Constant implements Term {
 
         Constant constant = (Constant) o;
 
-        return name.equals(constant.name);
+        if (!name.equals(constant.name)) return false;
+        return type == constant.type;
     }
 
     @Override
     public int hashCode() {
-        return name.hashCode();
+        int result = name.hashCode();
+        result = 31 * result + type.hashCode();
+        return result;
     }
 
 }

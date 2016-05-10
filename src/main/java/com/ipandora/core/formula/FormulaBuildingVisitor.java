@@ -2,6 +2,7 @@ package com.ipandora.core.formula;
 
 import com.ipandora.api.predicate.formula.*;
 import com.ipandora.api.predicate.term.Term;
+import com.ipandora.api.predicate.term.Type;
 import com.ipandora.api.predicate.term.Variable;
 import com.ipandora.core.term.TermBuildingVisitor;
 import com.ipandora.parser.PredicateLogicBaseVisitor;
@@ -115,16 +116,20 @@ public class FormulaBuildingVisitor extends PredicateLogicBaseVisitor<Formula> {
             return visit(ctx.form);
         }
 
-        throw new FormulaParsingException("Element contained no quant, pred, expr or form: " + ctx);
+        throw new IllegalFormulaException("Element contained no quant, pred, expr or form: " + ctx);
     }
 
     @Override
     public Formula visitQuantified(PredicateLogicParser.QuantifiedContext ctx) {
 
+        Type type = getTypeFromDomain(ctx.dom);
         String variableName = ctx.var.getText();
-        Variable variable = new Variable(variableName);
+        Variable variable = new Variable(variableName, type);
 
+        termBuildingVisitor.enterNewScope();
+        termBuildingVisitor.addTypeMapping(variableName, type);
         Formula formula = visit(ctx.elem);
+        termBuildingVisitor.exitScope();
 
         switch (ctx.quant.getType()) {
             case PredicateLogicLexer.FORALL:
@@ -133,7 +138,7 @@ public class FormulaBuildingVisitor extends PredicateLogicBaseVisitor<Formula> {
                 return new ExistsFormula(variable, formula);
         }
 
-        throw new FormulaParsingException("Unknown quantifier " + ctx.quant.getText());
+        throw new IllegalFormulaException("Unknown quantifier " + ctx.quant.getText());
     }
 
     @Override
@@ -174,7 +179,20 @@ public class FormulaBuildingVisitor extends PredicateLogicBaseVisitor<Formula> {
                 return new LessThanEqualFormula(lhs, rhs);
         }
 
-        throw new FormulaParsingException("Unknown boolean operator " + ctx.op.getText());
+        throw new IllegalFormulaException("Unknown boolean operator " + ctx.op.getText());
+    }
+
+    private Type getTypeFromDomain(PredicateLogicParser.DomainContext ctx) {
+
+        if (ctx == null) {
+            return Type.UNKNOWN;
+        }
+
+        switch (ctx.type.getType()) {
+            case PredicateLogicLexer.NAT: return Type.NAT;
+        }
+
+        throw new IllegalFormulaException("Unknown type " + ctx.type.getText());
     }
 
 }
