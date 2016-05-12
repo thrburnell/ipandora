@@ -92,10 +92,6 @@ export const uploadProofStructure = (file) => {
     return fetch(request)
       .then(res => res.json())
       .then(json => {
-        dispatch(clearProof())
-        nextProofStepId = 0
-        nextToShowId = 0
-
         json.given.map(g => dispatch(addGiven(g)))
         json.toShow.map(ts => dispatch(addToShow(ts)))
       })
@@ -105,9 +101,12 @@ export const uploadProofStructure = (file) => {
   }
 }
 
-export const clearProof = () => (
-  {
+export const clearProof = () => {
+  nextProofStepId = 0
+  nextToShowId = 0
+
+  return {
     type: 'CLEAR_PROOF'
   }
-)
+}
 

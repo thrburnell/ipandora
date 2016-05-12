@@ -1,9 +1,5 @@
 {
 
-  // The state of proof step entry
-  // Can be one of 'INACTIVE', 'AWAITING_VALIDITY_CHECK'
-  proofStepState: 'AWAITING_JUSTIFICATION',
-
   // Keys of formulas which justify the new proof step
   proofStepJustification: [0, 1],
 
