@@ -4,6 +4,23 @@ grammar PredicateLogic;
 package com.ipandora.parser;
 }
 
+// Mathematical functions
+
+functionDefinition
+    : name=NAME args=fnArgList ET (cases+=fnCase)+
+    ;
+
+fnArgList
+    : LPAREN (args+=VARIABLE (',' args+=VARIABLE)*)? RPAREN
+    ;
+
+fnCase
+    : expr=mathExpr IF cond=formula
+    | expr=mathExpr OTHERWISE?
+    ;
+
+// Formulas
+
 formula
     : lhs=iffElement (IFF rhs=formula)?;
 
@@ -46,6 +63,9 @@ boolExpr
 argList
     : LPAREN args+=mathExpr (',' args+=mathExpr)* RPAREN
     ;
+
+
+// Terms
 
 mathExpr
     : lhs=mathExpr op=(PLUS | MINUS) rhs=mathTerm
@@ -109,6 +129,10 @@ LTE: '<=';
 // Types
 IN: 'in';
 NAT: 'Nat';
+
+// Function definitions
+IF: 'if';
+OTHERWISE: 'otherwise';
 
 // These need to be at the end so string literals above take precedence
 VARIABLE: '?' ('a'..'z') CHARACTER*;
