@@ -7,14 +7,6 @@ public abstract class ArithmeticExpression implements Term {
     protected final Type type;
 
     protected ArithmeticExpression(Term left, Term right) {
-
-        if (left.getType() != Type.NAT) {
-            throw new TypeMismatchException("Left term not of type Nat: " + left);
-        }
-        if (right.getType() != Type.NAT) {
-            throw new TypeMismatchException("Right term not of type Nat: " + right);
-        }
-
         this.left = left;
         this.right = right;
         this.type = Type.NAT;

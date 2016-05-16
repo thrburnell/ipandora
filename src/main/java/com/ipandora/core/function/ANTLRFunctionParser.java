@@ -1,10 +1,10 @@
 package com.ipandora.core.function;
 
 import com.ipandora.api.predicate.function.Function;
-import com.ipandora.api.predicate.term.TypeMismatchException;
 import com.ipandora.core.formula.FormulaBuildingVisitor;
 import com.ipandora.core.term.SymbolTableCreator;
 import com.ipandora.core.term.TermBuildingVisitor;
+import com.ipandora.core.util.WrappingRuntimeException;
 import com.ipandora.parser.PredicateLogicLexer;
 import com.ipandora.parser.PredicateLogicParser;
 import org.antlr.v4.runtime.ANTLRInputStream;
@@ -32,8 +32,10 @@ public class ANTLRFunctionParser implements FunctionParser {
 
         try {
             return visitor.visit(fnCtx);
-        } catch (TypeMismatchException | IllegalFunctionException e) {
+        } catch (IllegalFunctionException e) {
             throw new FunctionParsingException(e);
+        } catch (WrappingRuntimeException e) {
+            throw new FunctionParsingException(e.getWrappedException());
         }
     }
 

@@ -9,10 +9,6 @@ public class Power implements Term {
     private final Type type;
 
     public Power(Term base, int exponent) {
-        if (base.getType() != Type.NAT) {
-            throw new TypeMismatchException("Base not of type Nat: " + base);
-        }
-
         this.base = base;
         this.exponent = exponent;
         this.type = Type.NAT;

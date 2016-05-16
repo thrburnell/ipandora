@@ -1,8 +1,13 @@
 package com.ipandora;
 
-import com.ipandora.core.formula.FormulaConjunctionReducer;
 import com.ipandora.core.formula.ANTLRFormulaParser;
+import com.ipandora.core.formula.FormulaBuildingVisitor;
+import com.ipandora.core.formula.FormulaConjunctionReducer;
+import com.ipandora.core.formula.TypeCheckAnalyser;
 import com.ipandora.core.proof.ProofStreamReaderCreator;
+import com.ipandora.core.term.SymbolTableCreator;
+import com.ipandora.core.term.TermBuildingVisitor;
+import com.ipandora.core.term.TermTypeChecker;
 import com.ipandora.core.util.EnvironmentVariableProviderImpl;
 import com.ipandora.core.util.ProcessExecutorImpl;
 import com.ipandora.core.z3.SMTCodeGeneratorImpl;
@@ -37,7 +42,12 @@ public class IPandoraApplication extends Application<IPandoraConfiguration> {
     public void run(IPandoraConfiguration IPandoraConfiguration,
                     Environment environment) throws Exception {
 
-        ANTLRFormulaParser formulaParser = new ANTLRFormulaParser();
+        SymbolTableCreator symbolTableCreator = new SymbolTableCreator();
+        FormulaBuildingVisitor formulaBuildingVisitor = new FormulaBuildingVisitor(
+                new TermBuildingVisitor(symbolTableCreator));
+        TypeCheckAnalyser typeCheckAnalyser = new TypeCheckAnalyser(new TermTypeChecker());
+
+        ANTLRFormulaParser formulaParser = new ANTLRFormulaParser(formulaBuildingVisitor, typeCheckAnalyser);
 
         Z3ImpliesChecker impliesChecker = new Z3ImpliesChecker(
                 new SMTCodeGeneratorImpl(new SMTGeneratingFormulaVisitorCreator()),

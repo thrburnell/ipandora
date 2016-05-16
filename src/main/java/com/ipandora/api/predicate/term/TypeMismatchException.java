@@ -1,6 +1,8 @@
 package com.ipandora.api.predicate.term;
 
-public class TypeMismatchException extends RuntimeException {
+import com.ipandora.core.formula.SemanticAnalysisException;
+
+public class TypeMismatchException extends SemanticAnalysisException {
 
     public TypeMismatchException(String message) {
         super(message);

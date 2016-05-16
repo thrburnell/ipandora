@@ -3,18 +3,33 @@ package com.ipandora.core.formula;
 import com.ipandora.api.predicate.formula.*;
 import com.ipandora.api.predicate.term.*;
 import com.ipandora.api.predicate.term.Number;
+import com.ipandora.core.term.SymbolTableCreator;
+import com.ipandora.core.term.TermBuildingVisitor;
+import com.ipandora.core.term.TermTypeChecker;
+import org.junit.Before;
 import org.junit.Test;
+import org.mockito.Mockito;
 
 import java.util.Arrays;
 import java.util.Collections;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.mockito.Mockito.verify;
 
 public class ANTLRFormulaParserTest {
 
+    private ANTLRFormulaParser parser;
+
+    @Before
+    public void before() {
+        SymbolTableCreator symbolTableCreator = new SymbolTableCreator();
+        FormulaBuildingVisitor visitor = new FormulaBuildingVisitor(new TermBuildingVisitor(symbolTableCreator));
+        TypeCheckAnalyser typeCheckAnalyser = new TypeCheckAnalyser(new TermTypeChecker());
+        parser = new ANTLRFormulaParser(visitor, typeCheckAnalyser);
+    }
+
     @Test
     public void fromStringPropositionalVariable() throws FormulaParsingException {
-        ANTLRFormulaParser parser = new ANTLRFormulaParser();
         Formula formula = parser.fromString("p");
         PropositionFormula expected = new PropositionFormula("p");
         assertThat(formula).isEqualTo(expected);
@@ -22,7 +37,6 @@ public class ANTLRFormulaParserTest {
 
     @Test
     public void fromStringPredicateWithSingleArgument() throws FormulaParsingException {
-        ANTLRFormulaParser parser = new ANTLRFormulaParser();
         Formula formula = parser.fromString("Foo(x)");
         PredicateFormula expected = new PredicateFormula("Foo", Collections.<Term>singletonList(new Constant("x")));
         assertThat(formula).isEqualTo(expected);
@@ -30,7 +44,6 @@ public class ANTLRFormulaParserTest {
 
     @Test
     public void fromStringPredicateWithMultipleArguments() throws FormulaParsingException {
-        ANTLRFormulaParser parser = new ANTLRFormulaParser();
         Formula formula = parser.fromString("Foo(?x, y, 13)");
         PredicateFormula expected = new PredicateFormula("Foo",
                 Arrays.asList(new Variable("?x"), new Constant("y"), new Number(13)));
@@ -40,7 +53,6 @@ public class ANTLRFormulaParserTest {
 
     @Test
     public void fromStringPredicateWithArithmeticArgment() throws FormulaParsingException {
-        ANTLRFormulaParser parser = new ANTLRFormulaParser();
         Formula formula = parser.fromString("Foo(1 + 3 * 4 ^ 2)");
 
         Power power = new Power(new Number(4), 2);
@@ -53,7 +65,6 @@ public class ANTLRFormulaParserTest {
 
     @Test
     public void fromStringForallWithNoDomain() throws FormulaParsingException {
-        ANTLRFormulaParser parser = new ANTLRFormulaParser();
         Formula formula = parser.fromString("\\FORALL ?x Foo(?x)");
         ForallFormula expected = new ForallFormula(new Variable("?x"),
                 new PredicateFormula("Foo", Collections.<Term>singletonList(new Variable("?x"))));
@@ -63,7 +74,6 @@ public class ANTLRFormulaParserTest {
 
     @Test
     public void fromStringForallWithDomain() throws FormulaParsingException {
-        ANTLRFormulaParser parser = new ANTLRFormulaParser();
         Formula formula = parser.fromString("\\FORALL ?x in Nat Foo(?x)");
         ForallFormula expected = new ForallFormula(Variable.withTypeNat("?x"),
                 new PredicateFormula("Foo", Collections.<Term>singletonList(Variable.withTypeNat("?x"))));
@@ -73,7 +83,6 @@ public class ANTLRFormulaParserTest {
 
     @Test
     public void fromStringExistsWithNoDomain() throws FormulaParsingException {
-        ANTLRFormulaParser parser = new ANTLRFormulaParser();
         Formula formula = parser.fromString("\\EXISTS ?x Foo(?x)");
         ExistsFormula expected = new ExistsFormula(new Variable("?x"),
                 new PredicateFormula("Foo", Collections.<Term>singletonList(new Variable("?x"))));
@@ -83,7 +92,6 @@ public class ANTLRFormulaParserTest {
 
     @Test
     public void fromStringExistsWithDomain() throws FormulaParsingException {
-        ANTLRFormulaParser parser = new ANTLRFormulaParser();
         Formula formula = parser.fromString("\\EXISTS ?x in Nat Foo(?x)");
         ExistsFormula expected = new ExistsFormula(Variable.withTypeNat("?x"),
                 new PredicateFormula("Foo", Collections.<Term>singletonList(Variable.withTypeNat("?x"))));
@@ -93,7 +101,6 @@ public class ANTLRFormulaParserTest {
 
     @Test
     public void fromStringNestedQuantifiersWithOverridingDomains() throws FormulaParsingException {
-        ANTLRFormulaParser parser = new ANTLRFormulaParser();
         Formula formula = parser.fromString("\\FORALL ?x \\FORALL ?x in Nat Foo(?x)");
 
         Variable xNat = Variable.withTypeNat("?x");
@@ -109,7 +116,6 @@ public class ANTLRFormulaParserTest {
 
     @Test
     public void fromStringNestedQuantifiersWithOverridingDomains2() throws FormulaParsingException {
-        ANTLRFormulaParser parser = new ANTLRFormulaParser();
         Formula formula = parser.fromString("\\FORALL ?x in Nat \\FORALL ?x Foo(?x)");
 
         Variable xNat = Variable.withTypeNat("?x");
@@ -125,7 +131,6 @@ public class ANTLRFormulaParserTest {
 
     @Test
     public void fromStringBooleanExpression() throws FormulaParsingException {
-        ANTLRFormulaParser parser = new ANTLRFormulaParser();
         Formula formula = parser.fromString("1 + 3 > 2 * 1");
 
         Addition addition = new Addition(new Number(1), new Number(3));
@@ -137,7 +142,6 @@ public class ANTLRFormulaParserTest {
 
     @Test
     public void fromStringSimplePredicateWithRedundantWrappingParenthesis() throws FormulaParsingException {
-        ANTLRFormulaParser parser = new ANTLRFormulaParser();
         Formula formula = parser.fromString("((((((Foo(?x)))))))");
         PredicateFormula expected = new PredicateFormula("Foo", Collections.<Term>singletonList(new Variable("?x")));
         assertThat(formula).isEqualTo(expected);
@@ -145,7 +149,6 @@ public class ANTLRFormulaParserTest {
 
     @Test
     public void fromStringNegatedPredicate() throws FormulaParsingException {
-        ANTLRFormulaParser parser = new ANTLRFormulaParser();
         Formula formula = parser.fromString("!Foo(?x)");
         PredicateFormula nested = new PredicateFormula("Foo", Collections.<Term>singletonList(new Variable("?x")));
         NotFormula expected = new NotFormula(nested);
@@ -154,7 +157,6 @@ public class ANTLRFormulaParserTest {
 
     @Test
     public void fromStringConjunctionOfPredicates() throws FormulaParsingException {
-        ANTLRFormulaParser parser = new ANTLRFormulaParser();
         Formula formula = parser.fromString("Foo(?x) & Bar(?y)");
         PredicateFormula foo = new PredicateFormula("Foo", Collections.<Term>singletonList(new Variable("?x")));
         PredicateFormula bar = new PredicateFormula("Bar", Collections.<Term>singletonList(new Variable("?y")));
@@ -164,7 +166,6 @@ public class ANTLRFormulaParserTest {
 
     @Test
     public void fromStringDisjunctionOfPredicates() throws FormulaParsingException {
-        ANTLRFormulaParser parser = new ANTLRFormulaParser();
         Formula formula = parser.fromString("Foo(?x) | Bar(?y)");
         PredicateFormula foo = new PredicateFormula("Foo", Collections.<Term>singletonList(new Variable("?x")));
         PredicateFormula bar = new PredicateFormula("Bar", Collections.<Term>singletonList(new Variable("?y")));
@@ -174,7 +175,6 @@ public class ANTLRFormulaParserTest {
 
     @Test
     public void fromStringImpliesOfPredicates() throws FormulaParsingException {
-        ANTLRFormulaParser parser = new ANTLRFormulaParser();
         Formula formula = parser.fromString("Foo(?x) -> Bar(?y)");
         PredicateFormula foo = new PredicateFormula("Foo", Collections.<Term>singletonList(new Variable("?x")));
         PredicateFormula bar = new PredicateFormula("Bar", Collections.<Term>singletonList(new Variable("?y")));
@@ -184,7 +184,6 @@ public class ANTLRFormulaParserTest {
 
     @Test
     public void fromStringIffOfPredicates() throws FormulaParsingException {
-        ANTLRFormulaParser parser = new ANTLRFormulaParser();
         Formula formula = parser.fromString("Foo(?x) <-> Bar(?y)");
         PredicateFormula foo = new PredicateFormula("Foo", Collections.<Term>singletonList(new Variable("?x")));
         PredicateFormula bar = new PredicateFormula("Bar", Collections.<Term>singletonList(new Variable("?y")));
@@ -194,7 +193,6 @@ public class ANTLRFormulaParserTest {
 
     @Test
     public void fromStringExplicitlyParenthesisedConnectedPredicates() throws FormulaParsingException {
-        ANTLRFormulaParser parser = new ANTLRFormulaParser();
         Formula formula = parser.fromString("!(P & ((Q | R) -> (S <-> T)))");
 
         PropositionFormula p = new PropositionFormula("P");
@@ -214,7 +212,6 @@ public class ANTLRFormulaParserTest {
 
     @Test
     public void fromStringShouldInferImplicitBracketing() throws FormulaParsingException {
-        ANTLRFormulaParser parser = new ANTLRFormulaParser();
         Formula formula = parser.fromString("P -> Q & R <-> S | !T");
 
         PropositionFormula p = new PropositionFormula("P");
@@ -234,14 +231,24 @@ public class ANTLRFormulaParserTest {
 
     @Test(expected = FormulaParsingException.class)
     public void fromStringShouldThrowIfUntypedVariableUsedInArithmeticExpression() throws FormulaParsingException {
-        ANTLRFormulaParser parser = new ANTLRFormulaParser();
         parser.fromString("Foo(?x + 2)");
     }
 
     @Test(expected = FormulaParsingException.class)
     public void fromStringShouldThrowIfUntypedVariableUsedInBooleanExpression() throws FormulaParsingException {
-        ANTLRFormulaParser parser = new ANTLRFormulaParser();
         parser.fromString("?x > 2");
+    }
+
+    @Test
+    public void fromStringShouldTypeCheckFormula() throws FormulaParsingException {
+        SymbolTableCreator symbolTableCreator = new SymbolTableCreator();
+        FormulaBuildingVisitor visitor = new FormulaBuildingVisitor(new TermBuildingVisitor(symbolTableCreator));
+        TypeCheckAnalyser mockTypeCheckAnalyser = Mockito.mock(TypeCheckAnalyser.class);
+        parser = new ANTLRFormulaParser(visitor, mockTypeCheckAnalyser);
+
+        Formula formula = parser.fromString("\\FORALL ?x in Nat ?x > 2");
+
+        verify(mockTypeCheckAnalyser).analyse(formula);
     }
 
 }

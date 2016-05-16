@@ -96,7 +96,7 @@ public class SMTGeneratingTermVisitor implements TermVisitor<String> {
     }
 
     @Override
-    public String visitSummation(Summation summar) {
+    public String visitSummation(Summation summation) {
         throw new RuntimeException("visitSummation() not yet implemented");
     }
 

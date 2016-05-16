@@ -11,24 +11,27 @@ public class Summation implements Term {
     private final Type type;
 
     public Summation(Variable variable, Term lowerBound, Term upperBound, Term element) {
-        if (variable.getType() != Type.NAT) {
-            throw new TypeMismatchException("Variable not of type Nat: " + variable);
-        }
-        if (lowerBound.getType() != Type.NAT) {
-            throw new TypeMismatchException("Lower bound not of type Nat: " + lowerBound);
-        }
-        if (upperBound.getType() != Type.NAT) {
-            throw new TypeMismatchException("Upper bound not of type Nat: " + upperBound);
-        }
-        if (element.getType() != Type.NAT) {
-            throw new TypeMismatchException("Element not of type Nat: " + element);
-        }
-
         this.variable = variable;
         this.lowerBound = lowerBound;
         this.upperBound = upperBound;
         this.element = element;
         this.type = Type.NAT;
+    }
+
+    public Variable getVariable() {
+        return variable;
+    }
+
+    public Term getLowerBound() {
+        return lowerBound;
+    }
+
+    public Term getUpperBound() {
+        return upperBound;
+    }
+
+    public Term getElement() {
+        return element;
     }
 
     @Override
