@@ -48,6 +48,7 @@ export const checkProofStep = (formula, justification) => {
       }),
       method: 'post',
       body: JSON.stringify({
+        method: "LOGICAL_IMPLICATION",
         goal: formula,
         assumptions: jFormulas
       })
@@ -56,7 +57,7 @@ export const checkProofStep = (formula, justification) => {
     return fetch(request)
       .then(res => res.json())
       .then(json => {
-        dispatch(receiveCheckStatus(formula, justification, json.validityPreserved))
+        dispatch(receiveCheckStatus(formula, justification, json.valid))
       })
       .catch(err => {
         console.log(err)

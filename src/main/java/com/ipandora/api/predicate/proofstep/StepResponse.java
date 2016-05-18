@@ -8,19 +8,20 @@ import java.util.List;
 @JsonInclude(JsonInclude.Include.NON_NULL)
 public class StepResponse {
 
-    private List<String> assumptions;
+    private String method;
     private String goal;
-    private boolean validityPreserved;
+    private List<String> assumptions;
+    private Boolean valid;
     private String errorMsg;
 
     @JsonProperty
-    public List<String> getAssumptions() {
-        return assumptions;
+    public String getMethod() {
+        return method;
     }
 
     @JsonProperty
-    public void setAssumptions(List<String> assumptions) {
-        this.assumptions = assumptions;
+    public void setMethod(String method) {
+        this.method = method;
     }
 
     @JsonProperty
@@ -34,13 +35,23 @@ public class StepResponse {
     }
 
     @JsonProperty
-    public boolean isValidityPreserved() {
-        return validityPreserved;
+    public List<String> getAssumptions() {
+        return assumptions;
     }
 
     @JsonProperty
-    public void setValidityPreserved(boolean validityPreserved) {
-        this.validityPreserved = validityPreserved;
+    public void setAssumptions(List<String> assumptions) {
+        this.assumptions = assumptions;
+    }
+
+    @JsonProperty
+    public Boolean isValid() {
+        return valid;
+    }
+
+    @JsonProperty
+    public void setValid(boolean valid) {
+        this.valid = valid;
     }
 
     @JsonProperty

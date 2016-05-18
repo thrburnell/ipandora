@@ -6,17 +6,18 @@ import java.util.List;
 
 public class StepRequest {
 
-    private List<String> assumptions;
+    private String method;
     private String goal;
+    private List<String> assumptions;
 
     @JsonProperty
-    public List<String> getAssumptions() {
-        return assumptions;
+    public String getMethod() {
+        return method;
     }
 
     @JsonProperty
-    public void setAssumptions(List<String> assumptions) {
-        this.assumptions = assumptions;
+    public void setMethod(String method) {
+        this.method = method;
     }
 
     @JsonProperty
@@ -27,6 +28,16 @@ public class StepRequest {
     @JsonProperty
     public void setGoal(String goal) {
         this.goal = goal;
+    }
+
+    @JsonProperty
+    public List<String> getAssumptions() {
+        return assumptions;
+    }
+
+    @JsonProperty
+    public void setAssumptions(List<String> assumptions) {
+        this.assumptions = assumptions;
     }
 
 }

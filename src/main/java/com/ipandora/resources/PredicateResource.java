@@ -15,10 +15,7 @@ import com.ipandora.core.formula.FormulaParsingException;
 import com.ipandora.core.induction.InductionSchema;
 import com.ipandora.core.induction.InductionSchemaGenerator;
 import com.ipandora.core.induction.SchemaGeneratorException;
-import com.ipandora.core.proof.ImpliesChecker;
-import com.ipandora.core.proof.ImpliesCheckerException;
-import com.ipandora.core.proof.ProofStreamReader;
-import com.ipandora.core.proof.ProofStreamReaderCreator;
+import com.ipandora.core.proof.*;
 import com.ipandora.core.util.PrettyStringBuilder;
 import org.glassfish.jersey.media.multipart.FormDataContentDisposition;
 import org.glassfish.jersey.media.multipart.FormDataParam;
@@ -75,27 +72,38 @@ public class PredicateResource {
     public StepResponse checkProofStep(StepRequest stepRequest)
             throws ImpliesCheckerException, FormulaParsingException {
 
-        List<String> assumptions = stepRequest.getAssumptions();
+        String method = stepRequest.getMethod();
 
-        List<Formula> assumptionFormulas = new ArrayList<>();
-        for (String assumption : assumptions) {
-            assumptionFormulas.add(formulaParser.fromString(assumption));
+        if (method.equals(ProofStepMethods.LOGICAL_IMPLICATION)) {
+
+            List<String> assumptions = stepRequest.getAssumptions();
+
+            List<Formula> assumptionFormulas = new ArrayList<>();
+            for (String assumption : assumptions) {
+                assumptionFormulas.add(formulaParser.fromString(assumption));
+            }
+
+            Formula goalFormula = formulaParser.fromString(stepRequest.getGoal());
+
+            boolean result = impliesChecker.check(assumptionFormulas, goalFormula);
+
+            StepResponse stepResponse = new StepResponse();
+            stepResponse.setMethod(method);
+            stepResponse.setGoal(stepRequest.getGoal());
+            stepResponse.setAssumptions(stepRequest.getAssumptions());
+            stepResponse.setValid(result);
+
+            if (!result) {
+                stepResponse.setErrorMsg("Error messages not yet implemented.");
+            }
+
+            return stepResponse;
         }
 
-        Formula goalFormula = formulaParser.fromString(stepRequest.getGoal());
-
-        boolean result = impliesChecker.check(assumptionFormulas, goalFormula);
-
-        StepResponse stepResponse = new StepResponse();
-        stepResponse.setAssumptions(stepRequest.getAssumptions());
-        stepResponse.setGoal(stepRequest.getGoal());
-        stepResponse.setValidityPreserved(result);
-
-        if (!result) {
-            stepResponse.setErrorMsg("Error messages not yet implemented.");
-        }
-
-        return stepResponse;
+        StepResponse unknownMethodResponse = new StepResponse();
+        unknownMethodResponse.setMethod(method);
+        unknownMethodResponse.setErrorMsg("Unknown proof step method");
+        return unknownMethodResponse;
     }
 
     @POST
