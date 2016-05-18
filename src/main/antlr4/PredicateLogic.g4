@@ -40,6 +40,7 @@ element
     : quant=quantified
     | pred=predicate
     | expr=boolExpr
+    | tf=(TRUTH | FALSITY)
     | LPAREN form=formula RPAREN
     ;
 
@@ -110,6 +111,8 @@ LPAREN: '(';
 RPAREN: ')';
 FORALL: '\\FORALL';
 EXISTS: '\\EXISTS';
+TRUTH: '\\TRUTH';
+FALSITY: '\\FALSITY';
 
 // Mathematical expressions
 PLUS: '+';

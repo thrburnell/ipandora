@@ -29,6 +29,20 @@ public class ANTLRFormulaParserTest {
     }
 
     @Test
+    public void fromStringTruth() throws FormulaParsingException {
+        Formula formula = parser.fromString("\\TRUTH");
+        TruthFormula expected = new TruthFormula();
+        assertThat(formula).isEqualTo(expected);
+    }
+
+    @Test
+    public void fromStringFalsity() throws FormulaParsingException {
+        Formula formula = parser.fromString("\\FALSITY");
+        FalsityFormula expected = new FalsityFormula();
+        assertThat(formula).isEqualTo(expected);
+    }
+
+    @Test
     public void fromStringPropositionalVariable() throws FormulaParsingException {
         Formula formula = parser.fromString("p");
         PropositionFormula expected = new PropositionFormula("p");

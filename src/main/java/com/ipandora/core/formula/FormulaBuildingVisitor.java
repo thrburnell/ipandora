@@ -116,6 +116,17 @@ public class FormulaBuildingVisitor extends PredicateLogicBaseVisitor<Formula> {
             return visit(ctx.form);
         }
 
+        if (ctx.tf != null) {
+            switch (ctx.tf.getType()) {
+                case PredicateLogicLexer.TRUTH:
+                    return new TruthFormula();
+                case PredicateLogicLexer.FALSITY:
+                    return new FalsityFormula();
+            }
+
+            throw new IllegalFormulaException("Unknown truth/falsity value: " + ctx.tf.getText());
+        }
+
         throw new IllegalFormulaException("Element contained no quant, pred, expr or form: " + ctx);
     }
 
