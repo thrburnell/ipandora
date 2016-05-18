@@ -4,7 +4,7 @@ import com.ipandora.core.term.TermVisitor;
 
 import java.util.List;
 
-public class Function implements Term {
+public class Function implements Atom {
 
     private final String name;
     private final List<Term> args;

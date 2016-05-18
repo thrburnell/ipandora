@@ -2,7 +2,7 @@ package com.ipandora.api.predicate.term;
 
 import com.ipandora.core.term.TermVisitor;
 
-public class Constant implements Term {
+public class Constant implements Atom {
 
     private final String name;
     private final Type type;

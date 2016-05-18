@@ -2,7 +2,7 @@ package com.ipandora.api.predicate.term;
 
 import com.ipandora.core.term.TermVisitor;
 
-public class Number implements Term {
+public class Number implements Atom {
 
     private final int number;
     private final Type type;

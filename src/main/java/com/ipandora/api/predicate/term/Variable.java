@@ -2,7 +2,7 @@ package com.ipandora.api.predicate.term;
 
 import com.ipandora.core.term.TermVisitor;
 
-public class Variable implements Term {
+public class Variable implements Atom {
 
     private final String name;
     private final Type type;
