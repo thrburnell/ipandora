@@ -20,6 +20,22 @@ public class InductionSchema {
         this.inductiveCaseToShow = inductiveCaseToShow;
     }
 
+    public List<Formula> getBaseCaseToShow() {
+        return baseCaseToShow;
+    }
+
+    public Constant getInductiveTerm() {
+        return inductiveTerm;
+    }
+
+    public Formula getInductiveHypothesis() {
+        return inductiveHypothesis;
+    }
+
+    public List<Formula> getInductiveCaseToShow() {
+        return inductiveCaseToShow;
+    }
+
     @Override
     public String toString() {
         StringBuilder sb = new StringBuilder();

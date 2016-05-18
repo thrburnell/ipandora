@@ -53,16 +53,18 @@ public class TermStringBuilder implements PrettyStringBuilder<Term>, TermVisitor
     @Override
     public String visitSubtraction(Subtraction subtraction) {
         ArithmeticOperator minus = ArithmeticOperator.MINUS;
+        ArithmeticOperator minusRight = ArithmeticOperator.MINUS_RIGHT;
+
         operatorStack.push(minus);
         String left = visit(subtraction.getLeft());
-        operatorStack.push(ArithmeticOperator.MINUS_RIGHT);
+        operatorStack.push(minusRight);
         String right = visit(subtraction.getRight());
         operatorStack.pop();
         operatorStack.pop();
 
         String result = String.format("%s - %s", left, right);
 
-        if (doesCurrentContextBindStronger(minus)) {
+        if (doesCurrentContextBindStronger(minus) && isCurrentContextDifferentTo(minusRight)) {
             result = wrapInParenthesis(result);
         }
 
@@ -79,7 +81,7 @@ public class TermStringBuilder implements PrettyStringBuilder<Term>, TermVisitor
 
         String result = String.format("%s * %s", left, right);
 
-        if (doesCurrentContextBindStrongerOrEqual(multiply)) {
+        if (doesCurrentContextBindStrongerOrEqual(multiply) && isCurrentContextDifferentTo(multiply)) {
             result = wrapInParenthesis(result);
         }
 
@@ -164,6 +166,10 @@ public class TermStringBuilder implements PrettyStringBuilder<Term>, TermVisitor
 
     private boolean doesCurrentContextBindStrongerOrEqual(ArithmeticOperator operator) {
         return !operatorStack.isEmpty() && operatorStack.peek().getPrecedence() >= operator.getPrecedence();
+    }
+
+    private boolean isCurrentContextDifferentTo(ArithmeticOperator operator) {
+        return !operatorStack.isEmpty() && operatorStack.peek() != operator;
     }
 
     private String wrapInParenthesis(String result) {

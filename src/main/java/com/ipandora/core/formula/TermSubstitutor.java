@@ -150,7 +150,7 @@ public class TermSubstitutor {
 
     private class SubstitutingTermVisitor implements TermVisitor<Term> {
 
-        // Needs to be a List to support e.g. forall ?x (forall ?x (?x = 2))
+        // Needs to be a List to support vars introduced multiple times e.g. forall ?x (forall ?x (?x = 2))
         private final List<String> varsIgnoring = new ArrayList<>();
         private final Term t1;
         private final Term t2;

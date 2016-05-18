@@ -46,7 +46,7 @@ public class ANTLRFormulaParserTest {
     public void fromStringPredicateWithMultipleArguments() throws FormulaParsingException {
         Formula formula = parser.fromString("Foo(?x, y, 13)");
         PredicateFormula expected = new PredicateFormula("Foo",
-                Arrays.asList(new Variable("?x"), new Constant("y"), new Number(13)));
+                Arrays.<Term>asList(new Variable("?x"), new Constant("y"), new Number(13)));
 
         assertThat(formula).isEqualTo(expected);
     }

@@ -179,35 +179,65 @@ public class FormulaStringBuilder implements PrettyStringBuilder<Formula>, Formu
     public String visitEqualToFormula(EqualToFormula equalToFormula) {
         String left = termStringBuilder.build(equalToFormula.getLeft());
         String right = termStringBuilder.build(equalToFormula.getRight());
-        return String.format("(%s = %s)", left, right);
+        String result = String.format("%s = %s", left, right);
+
+        if (!isInOutermostContext()) {
+            result = wrapInParenthesis(result);
+        }
+
+        return result;
     }
 
     @Override
     public String visitGreaterThanFormula(GreaterThanFormula greaterThanFormula) {
         String left = termStringBuilder.build(greaterThanFormula.getLeft());
         String right = termStringBuilder.build(greaterThanFormula.getRight());
-        return String.format("(%s > %s)", left, right);
+        String result = String.format("%s > %s", left, right);
+
+        if (!isInOutermostContext()) {
+            result = wrapInParenthesis(result);
+        }
+
+        return result;
     }
 
     @Override
     public String visitLessThanFormula(LessThanFormula lessThanFormula) {
         String left = termStringBuilder.build(lessThanFormula.getLeft());
         String right = termStringBuilder.build(lessThanFormula.getRight());
-        return String.format("(%s < %s)", left, right);
+        String result = String.format("%s < %s", left, right);
+
+        if (!isInOutermostContext()) {
+            result = wrapInParenthesis(result);
+        }
+
+        return result;
     }
 
     @Override
     public String visitGreaterThanEqualFormula(GreaterThanEqualFormula greaterThanEqualFormula) {
         String left = termStringBuilder.build(greaterThanEqualFormula.getLeft());
         String right = termStringBuilder.build(greaterThanEqualFormula.getRight());
-        return String.format("(%s >= %s)", left, right);
+        String result = String.format("%s >= %s", left, right);
+
+        if (!isInOutermostContext()) {
+            result = wrapInParenthesis(result);
+        }
+
+        return result;
     }
 
     @Override
     public String visitLessThanEqualFormula(LessThanEqualFormula lessThanEqualFormula) {
         String left = termStringBuilder.build(lessThanEqualFormula.getLeft());
         String right = termStringBuilder.build(lessThanEqualFormula.getRight());
-        return String.format("(%s <= %s)", left, right);
+        String result = String.format("%s <= %s", left, right);
+
+        if (!isInOutermostContext()) {
+            result = wrapInParenthesis(result);
+        }
+
+        return result;
     }
 
     private boolean doesCurrentContextBindStronger(LogicConnective connective) {
@@ -216,6 +246,10 @@ public class FormulaStringBuilder implements PrettyStringBuilder<Formula>, Formu
 
     private boolean doesCurrentContextBindStrongerOrEqual(LogicConnective connective) {
         return !connectiveStack.isEmpty() && connectiveStack.peek().getPrecedence() >= connective.getPrecedence();
+    }
+
+    private boolean isInOutermostContext() {
+        return connectiveStack.isEmpty();
     }
 
     private String wrapInParenthesis(String result) {

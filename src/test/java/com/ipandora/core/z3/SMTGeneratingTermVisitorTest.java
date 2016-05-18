@@ -127,7 +127,7 @@ public class SMTGeneratingTermVisitorTest {
     @Test
     public void visitFunctionReturnsCorrectCode() {
         SMTGeneratingTermVisitor visitor = new SMTGeneratingTermVisitor();
-        Function function = new Function("f", Arrays.asList(new Variable("x"), new Constant("y")));
+        Function function = new Function("f", Arrays.<Term>asList(new Variable("x"), new Constant("y")));
         String result = visitor.visit(function);
         assertThat(result).isEqualTo("(f x y)");
     }
@@ -136,7 +136,7 @@ public class SMTGeneratingTermVisitorTest {
     public void visitFunctionReturnsCorrectCodeForNestedFunctions() {
         SMTGeneratingTermVisitor visitor = new SMTGeneratingTermVisitor();
         Function f = new Function("f", Arrays.<Term>asList(new Variable("x"), new Variable("y")));
-        Function g = new Function("g", Arrays.asList(new Variable("x"), f));
+        Function g = new Function("g", Arrays.<Term>asList(new Variable("x"), f));
         String result = visitor.visit(g);
         assertThat(result).isEqualTo("(g x (f x y))");
     }

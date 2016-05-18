@@ -36,7 +36,7 @@ public class TypeCheckAnalyserTest {
         Number number = new Number(1);
         Constant constant = new Constant("y");
         Variable variable = new Variable("?x");
-        PredicateFormula predicate = new PredicateFormula("Foo", Arrays.asList(number, constant, variable));
+        PredicateFormula predicate = new PredicateFormula("Foo", Arrays.<Term>asList(number, constant, variable));
 
         analyser.analyse(predicate);
 

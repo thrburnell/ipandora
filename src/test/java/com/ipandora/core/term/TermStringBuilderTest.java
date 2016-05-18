@@ -133,7 +133,7 @@ public class TermStringBuilderTest {
     public void buildFunction() {
         // Foo(x, y, 2)
         TermStringBuilder builder = new TermStringBuilder();
-        Function term = new Function("Foo", Arrays.asList(X, Y, new Number(2)));
+        Function term = new Function("Foo", Arrays.<Term>asList(X, Y, new Number(2)));
         String result = builder.build(term);
         assertThat(result).isEqualTo("Foo(x, y, 2)");
     }
@@ -190,6 +190,58 @@ public class TermStringBuilderTest {
         Power term = new Power(new Division(X, Y), 2);
         String result = builder.build(term);
         assertThat(result).isEqualTo("(x / y)^2");
+    }
+
+    @Test
+    public void buildNestedPlusShouldHaveNoBrackets() {
+        // x + y + z
+        TermStringBuilder builder = new TermStringBuilder();
+        Addition term = new Addition(X, new Addition(Y, Z));
+        String result = builder.build(term);
+        assertThat(result).isEqualTo("x + y + z");
+
+        term = new Addition(new Addition(X, Y), Z);
+        result = builder.build(term);
+        assertThat(result).isEqualTo("x + y + z");
+    }
+
+    @Test
+    public void buildNestedMinusShouldHaveNoBrackets() {
+        // x - y - z
+        TermStringBuilder builder = new TermStringBuilder();
+        Subtraction term = new Subtraction(X, new Subtraction(Y, Z));
+        String result = builder.build(term);
+        assertThat(result).isEqualTo("x - y - z");
+
+        term = new Subtraction(new Subtraction(X, Y), Z);
+        result = builder.build(term);
+        assertThat(result).isEqualTo("x - y - z");
+    }
+
+    @Test
+    public void buildNestedMultiplyShouldHaveNoBrackets() {
+        // x * y * z
+        TermStringBuilder builder = new TermStringBuilder();
+        Multiplication term = new Multiplication(X, new Multiplication(Y, Z));
+        String result = builder.build(term);
+        assertThat(result).isEqualTo("x * y * z");
+
+        term = new Multiplication(new Multiplication(X, Y), Z);
+        result = builder.build(term);
+        assertThat(result).isEqualTo("x * y * z");
+    }
+
+    @Test
+    public void buildNestedDivideShouldHaveBrackets() {
+        // x / (y / z)
+        TermStringBuilder builder = new TermStringBuilder();
+        Division term = new Division(X, new Division(Y, Z));
+        String result = builder.build(term);
+        assertThat(result).isEqualTo("x / (y / z)");
+
+        term = new Division(new Division(X, Y), Z);
+        result = builder.build(term);
+        assertThat(result).isEqualTo("(x / y) / z");
     }
 
 }

@@ -247,7 +247,57 @@ public class FormulaStringBuilderTest {
     // (?x = 2) & (?y = 3)
 
     @Test
-    public void buildEqualToShouldHaveBrackets() {
+    public void buildEqualToShouldNotHaveBracketsIfInOutermostContext() {
+        // ?x = 2
+        FormulaStringBuilder builder = new FormulaStringBuilder(new TermStringBuilder());
+        EqualToFormula formula = new EqualToFormula(X, new Number(2));
+        String result = builder.build(formula);
+
+        assertThat(result).isEqualTo("?x = 2");
+    }
+
+    @Test
+    public void buildGreaterThanShouldNotHaveBracketsIfInOutermostContext() {
+        // ?x > 2
+        FormulaStringBuilder builder = new FormulaStringBuilder(new TermStringBuilder());
+        GreaterThanFormula formula = new GreaterThanFormula(X, new Number(2));
+        String result = builder.build(formula);
+
+        assertThat(result).isEqualTo("?x > 2");
+    }
+
+    @Test
+    public void buildGreaterThanEqualShouldNotHaveBracketsIfInOutermostContext() {
+        // ?x >= 2
+        FormulaStringBuilder builder = new FormulaStringBuilder(new TermStringBuilder());
+        GreaterThanEqualFormula formula = new GreaterThanEqualFormula(X, new Number(2));
+        String result = builder.build(formula);
+
+        assertThat(result).isEqualTo("?x >= 2");
+    }
+
+    @Test
+    public void buildLessThanShouldNotHaveBracketsIfInOutermostContext() {
+        // ?x < 2
+        FormulaStringBuilder builder = new FormulaStringBuilder(new TermStringBuilder());
+        LessThanFormula formula = new LessThanFormula(X, new Number(2));
+        String result = builder.build(formula);
+
+        assertThat(result).isEqualTo("?x < 2");
+    }
+
+    @Test
+    public void buildLessThanEqualShouldNotHaveBracketsIfInOutermostContext() {
+        // ?x <= 2
+        FormulaStringBuilder builder = new FormulaStringBuilder(new TermStringBuilder());
+        LessThanEqualFormula formula = new LessThanEqualFormula(X, new Number(2));
+        String result = builder.build(formula);
+
+        assertThat(result).isEqualTo("?x <= 2");
+    }
+
+    @Test
+    public void buildEqualToShouldHaveBracketsIfNotInOutermostContext() {
         // !(?x = 2)
         FormulaStringBuilder builder = new FormulaStringBuilder(new TermStringBuilder());
         NotFormula formula = new NotFormula(new EqualToFormula(X, new Number(2)));
@@ -257,7 +307,7 @@ public class FormulaStringBuilderTest {
     }
 
     @Test
-    public void buildGreaterThanShouldHaveBrackets() {
+    public void buildGreaterThanShouldHaveBracketsIfNotInOutermostContext() {
         // !(?x > 2)
         FormulaStringBuilder builder = new FormulaStringBuilder(new TermStringBuilder());
         NotFormula formula = new NotFormula(new GreaterThanFormula(X, new Number(2)));
@@ -267,8 +317,8 @@ public class FormulaStringBuilderTest {
     }
 
     @Test
-    public void buildGreaterThanEqualShouldHaveBrackets() {
-        // !(?x = 2)
+    public void buildGreaterThanEqualShouldHaveBracketsIfNotInOutermostContext() {
+        // !(?x >= 2)
         FormulaStringBuilder builder = new FormulaStringBuilder(new TermStringBuilder());
         NotFormula formula = new NotFormula(new GreaterThanEqualFormula(X, new Number(2)));
         String result = builder.build(formula);
@@ -277,8 +327,8 @@ public class FormulaStringBuilderTest {
     }
 
     @Test
-    public void buildLessThanShouldHaveBrackets() {
-        // !(?x = 2)
+    public void buildLessThanShouldHaveBracketsIfNotInOutermostContext() {
+        // !(?x < 2)
         FormulaStringBuilder builder = new FormulaStringBuilder(new TermStringBuilder());
         NotFormula formula = new NotFormula(new LessThanFormula(X, new Number(2)));
         String result = builder.build(formula);
@@ -287,8 +337,8 @@ public class FormulaStringBuilderTest {
     }
 
     @Test
-    public void buildLessThanEqualShouldHaveBrackets() {
-        // !(?x = 2)
+    public void buildLessThanEqualShouldHaveBracketsIfNotInOutermostContext() {
+        // !(?x <= 2)
         FormulaStringBuilder builder = new FormulaStringBuilder(new TermStringBuilder());
         NotFormula formula = new NotFormula(new LessThanEqualFormula(X, new Number(2)));
         String result = builder.build(formula);
