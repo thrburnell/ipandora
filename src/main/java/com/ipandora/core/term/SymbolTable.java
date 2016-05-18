@@ -7,6 +7,7 @@ public interface SymbolTable {
     void setParent(SymbolTable parent);
     SymbolTable getParent();
     Type getType(String variable);
+    Type getTypeOrUnknown(String variable);
     void addMapping(String variable, Type type);
 
 }

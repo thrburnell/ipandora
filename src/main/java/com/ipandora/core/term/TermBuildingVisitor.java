@@ -104,14 +104,12 @@ public class TermBuildingVisitor extends PredicateLogicBaseVisitor<Term> {
 
     @Override
     public Term visitLeafTerm(PredicateLogicParser.LeafTermContext ctx) {
-        Token var = ctx.var;
-        if (var != null) {
-            return createTypedVariable(var.getText());
-        }
 
-        Token constant = ctx.constant;
-        if (constant != null) {
-            return new Constant(constant.getText());
+        Token term = ctx.term;
+        if (term != null) {
+            String name = term.getText();
+            Type type = symbolTable.getType(name);
+            return type == null ? new Constant(name) : new Variable(name, type);
         }
 
         Token number = ctx.number;
@@ -145,11 +143,6 @@ public class TermBuildingVisitor extends PredicateLogicBaseVisitor<Term> {
         }
 
         return new Function(name, args);
-    }
-
-    private Variable createTypedVariable(String varName) {
-        Type type = symbolTable.getType(varName);
-        return new Variable(varName, type);
     }
 
     public void enterNewScope() {

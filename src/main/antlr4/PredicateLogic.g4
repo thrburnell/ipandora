@@ -11,7 +11,7 @@ functionDefinition
     ;
 
 fnArgList
-    : LPAREN (args+=VARIABLE (',' args+=VARIABLE)*)? RPAREN
+    : LPAREN (args+=NAME (',' args+=NAME)*)? RPAREN
     ;
 
 fnCase
@@ -45,7 +45,7 @@ element
     ;
 
 quantified
-    : quant=(FORALL | EXISTS) var=VARIABLE (dom=domain)? elem=negElement
+    : quant=(FORALL | EXISTS) var=NAME (dom=domain)? elem=negElement
     ;
 
 domain
@@ -74,7 +74,7 @@ mathExpr
     ;
 
 sumExpr
-    : SUM var=VARIABLE lower=mathExpr upper=mathExpr elem=sumExpr
+    : SUM var=NAME lower=mathExpr upper=mathExpr elem=sumExpr
     | term=mathTerm
     ;
 
@@ -90,8 +90,7 @@ powerTerm
 
 leafTerm
     : func=function
-    | var=VARIABLE
-    | constant=NAME
+    | term=NAME
     | number=NUMBER
     | LPAREN expr=mathExpr RPAREN
     ;
@@ -138,7 +137,6 @@ IF: 'if';
 OTHERWISE: 'otherwise';
 
 // These need to be at the end so string literals above take precedence
-VARIABLE: '?' ('a'..'z') CHARACTER*;
 NAME: LETTER CHARACTER*;
 NUMBER: DIGIT+;
 fragment CHARACTER: LETTER | DIGIT | '_';

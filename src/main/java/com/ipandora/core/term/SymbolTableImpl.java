@@ -22,7 +22,6 @@ public class SymbolTableImpl implements SymbolTable {
 
     @Override
     public Type getType(String variable) {
-
         Type type = typeMapping.get(variable);
         if (type != null) {
             return type;
@@ -32,7 +31,13 @@ public class SymbolTableImpl implements SymbolTable {
             return parent.getType(variable);
         }
 
-        return Type.UNKNOWN;
+        return null;
+    }
+
+    @Override
+    public Type getTypeOrUnknown(String variable) {
+        Type type = getType(variable);
+        return type != null ? type : Type.UNKNOWN;
     }
 
     @Override

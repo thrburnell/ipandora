@@ -11,10 +11,25 @@ import static org.mockito.Mockito.when;
 public class SymbolTableImplTest {
 
     @Test
-    public void getTypeShouldReturnUnknownForNonRegisteredVariable() {
+    public void getTypeOrUnknownShouldReturnUnknownForNonRegisteredVariable() {
+        SymbolTableImpl symbolTable = new SymbolTableImpl();
+        Type type = symbolTable.getTypeOrUnknown("x");
+        assertThat(type).isEqualTo(Type.UNKNOWN);
+    }
+
+    @Test
+    public void getTypeOrUnknownShouldReturnNatForRegisteredNatVariable() {
+        SymbolTableImpl symbolTable = new SymbolTableImpl();
+        symbolTable.addMapping("x", Type.NAT);
+        Type type = symbolTable.getTypeOrUnknown("x");
+        assertThat(type).isEqualTo(Type.NAT);
+    }
+
+    @Test
+    public void getTypeShouldReturnNullForNonRegisteredVariable() {
         SymbolTableImpl symbolTable = new SymbolTableImpl();
         Type type = symbolTable.getType("x");
-        assertThat(type).isEqualTo(Type.UNKNOWN);
+        assertThat(type).isNull();
     }
 
     @Test
@@ -42,7 +57,26 @@ public class SymbolTableImplTest {
     }
 
     @Test
-    public void getTypeShouldAskParentIfNoMappingFoundInCurrent() {
+    public void getTypeOrUnknownShouldAskParentIfNoMappingFoundInCurrent() {
+        SymbolTableImpl symbolTable = new SymbolTableImpl();
+        SymbolTable mockParent = Mockito.mock(SymbolTable.class);
+        symbolTable.setParent(mockParent);
+        symbolTable.getTypeOrUnknown("x");
+        verify(mockParent).getType("x");
+    }
+
+    @Test
+    public void getTypeOrUnknownShouldReturnParentAnswerIfNoMappingFoundInCurrentTable() {
+        SymbolTableImpl symbolTable = new SymbolTableImpl();
+        SymbolTable mockParent = Mockito.mock(SymbolTable.class);
+        when(mockParent.getType("x")).thenReturn(Type.NAT);
+        symbolTable.setParent(mockParent);
+        Type type = symbolTable.getTypeOrUnknown("x");
+        assertThat(type).isEqualTo(Type.NAT);
+    }
+
+    @Test
+    public void getTypeShouldAskParentIfNpMappingFoundInCurrent() {
         SymbolTableImpl symbolTable = new SymbolTableImpl();
         SymbolTable mockParent = Mockito.mock(SymbolTable.class);
         symbolTable.setParent(mockParent);
