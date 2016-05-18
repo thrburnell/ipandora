@@ -3,13 +3,14 @@ package com.ipandora.core.formula;
 import com.ipandora.api.predicate.formula.*;
 import com.ipandora.api.predicate.term.Term;
 import com.ipandora.core.term.TermStringBuilder;
+import com.ipandora.core.util.PrettyStringBuilder;
 import org.apache.commons.lang3.StringUtils;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Stack;
 
-public class FormulaStringBuilder implements FormulaVisitor<String> {
+public class FormulaStringBuilder implements PrettyStringBuilder<Formula>, FormulaVisitor<String> {
 
     private final Stack<LogicConnective> connectiveStack = new Stack<>();
     private final TermStringBuilder termStringBuilder;
@@ -18,6 +19,7 @@ public class FormulaStringBuilder implements FormulaVisitor<String> {
         this.termStringBuilder = termStringBuilder;
     }
 
+    @Override
     public String build(Formula formula) {
         return visit(formula);
     }
