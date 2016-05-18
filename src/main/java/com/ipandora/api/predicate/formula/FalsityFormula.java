@@ -19,4 +19,8 @@ public class FalsityFormula implements Formula {
         return "falsity".hashCode();
     }
 
+    @Override
+    public String toString() {
+        return "\u22A5";
+    }
 }

@@ -19,4 +19,8 @@ public class TruthFormula implements Formula {
         return "truth".hashCode();
     }
 
+    @Override
+    public String toString() {
+        return "\u22A4";
+    }
 }
