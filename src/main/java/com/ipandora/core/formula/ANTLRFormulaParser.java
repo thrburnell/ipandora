@@ -5,7 +5,9 @@ import com.ipandora.core.util.WrappingRuntimeException;
 import com.ipandora.parser.PredicateLogicLexer;
 import com.ipandora.parser.PredicateLogicParser;
 import org.antlr.v4.runtime.ANTLRInputStream;
+import org.antlr.v4.runtime.BailErrorStrategy;
 import org.antlr.v4.runtime.CommonTokenStream;
+import org.antlr.v4.runtime.misc.ParseCancellationException;
 
 public class ANTLRFormulaParser implements FormulaParser {
 
@@ -18,19 +20,23 @@ public class ANTLRFormulaParser implements FormulaParser {
     }
 
     public Formula fromString(String formula) throws FormulaParsingException {
-        // TODO: fail on any parsing error
         ANTLRInputStream stream = new ANTLRInputStream(formula);
         PredicateLogicLexer lexer = new PredicateLogicLexer(stream);
         CommonTokenStream tokens = new CommonTokenStream(lexer);
         PredicateLogicParser parser = new PredicateLogicParser(tokens);
-        PredicateLogicParser.FormulaContext formulaCtx = parser.formula();
+        parser.setErrorHandler(new BailErrorStrategy());
+
+        PredicateLogicParser.FormulaContext formulaCtx;
+        try {
+            formulaCtx = parser.formula();
+        } catch (ParseCancellationException e) {
+            throw new FormulaParsingException("Invalid formula: " + formula);
+        }
 
         try {
             Formula form = formulaBuildingVisitor.visit(formulaCtx);
             typeCheckAnalyser.analyse(form);
             return form;
-        } catch (IllegalFormulaException e) {
-            throw new FormulaParsingException(e);
         } catch (WrappingRuntimeException e) {
             throw new FormulaParsingException(e.getWrappedException());
         }

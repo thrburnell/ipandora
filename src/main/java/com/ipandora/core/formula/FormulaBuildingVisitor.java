@@ -5,6 +5,7 @@ import com.ipandora.api.predicate.term.Term;
 import com.ipandora.api.predicate.term.Type;
 import com.ipandora.api.predicate.term.Variable;
 import com.ipandora.core.term.TermBuildingVisitor;
+import com.ipandora.core.util.WrappingRuntimeException;
 import com.ipandora.parser.PredicateLogicBaseVisitor;
 import com.ipandora.parser.PredicateLogicLexer;
 import com.ipandora.parser.PredicateLogicParser;
@@ -124,10 +125,12 @@ public class FormulaBuildingVisitor extends PredicateLogicBaseVisitor<Formula> {
                     return new FalsityFormula();
             }
 
-            throw new IllegalFormulaException("Unknown truth/falsity value: " + ctx.tf.getText());
+            throw new WrappingRuntimeException(
+                    new InvalidSyntaxException("Unknown truth/falsity value: " + ctx.tf.getText()));
         }
 
-        throw new IllegalFormulaException("Element contained no quant, pred, expr or form: " + ctx);
+        throw new WrappingRuntimeException(
+                new InvalidSyntaxException("Element contained no quant, pred, expr or form: " + ctx));
     }
 
     @Override
@@ -149,7 +152,8 @@ public class FormulaBuildingVisitor extends PredicateLogicBaseVisitor<Formula> {
                 return new ExistsFormula(variable, formula);
         }
 
-        throw new IllegalFormulaException("Unknown quantifier " + ctx.quant.getText());
+        throw new WrappingRuntimeException(
+                new InvalidSyntaxException("Unknown quantifier " + ctx.quant.getText()));
     }
 
     @Override
@@ -190,7 +194,8 @@ public class FormulaBuildingVisitor extends PredicateLogicBaseVisitor<Formula> {
                 return new LessThanEqualFormula(lhs, rhs);
         }
 
-        throw new IllegalFormulaException("Unknown boolean operator " + ctx.op.getText());
+        throw new WrappingRuntimeException(
+                new InvalidSyntaxException("Unknown boolean operator " + ctx.op.getText()));
     }
 
     private Type getTypeFromDomain(PredicateLogicParser.DomainContext ctx) {
@@ -203,7 +208,8 @@ public class FormulaBuildingVisitor extends PredicateLogicBaseVisitor<Formula> {
             case PredicateLogicLexer.NAT: return Type.NAT;
         }
 
-        throw new IllegalFormulaException("Unknown type " + ctx.type.getText());
+        throw new WrappingRuntimeException(
+                new InvalidSyntaxException("Unknown type " + ctx.type.getText()));
     }
 
 }

@@ -6,4 +6,7 @@ public class FormulaParsingException extends Exception {
         super(cause);
     }
 
+    public FormulaParsingException(String message) {
+        super(message);
+    }
 }

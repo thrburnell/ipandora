@@ -2,8 +2,9 @@ package com.ipandora.core.term;
 
 import com.ipandora.api.predicate.term.*;
 import com.ipandora.api.predicate.term.Number;
-import com.ipandora.core.formula.IllegalFormulaException;
+import com.ipandora.core.formula.InvalidSyntaxException;
 import com.ipandora.core.util.Creator;
+import com.ipandora.core.util.WrappingRuntimeException;
 import com.ipandora.parser.PredicateLogicBaseVisitor;
 import com.ipandora.parser.PredicateLogicLexer;
 import com.ipandora.parser.PredicateLogicParser;
@@ -40,7 +41,8 @@ public class TermBuildingVisitor extends PredicateLogicBaseVisitor<Term> {
                 return new Subtraction(left, right);
         }
 
-        throw new IllegalFormulaException("Unknown mathematical operator " + ctx.op.getText());
+        throw new WrappingRuntimeException(
+                new InvalidSyntaxException("Unknown mathematical operator " + ctx.op.getText()));
     }
 
     @Override
@@ -84,7 +86,8 @@ public class TermBuildingVisitor extends PredicateLogicBaseVisitor<Term> {
                 return new Division(left, right);
         }
 
-        throw new IllegalFormulaException("Unknown mathematical operator " + ctx.op.getText());
+        throw new WrappingRuntimeException(
+                new InvalidSyntaxException("Unknown mathematical operator " + ctx.op.getText()));
     }
 
     @Override
@@ -129,7 +132,8 @@ public class TermBuildingVisitor extends PredicateLogicBaseVisitor<Term> {
             return visit(func);
         }
 
-        throw new IllegalFormulaException("Leaf term contained no var, constant, number, expr or func");
+        throw new WrappingRuntimeException(
+                new InvalidSyntaxException("Leaf term contained no var, constant, number, expr or func"));
     }
 
     @Override
