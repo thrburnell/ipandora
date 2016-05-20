@@ -24,8 +24,8 @@ public class ANTLRFormulaParserTest {
     public void before() {
         SymbolTableCreator symbolTableCreator = new SymbolTableCreator();
         FormulaBuildingVisitor visitor = new FormulaBuildingVisitor(new TermBuildingVisitor(symbolTableCreator));
-        TypeCheckAnalyser typeCheckAnalyser = new TypeCheckAnalyser(new TermTypeChecker());
-        parser = new ANTLRFormulaParser(visitor, typeCheckAnalyser);
+        FormulaTypeChecker formulaTypeChecker = new FormulaTypeChecker(new TermTypeChecker());
+        parser = new ANTLRFormulaParser(visitor, formulaTypeChecker);
     }
 
     @Test
@@ -271,12 +271,17 @@ public class ANTLRFormulaParserTest {
     public void fromStringShouldTypeCheckFormula() throws FormulaParsingException {
         SymbolTableCreator symbolTableCreator = new SymbolTableCreator();
         FormulaBuildingVisitor visitor = new FormulaBuildingVisitor(new TermBuildingVisitor(symbolTableCreator));
-        TypeCheckAnalyser mockTypeCheckAnalyser = Mockito.mock(TypeCheckAnalyser.class);
-        parser = new ANTLRFormulaParser(visitor, mockTypeCheckAnalyser);
+        FormulaTypeChecker mockFormulaTypeChecker = Mockito.mock(FormulaTypeChecker.class);
+        parser = new ANTLRFormulaParser(visitor, mockFormulaTypeChecker);
 
         Formula formula = parser.fromString("\\FORALL x in Nat. x > 2");
 
-        verify(mockTypeCheckAnalyser).analyse(formula);
+        verify(mockFormulaTypeChecker).analyse(formula);
+    }
+
+    @Test(expected = FormulaParsingException.class)
+    public void fromStringShouldThrowIfInvalidFormulaGiven() throws FormulaParsingException {
+        parser.fromString("\\FORALL x. (Foo x & Bar(y)");
     }
 
 }

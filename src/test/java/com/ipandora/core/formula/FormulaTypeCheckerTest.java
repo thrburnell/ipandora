@@ -18,16 +18,16 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 @RunWith(MockitoJUnitRunner.class)
-public class TypeCheckAnalyserTest {
+public class FormulaTypeCheckerTest {
 
     @Mock
     private TermTypeChecker mockTermTypeChecker;
 
-    private TypeCheckAnalyser analyser;
+    private FormulaTypeChecker typeChecker;
 
     @Before
     public void before() {
-        analyser = new TypeCheckAnalyser(mockTermTypeChecker);
+        typeChecker = new FormulaTypeChecker(mockTermTypeChecker);
     }
 
 
@@ -38,7 +38,7 @@ public class TypeCheckAnalyserTest {
         Variable variable = new Variable("?x");
         PredicateFormula predicate = new PredicateFormula("Foo", Arrays.<Term>asList(number, constant, variable));
 
-        analyser.analyse(predicate);
+        typeChecker.analyse(predicate);
 
         verify(mockTermTypeChecker).visit(number);
         verify(mockTermTypeChecker).visit(constant);
@@ -51,7 +51,7 @@ public class TypeCheckAnalyserTest {
         Variable variable = Variable.withTypeNat("?x");
         EqualToFormula equalToFormula = new EqualToFormula(number, variable);
 
-        analyser.analyse(equalToFormula);
+        typeChecker.analyse(equalToFormula);
 
         verify(mockTermTypeChecker).visit(number);
         verify(mockTermTypeChecker).visit(variable);
@@ -63,7 +63,7 @@ public class TypeCheckAnalyserTest {
         Variable variable = Variable.withTypeNat("?x");
         GreaterThanFormula greaterThanFormula = new GreaterThanFormula(number, variable);
 
-        analyser.analyse(greaterThanFormula);
+        typeChecker.analyse(greaterThanFormula);
 
         verify(mockTermTypeChecker).visit(number);
         verify(mockTermTypeChecker).visit(variable);
@@ -75,7 +75,7 @@ public class TypeCheckAnalyserTest {
         Variable variable = Variable.withTypeNat("?x");
         GreaterThanEqualFormula greaterThanEqualFormula = new GreaterThanEqualFormula(number, variable);
 
-        analyser.analyse(greaterThanEqualFormula);
+        typeChecker.analyse(greaterThanEqualFormula);
 
         verify(mockTermTypeChecker).visit(number);
         verify(mockTermTypeChecker).visit(variable);
@@ -87,7 +87,7 @@ public class TypeCheckAnalyserTest {
         Variable variable = Variable.withTypeNat("?x");
         LessThanFormula lessThanFormula = new LessThanFormula(number, variable);
 
-        analyser.analyse(lessThanFormula);
+        typeChecker.analyse(lessThanFormula);
 
         verify(mockTermTypeChecker).visit(number);
         verify(mockTermTypeChecker).visit(variable);
@@ -99,7 +99,7 @@ public class TypeCheckAnalyserTest {
         Variable variable = Variable.withTypeNat("?x");
         LessThanEqualFormula lessThanEqualFormula = new LessThanEqualFormula(number, variable);
 
-        analyser.analyse(lessThanEqualFormula);
+        typeChecker.analyse(lessThanEqualFormula);
 
         verify(mockTermTypeChecker).visit(number);
         verify(mockTermTypeChecker).visit(variable);
@@ -163,7 +163,7 @@ public class TypeCheckAnalyserTest {
 
     private void analyseAndExpectWrappedRuntimeException(Formula formula) throws Exception {
         try {
-            analyser.analyse(formula);
+            typeChecker.analyse(formula);
         } catch (WrappingRuntimeException e) {
             throw e.getWrappedException();
         }

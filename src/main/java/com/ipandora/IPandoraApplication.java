@@ -44,9 +44,9 @@ public class IPandoraApplication extends Application<IPandoraConfiguration> {
         SymbolTableCreator symbolTableCreator = new SymbolTableCreator();
         FormulaBuildingVisitor formulaBuildingVisitor = new FormulaBuildingVisitor(
                 new TermBuildingVisitor(symbolTableCreator));
-        TypeCheckAnalyser typeCheckAnalyser = new TypeCheckAnalyser(new TermTypeChecker());
+        FormulaTypeChecker formulaTypeChecker = new FormulaTypeChecker(new TermTypeChecker());
 
-        ANTLRFormulaParser formulaParser = new ANTLRFormulaParser(formulaBuildingVisitor, typeCheckAnalyser);
+        ANTLRFormulaParser formulaParser = new ANTLRFormulaParser(formulaBuildingVisitor, formulaTypeChecker);
 
         Z3ImpliesChecker impliesChecker = new Z3ImpliesChecker(
                 new SMTCodeGeneratorImpl(new SMTGeneratingFormulaVisitorCreator()),

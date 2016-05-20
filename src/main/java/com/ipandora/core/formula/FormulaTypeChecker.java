@@ -9,11 +9,11 @@ import com.ipandora.core.util.WrappingRuntimeException;
 
 import java.util.List;
 
-public class TypeCheckAnalyser implements FormulaSemanticAnalyser, FormulaVisitor<Void> {
+public class FormulaTypeChecker implements FormulaSemanticAnalyser, FormulaVisitor<Void> {
 
     private final TermTypeChecker termTypeChecker;
 
-    public TypeCheckAnalyser(TermTypeChecker termTypeChecker) {
+    public FormulaTypeChecker(TermTypeChecker termTypeChecker) {
         this.termTypeChecker = termTypeChecker;
     }
 

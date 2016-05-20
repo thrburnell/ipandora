@@ -12,11 +12,11 @@ import org.antlr.v4.runtime.misc.ParseCancellationException;
 public class ANTLRFormulaParser implements FormulaParser {
 
     private final FormulaBuildingVisitor formulaBuildingVisitor;
-    private final TypeCheckAnalyser typeCheckAnalyser;
+    private final FormulaTypeChecker formulaTypeChecker;
 
-    public ANTLRFormulaParser(FormulaBuildingVisitor formulaBuildingVisitor, TypeCheckAnalyser typeCheckAnalyser) {
+    public ANTLRFormulaParser(FormulaBuildingVisitor formulaBuildingVisitor, FormulaTypeChecker formulaTypeChecker) {
         this.formulaBuildingVisitor = formulaBuildingVisitor;
-        this.typeCheckAnalyser = typeCheckAnalyser;
+        this.formulaTypeChecker = formulaTypeChecker;
     }
 
     public Formula fromString(String formula) throws FormulaParsingException {
@@ -35,7 +35,7 @@ public class ANTLRFormulaParser implements FormulaParser {
 
         try {
             Formula form = formulaBuildingVisitor.visit(formulaCtx);
-            typeCheckAnalyser.analyse(form);
+            formulaTypeChecker.analyse(form);
             return form;
         } catch (WrappingRuntimeException e) {
             throw new FormulaParsingException(e.getWrappedException());
