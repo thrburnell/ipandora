@@ -1,14 +1,12 @@
 package com.ipandora.core.formula;
 
 import com.ipandora.api.predicate.formula.*;
+import com.ipandora.api.predicate.term.*;
 import com.ipandora.api.predicate.term.Number;
-import com.ipandora.api.predicate.term.Term;
-import com.ipandora.api.predicate.term.Variable;
 import com.ipandora.core.term.TermStringBuilder;
 import org.junit.Test;
 
-import java.util.Arrays;
-import java.util.List;
+import java.util.*;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
@@ -18,8 +16,12 @@ public class FormulaStringBuilderTest {
     private static final PropositionFormula Q = new PropositionFormula("Q");
     private static final PropositionFormula R = new PropositionFormula("R");
 
-    private static final Variable X = new Variable("?x");
-    private static final Variable Y = new Variable("?y");
+    private static final Variable X = new Variable("x");
+    private static final Variable Y = new Variable("y");
+    private static final Variable Z = new Variable("z");
+
+    private static final Variable X_NAT = Variable.withTypeNat("x");
+    private static final Variable Y_NAT = Variable.withTypeNat("y");
 
     private static List<Term> list(Term... term) {
         return Arrays.asList(term);
@@ -32,7 +34,7 @@ public class FormulaStringBuilderTest {
         ForallFormula formula = new ForallFormula(X, new NotFormula(new PredicateFormula("P", list(X))));
         String result = builder.build(formula);
 
-        assertThat(result).isEqualTo("\\FORALL ?x !P(?x)");
+        assertThat(result).isEqualTo("\\FORALL x. !P(x)");
     }
 
     @Test
@@ -43,7 +45,7 @@ public class FormulaStringBuilderTest {
         ForallFormula formula = new ForallFormula(X, new AndFormula(forallY, new PredicateFormula("P", list(X))));
         String result = builder.build(formula);
 
-        assertThat(result).isEqualTo("\\FORALL ?x (\\FORALL ?y P(?y) & P(?x))");
+        assertThat(result).isEqualTo("\\FORALL x. (\\FORALL y. P(y) & P(x))");
     }
 
     @Test
@@ -55,7 +57,7 @@ public class FormulaStringBuilderTest {
         ForallFormula formula = new ForallFormula(X, new ForallFormula(Y, new AndFormula(pY, pX)));
         String result = builder.build(formula);
 
-        assertThat(result).isEqualTo("\\FORALL ?x \\FORALL ?y (P(?y) & P(?x))");
+        assertThat(result).isEqualTo("\\FORALL x. \\FORALL y. (P(y) & P(x))");
     }
 
     @Test
@@ -65,7 +67,7 @@ public class FormulaStringBuilderTest {
         ExistsFormula formula = new ExistsFormula(X, new NotFormula(new PredicateFormula("P", list(X))));
         String result = builder.build(formula);
 
-        assertThat(result).isEqualTo("\\EXISTS ?x !P(?x)");
+        assertThat(result).isEqualTo("\\EXISTS x. !P(x)");
     }
 
     @Test
@@ -76,7 +78,7 @@ public class FormulaStringBuilderTest {
         ExistsFormula formula = new ExistsFormula(X, new AndFormula(existsY, new PredicateFormula("P", list(X))));
         String result = builder.build(formula);
 
-        assertThat(result).isEqualTo("\\EXISTS ?x (\\EXISTS ?y P(?y) & P(?x))");
+        assertThat(result).isEqualTo("\\EXISTS x. (\\EXISTS y. P(y) & P(x))");
     }
 
     @Test
@@ -88,7 +90,7 @@ public class FormulaStringBuilderTest {
         ExistsFormula formula = new ExistsFormula(X, new ExistsFormula(Y, new AndFormula(pY, pX)));
         String result = builder.build(formula);
 
-        assertThat(result).isEqualTo("\\EXISTS ?x \\EXISTS ?y (P(?y) & P(?x))");
+        assertThat(result).isEqualTo("\\EXISTS x. \\EXISTS y. (P(y) & P(x))");
     }
 
     @Test
@@ -178,7 +180,7 @@ public class FormulaStringBuilderTest {
         ForallFormula formula = new ForallFormula(X, new ExistsFormula(Y, new PredicateFormula("P", list(X, Y))));
         String result = builder.build(formula);
 
-        assertThat(result).isEqualTo("\\FORALL ?x \\EXISTS ?y P(?x, ?y)");
+        assertThat(result).isEqualTo("\\FORALL x. \\EXISTS y. P(x, y)");
     }
 
     @Test
@@ -243,9 +245,6 @@ public class FormulaStringBuilderTest {
         assertThat(result).isEqualTo("(P <-> Q) <-> R");
     }
 
-    // !(?x = 2)
-    // (?x = 2) & (?y = 3)
-
     @Test
     public void buildEqualToShouldNotHaveBracketsIfInOutermostContext() {
         // ?x = 2
@@ -253,7 +252,7 @@ public class FormulaStringBuilderTest {
         EqualToFormula formula = new EqualToFormula(X, new Number(2));
         String result = builder.build(formula);
 
-        assertThat(result).isEqualTo("?x = 2");
+        assertThat(result).isEqualTo("x = 2");
     }
 
     @Test
@@ -263,7 +262,7 @@ public class FormulaStringBuilderTest {
         GreaterThanFormula formula = new GreaterThanFormula(X, new Number(2));
         String result = builder.build(formula);
 
-        assertThat(result).isEqualTo("?x > 2");
+        assertThat(result).isEqualTo("x > 2");
     }
 
     @Test
@@ -273,7 +272,7 @@ public class FormulaStringBuilderTest {
         GreaterThanEqualFormula formula = new GreaterThanEqualFormula(X, new Number(2));
         String result = builder.build(formula);
 
-        assertThat(result).isEqualTo("?x >= 2");
+        assertThat(result).isEqualTo("x >= 2");
     }
 
     @Test
@@ -283,7 +282,7 @@ public class FormulaStringBuilderTest {
         LessThanFormula formula = new LessThanFormula(X, new Number(2));
         String result = builder.build(formula);
 
-        assertThat(result).isEqualTo("?x < 2");
+        assertThat(result).isEqualTo("x < 2");
     }
 
     @Test
@@ -293,7 +292,7 @@ public class FormulaStringBuilderTest {
         LessThanEqualFormula formula = new LessThanEqualFormula(X, new Number(2));
         String result = builder.build(formula);
 
-        assertThat(result).isEqualTo("?x <= 2");
+        assertThat(result).isEqualTo("x <= 2");
     }
 
     @Test
@@ -303,7 +302,7 @@ public class FormulaStringBuilderTest {
         NotFormula formula = new NotFormula(new EqualToFormula(X, new Number(2)));
         String result = builder.build(formula);
 
-        assertThat(result).isEqualTo("!(?x = 2)");
+        assertThat(result).isEqualTo("!(x = 2)");
     }
 
     @Test
@@ -313,7 +312,7 @@ public class FormulaStringBuilderTest {
         NotFormula formula = new NotFormula(new GreaterThanFormula(X, new Number(2)));
         String result = builder.build(formula);
 
-        assertThat(result).isEqualTo("!(?x > 2)");
+        assertThat(result).isEqualTo("!(x > 2)");
     }
 
     @Test
@@ -323,7 +322,7 @@ public class FormulaStringBuilderTest {
         NotFormula formula = new NotFormula(new GreaterThanEqualFormula(X, new Number(2)));
         String result = builder.build(formula);
 
-        assertThat(result).isEqualTo("!(?x >= 2)");
+        assertThat(result).isEqualTo("!(x >= 2)");
     }
 
     @Test
@@ -333,7 +332,7 @@ public class FormulaStringBuilderTest {
         NotFormula formula = new NotFormula(new LessThanFormula(X, new Number(2)));
         String result = builder.build(formula);
 
-        assertThat(result).isEqualTo("!(?x < 2)");
+        assertThat(result).isEqualTo("!(x < 2)");
     }
 
     @Test
@@ -343,7 +342,7 @@ public class FormulaStringBuilderTest {
         NotFormula formula = new NotFormula(new LessThanEqualFormula(X, new Number(2)));
         String result = builder.build(formula);
 
-        assertThat(result).isEqualTo("!(?x <= 2)");
+        assertThat(result).isEqualTo("!(x <= 2)");
     }
 
     @Test
@@ -359,8 +358,41 @@ public class FormulaStringBuilderTest {
         AndFormula formula = new AndFormula(eq, new AndFormula(gt, new AndFormula(gte, new AndFormula(lt, lte))));
         String result = builder.build(formula);
 
-        assertThat(result).isEqualTo("(?x = 2) & (?x > 1) & (?x >= 0) & (?x < 3) & (?x <= 2)");
+        assertThat(result).isEqualTo("(x = 2) & (x > 1) & (x >= 0) & (x < 3) & (x <= 2)");
     }
 
+    @Test
+    public void buildQuantifiersWithTypedVariables() {
+        // \\FORALL x, y in Nat. x + y = y + x
+        FormulaStringBuilder builder = new FormulaStringBuilder(new TermStringBuilder());
+
+        Map<Type, List<Variable>> variablesByType = new HashMap<>();
+        variablesByType.put(Type.NAT, Arrays.asList(X_NAT, Y_NAT));
+
+        ForallFormula formula = new ForallFormula(variablesByType,
+                new EqualToFormula(new Addition(X_NAT, Y_NAT), new Addition(Y_NAT, X_NAT)));
+
+        String result = builder.build(formula);
+
+        assertThat(result).isEqualTo("\\FORALL x, y in Nat. (x + y = y + x)");
+    }
+
+    @Test
+    public void buildQuantifiersWithDifferentTypedVariables() {
+        // \\FORALL x, y in Nat, z. x + y = 0 & Foo(z)
+        FormulaStringBuilder builder = new FormulaStringBuilder(new TermStringBuilder());
+
+        Map<Type, List<Variable>> variablesByType = new HashMap<>();
+        variablesByType.put(Type.NAT, Arrays.asList(X_NAT, Y_NAT));
+        variablesByType.put(Type.UNKNOWN, Arrays.asList(Z));
+
+        ForallFormula formula = new ForallFormula(variablesByType, new AndFormula(
+                new EqualToFormula(new Addition(X_NAT, Y_NAT), new Number(0)),
+                new PredicateFormula("Foo", list(Z))));
+
+        String result = builder.build(formula);
+
+        assertThat(result).isEqualTo("\\FORALL x, y in Nat, z. ((x + y = 0) & Foo(z))");
+    }
 
 }

@@ -45,7 +45,11 @@ element
     ;
 
 quantified
-    : quant=(FORALL | EXISTS) var=NAME (dom=domain)? elem=negElement
+    : quant=(FORALL | EXISTS) varSets+=varSet (',' varSets+=varSet)* '.' elem=negElement
+    ;
+
+varSet
+    : vars+=NAME (',' vars+=NAME)* (dom=domain)?
     ;
 
 domain
@@ -98,7 +102,6 @@ leafTerm
 function
     : name=NAME args=argList
     ;
-
 
 // Connectives
 NOT: '!';

@@ -2,12 +2,15 @@ package com.ipandora.core.formula;
 
 import com.ipandora.api.predicate.formula.*;
 import com.ipandora.api.predicate.term.Term;
+import com.ipandora.api.predicate.term.Type;
+import com.ipandora.api.predicate.term.Variable;
 import com.ipandora.core.term.TermStringBuilder;
 import com.ipandora.core.util.PrettyStringBuilder;
 import org.apache.commons.lang3.StringUtils;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 import java.util.Stack;
 
 public class FormulaStringBuilder implements PrettyStringBuilder<Formula>, FormulaVisitor<String> {
@@ -67,12 +70,13 @@ public class FormulaStringBuilder implements PrettyStringBuilder<Formula>, Formu
     @Override
     public String visitForallFormula(ForallFormula forallFormula) {
         LogicConnective forall = LogicConnective.FORALL;
+        String variables = visitQuantifiedVariableList(forallFormula.getVariablesByType());
+
         connectiveStack.push(forall);
-        String variable = termStringBuilder.build(forallFormula.getVariable());
         String formula = visit(forallFormula.getFormula());
         connectiveStack.pop();
 
-        String result = String.format("\\FORALL %s %s", variable, formula);
+        String result = String.format("\\FORALL %s. %s", variables, formula);
 
         if (doesCurrentContextBindStronger(forall)) {
             result = wrapInParenthesis(result);
@@ -84,18 +88,39 @@ public class FormulaStringBuilder implements PrettyStringBuilder<Formula>, Formu
     @Override
     public String visitExistsFormula(ExistsFormula existsFormula) {
         LogicConnective exists = LogicConnective.EXISTS;
+        String variables = visitQuantifiedVariableList(existsFormula.getVariablesByType());
+
         connectiveStack.push(exists);
-        String variable = termStringBuilder.build(existsFormula.getVariable());
         String formula = visit(existsFormula.getFormula());
         connectiveStack.pop();
 
-        String result = String.format("\\EXISTS %s %s", variable, formula);
+        String result = String.format("\\EXISTS %s. %s", variables, formula);
 
         if (doesCurrentContextBindStronger(exists)) {
             result = wrapInParenthesis(result);
         }
 
         return result;
+    }
+
+    private String visitQuantifiedVariableList(Map<Type, List<Variable>> variablesByType) {
+        List<String> varStrings = new ArrayList<>();
+        for (Map.Entry<Type, List<Variable>> vars : variablesByType.entrySet()) {
+            Type type = vars.getKey();
+            List<String> thisVarStrings = new ArrayList<>();
+            for (Variable var : vars.getValue()) {
+                thisVarStrings.add(termStringBuilder.build(var));
+            }
+
+            StringBuilder varBuilder = new StringBuilder();
+            varBuilder.append(StringUtils.join(thisVarStrings, ", "));
+            if (type != Type.UNKNOWN) {
+                varBuilder.append(" in ").append(type.getName());
+            }
+            varStrings.add(varBuilder.toString());
+        }
+
+        return StringUtils.join(varStrings, ", ");
     }
 
     @Override

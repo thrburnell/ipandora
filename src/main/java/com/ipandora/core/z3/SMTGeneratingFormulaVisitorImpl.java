@@ -2,6 +2,7 @@ package com.ipandora.core.z3;
 
 import com.ipandora.api.predicate.formula.*;
 import com.ipandora.api.predicate.term.Term;
+import com.ipandora.api.predicate.term.Type;
 import com.ipandora.api.predicate.term.Variable;
 import org.apache.commons.lang3.StringUtils;
 
@@ -93,17 +94,23 @@ public class SMTGeneratingFormulaVisitorImpl implements SMTGeneratingFormulaVisi
 
     @Override
     public String visitForallFormula(ForallFormula forallFormula) {
-        String variableName = forallFormula.getVariable().getName();
+
+        StringBuilder sb = new StringBuilder();
+        for (Variable variable : forallFormula.getVariables()) {
+            sb.append("(").append(variable.getName()).append(" ").append(TYPE_NAME).append(")");
+        }
+        String vars = sb.toString();
+
         Formula formula = forallFormula.getFormula();
-        return String.format("(forall ((%s %s)) %s)", variableName, TYPE_NAME, visit(formula));
+        return String.format("(forall (%s) %s)", vars, visit(formula));
     }
 
     @Override
     public String visitExistsFormula(ExistsFormula existsFormula) {
         // Z3 only supports forall. Use equivalence (exists x. foo) === (!(forall x. !foo))
-        Variable variable = existsFormula.getVariable();
+        Map<Type, List<Variable>> variablesByType = existsFormula.getVariablesByType();
         Formula formula = existsFormula.getFormula();
-        NotFormula equivalent = new NotFormula(new ForallFormula(variable, new NotFormula(formula)));
+        NotFormula equivalent = new NotFormula(new ForallFormula(variablesByType, new NotFormula(formula)));
         return visit(equivalent);
     }
 

@@ -9,6 +9,7 @@ import java.util.List;
 public class SchemaResponse {
 
     private String goal;
+    private String variable;
     private BaseCase baseCase;
     private InductiveCase inductiveCase;
 
@@ -20,6 +21,16 @@ public class SchemaResponse {
     @JsonProperty
     public void setGoal(String goal) {
         this.goal = goal;
+    }
+
+    @JsonProperty
+    public String getVariable() {
+        return variable;
+    }
+
+    @JsonProperty
+    public void setVariable(String variable) {
+        this.variable = variable;
     }
 
     @JsonProperty

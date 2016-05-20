@@ -9,9 +9,12 @@ import com.ipandora.core.util.WrappingRuntimeException;
 import com.ipandora.parser.PredicateLogicBaseVisitor;
 import com.ipandora.parser.PredicateLogicLexer;
 import com.ipandora.parser.PredicateLogicParser;
+import org.antlr.v4.runtime.Token;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 public class FormulaBuildingVisitor extends PredicateLogicBaseVisitor<Formula> {
 
@@ -136,20 +139,33 @@ public class FormulaBuildingVisitor extends PredicateLogicBaseVisitor<Formula> {
     @Override
     public Formula visitQuantified(PredicateLogicParser.QuantifiedContext ctx) {
 
-        Type type = getTypeFromDomain(ctx.dom);
-        String variableName = ctx.var.getText();
-        Variable variable = new Variable(variableName, type);
-
         termBuildingVisitor.enterNewScope();
-        termBuildingVisitor.addTypeMapping(variableName, type);
+
+        Map<Type, List<Variable>> variablesByType = new HashMap<>();
+        for (PredicateLogicParser.VarSetContext vsc : ctx.varSets) {
+            List<Variable> variables = new ArrayList<>();
+            Type type = getTypeFromDomain(vsc.dom);
+            for (Token var : vsc.vars) {
+                String variableName = var.getText();
+                variables.add(new Variable(variableName, type));
+                termBuildingVisitor.addTypeMapping(variableName, type);
+            }
+            List<Variable> variablesAlreadySaved = variablesByType.get(type);
+            if (variablesAlreadySaved == null) {
+                variablesByType.put(type, variables);
+            } else {
+                variablesAlreadySaved.addAll(variables);
+            }
+        }
+
         Formula formula = visit(ctx.elem);
         termBuildingVisitor.exitScope();
 
         switch (ctx.quant.getType()) {
             case PredicateLogicLexer.FORALL:
-                return new ForallFormula(variable, formula);
+                return new ForallFormula(variablesByType, formula);
             case PredicateLogicLexer.EXISTS:
-                return new ExistsFormula(variable, formula);
+                return new ExistsFormula(variablesByType, formula);
         }
 
         throw new WrappingRuntimeException(

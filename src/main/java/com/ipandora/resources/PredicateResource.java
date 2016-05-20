@@ -8,6 +8,7 @@ import com.ipandora.api.predicate.proofstep.StepRequest;
 import com.ipandora.api.predicate.proofstep.StepResponse;
 import com.ipandora.api.predicate.read.ReadResponse;
 import com.ipandora.api.predicate.term.Term;
+import com.ipandora.api.predicate.term.Variable;
 import com.ipandora.api.predicate.validate.ValidateRequest;
 import com.ipandora.api.predicate.validate.ValidateResponse;
 import com.ipandora.core.formula.FormulaParser;
@@ -132,16 +133,19 @@ public class PredicateResource {
             throws FormulaParsingException, SchemaGeneratorException {
 
         String goal = schemaRequest.getGoal();
+        String varName = schemaRequest.getVariable();
 
         SchemaResponse response = new SchemaResponse();
         response.setGoal(goal);
+        response.setVariable(varName);
 
         Formula formula = formulaParser.fromString(goal);
         if (!(formula instanceof ForallFormula)) {
             return Response.status(422).entity(response).build();
         }
 
-        InductionSchema schema = inductionSchemaGenerator.generateSchema((ForallFormula) formula);
+        Variable variable = Variable.withTypeNat(varName);
+        InductionSchema schema = inductionSchemaGenerator.generateSchema((ForallFormula) formula, variable);
 
         List<String> baseCaseToShow = new ArrayList<>();
         for (Formula bcts : schema.getBaseCaseToShow()) {

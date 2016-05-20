@@ -46,17 +46,19 @@ public class SMTGeneratingFormulaVisitorImplTest {
 
     @Test
     public void visitForallFormulaReturnsCorrectCode() {
-        // (forall ((x Type)) (Foo x))
+        // (forall ((x Type) (y Type) (z Type)) (Foo x))
 
         Variable x = new Variable("x");
+        Variable y = new Variable("y");
+        Variable z = new Variable("z");
         PredicateFormula predicateFormula = new PredicateFormula("Foo", Collections.<Term>singletonList(x));
-        ForallFormula forallFormula = new ForallFormula(x, predicateFormula);
+        ForallFormula forallFormula = new ForallFormula(predicateFormula, x, y, z);
 
         SMTGeneratingTermVisitor termVisitor = new SMTGeneratingTermVisitor();
         SMTGeneratingFormulaVisitor visitor = new SMTGeneratingFormulaVisitorImpl(termVisitor);
         String result = visitor.visit(forallFormula);
 
-        assertThat(result).isEqualTo("(forall ((x Type)) (Foo x))");
+        assertThat(result).isEqualTo("(forall ((x Type)(y Type)(z Type)) (Foo x))");
     }
 
     @Test
@@ -64,14 +66,16 @@ public class SMTGeneratingFormulaVisitorImplTest {
         // (not (forall ((x Type)) (not (Foo x))))
 
         Variable x = new Variable("x");
+        Variable y = new Variable("y");
+        Variable z = new Variable("z");
         PredicateFormula predicateFormula = new PredicateFormula("Foo", Collections.<Term>singletonList(x));
-        ExistsFormula existsFormula = new ExistsFormula(x, predicateFormula);
+        ExistsFormula existsFormula = new ExistsFormula(predicateFormula, x, y, z);
 
         SMTGeneratingTermVisitor termVisitor = new SMTGeneratingTermVisitor();
         SMTGeneratingFormulaVisitor visitor = new SMTGeneratingFormulaVisitorImpl(termVisitor);
         String result = visitor.visit(existsFormula);
 
-        assertThat(result).isEqualTo("(not (forall ((x Type)) (not (Foo x))))");
+        assertThat(result).isEqualTo("(not (forall ((x Type)(y Type)(z Type)) (not (Foo x))))");
     }
 
     @Test

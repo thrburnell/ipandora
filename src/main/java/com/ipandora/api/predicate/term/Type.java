@@ -1,8 +1,10 @@
 package com.ipandora.api.predicate.term;
 
-public enum Type {
+public enum Type implements Comparable<Type> {
 
-    NAT("Nat"), UNKNOWN("");
+    // NOTE: UNKNOWN must be kept last, for natural ordering
+    NAT("Nat"),
+    UNKNOWN("Unknown");
 
     private final String name;
 
@@ -14,4 +16,7 @@ public enum Type {
         return name;
     }
 
+    public String getName() {
+        return name;
+    }
 }

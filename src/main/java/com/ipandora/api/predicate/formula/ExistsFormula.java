@@ -3,30 +3,38 @@ package com.ipandora.api.predicate.formula;
 import com.ipandora.api.predicate.term.Type;
 import com.ipandora.api.predicate.term.Variable;
 import com.ipandora.core.formula.FormulaVisitor;
+import org.apache.commons.lang3.StringUtils;
 
-public class ExistsFormula implements Formula {
+import java.util.List;
+import java.util.Map;
 
-    private final Variable variable;
-    private final Formula formula;
+public class ExistsFormula extends QuantifiedFormula {
+
+    public ExistsFormula(Map<Type, List<Variable>> variablesByType, Formula formula) {
+        super(variablesByType, formula);
+    }
 
     public ExistsFormula(Variable variable, Formula formula) {
-        this.variable = variable;
-        this.formula = formula;
+        super(variable, formula);
     }
 
-    public Variable getVariable() {
-        return variable;
-    }
-
-    public Formula getFormula() {
-        return formula;
+    public ExistsFormula(Formula formula, Variable... variables) {
+        super(formula, variables);
     }
 
     @Override
     public String toString() {
-        Type type = variable.getType();
-        String typeString = type == null ? "" : String.format("\u2208%s", type);
-        return String.format("\u2203%s%s.(%s)", variable, typeString, formula);
+        StringBuilder sb = new StringBuilder();
+        sb.append("\u2203");
+        for (Map.Entry<Type, List<Variable>> entry : variablesByType.entrySet()) {
+            Type type = entry.getKey();
+            String varNames = StringUtils.join(entry.getValue(), ",");
+            String typeString = type == null ? "" : String.format("\u2208%s", type);
+            sb.append(varNames).append(typeString);
+        }
+        sb.append(" ").append(formula);
+
+        return sb.toString();
     }
 
     @Override
@@ -34,22 +42,4 @@ public class ExistsFormula implements Formula {
         return visitor.visitExistsFormula(this);
     }
 
-    @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
-
-        ExistsFormula that = (ExistsFormula) o;
-
-        if (variable != null ? !variable.equals(that.variable) : that.variable != null) return false;
-        return !(formula != null ? !formula.equals(that.formula) : that.formula != null);
-
-    }
-
-    @Override
-    public int hashCode() {
-        int result = variable != null ? variable.hashCode() : 0;
-        result = 31 * result + (formula != null ? formula.hashCode() : 0);
-        return result;
-    }
 }

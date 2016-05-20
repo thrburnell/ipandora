@@ -49,20 +49,29 @@ public class TermSubstitutor {
 
         @Override
         public Formula visitForallFormula(ForallFormula forallFormula) {
-            String varName = forallFormula.getVariable().getName();
-            substitutingTermVisitor.ignoreFromSubstitution(varName);
-            Formula result = visit(forallFormula.getFormula());
-            substitutingTermVisitor.removeFromIgnoreList(varName);
-            return new ForallFormula(forallFormula.getVariable(), result);
+            return new ForallFormula(forallFormula.getVariablesByType(),
+                    visitNestedFormulaIgnoringQuantVars(forallFormula));
         }
 
         @Override
         public Formula visitExistsFormula(ExistsFormula existsFormula) {
-            String varName = existsFormula.getVariable().getName();
-            substitutingTermVisitor.ignoreFromSubstitution(varName);
-            Formula result = visit(existsFormula.getFormula());
-            substitutingTermVisitor.removeFromIgnoreList(varName);
-            return new ExistsFormula(existsFormula.getVariable(), result);
+            return new ExistsFormula(existsFormula.getVariablesByType(),
+                    visitNestedFormulaIgnoringQuantVars(existsFormula));
+        }
+
+        private Formula visitNestedFormulaIgnoringQuantVars(QuantifiedFormula quantifiedFormula) {
+            List<Variable> variables = quantifiedFormula.getVariables();
+            for (Variable variable : variables) {
+                substitutingTermVisitor.ignoreFromSubstitution(variable.getName());
+            }
+
+            Formula result = visit(quantifiedFormula.getFormula());
+
+            for (Variable variable : variables) {
+                substitutingTermVisitor.removeFromIgnoreList(variable.getName());
+            }
+
+            return result;
         }
 
         @Override

@@ -14,11 +14,11 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 public class AtomicTermCollectorTest {
 
-    public static final Variable X = new Variable("x");
-    public static final Constant Y = new Constant("y");
-    public static final Variable Z = new Variable("z");
-    public static final Number N_1 = new Number(1);
-    public static final Number N_14 = new Number(14);
+    private static final Variable X = new Variable("x");
+    private static final Constant Y = new Constant("y");
+    private static final Variable Z = new Variable("z");
+    private static final Number N_1 = new Number(1);
+    private static final Number N_14 = new Number(14);
 
     @Test
     public void collectAtomsAndFormula() {

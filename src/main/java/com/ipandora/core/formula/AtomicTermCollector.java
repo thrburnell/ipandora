@@ -48,14 +48,14 @@ public class AtomicTermCollector {
 
         @Override
         public Void visitForallFormula(ForallFormula forallFormula) {
-            atoms.add(forallFormula.getVariable());
+            atoms.addAll(forallFormula.getVariables());
             visit(forallFormula.getFormula());
             return null;
         }
 
         @Override
         public Void visitExistsFormula(ExistsFormula existsFormula) {
-            atoms.add(existsFormula.getVariable());
+            atoms.addAll(existsFormula.getVariables());
             visit(existsFormula.getFormula());
             return null;
         }

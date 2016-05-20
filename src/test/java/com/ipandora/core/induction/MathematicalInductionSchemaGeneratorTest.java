@@ -15,16 +15,18 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 public class MathematicalInductionSchemaGeneratorTest {
 
-    private static final Constant K = new Constant("k");
-    private static final Constant K2 = new Constant("k2");
-    private static final Variable K_VAR = Variable.withTypeNat("k");
-    private static final Variable K1_VAR = Variable.withTypeNat("k1");
+    private static final Constant K_CONST = new Constant("k");
+    private static final Constant K1_CONST = new Constant("k1");
+    private static final Constant K2_CONST = new Constant("k2");
+    private static final Variable K_NAT = Variable.withTypeNat("k");
+    private static final Variable K1_NAT = Variable.withTypeNat("k1");
     private static final Number ZERO = new Number(0);
     private static final Number ONE = new Number(1);
     private static final Number TWO = new Number(2);
-    private static final Variable N_NAT = Variable.withTypeNat("?n");
-    private static final Variable M_NAT = Variable.withTypeNat("?m");
-    private static final Variable I_NAT = Variable.withTypeNat("?i");
+    private static final Variable N_NAT = Variable.withTypeNat("n");
+    private static final Variable M_NAT = Variable.withTypeNat("m");
+    private static final Variable I_NAT = Variable.withTypeNat("i");
+    private static final Variable X_UNKNOWN = new Variable("x");
 
     private TermStringBuilder termStringBuilder;
     private TermSubstitutor termSubstitutor;
@@ -39,35 +41,35 @@ public class MathematicalInductionSchemaGeneratorTest {
 
     @Test
     public void generateSchemaSimpleEquality() throws SchemaGeneratorException {
-        // \FORALL ?n in Nat ?n = ?n
+        // \FORALL n in Nat. n = n
 
         EqualToFormula baseCase = new EqualToFormula(ZERO, ZERO);
-        EqualToFormula indHyp = new EqualToFormula(K, K);
-        EqualToFormula inductiveCase = new EqualToFormula(new Addition(K, ONE), new Addition(K, ONE));
+        EqualToFormula indHyp = new EqualToFormula(K_CONST, K_CONST);
+        EqualToFormula inductiveCase = new EqualToFormula(new Addition(K_CONST, ONE), new Addition(K_CONST, ONE));
 
         InductionSchema expected = new InductionSchema(
-                Collections.<Formula>singletonList(baseCase), K, indHyp,
+                Collections.<Formula>singletonList(baseCase), K_CONST, indHyp,
                 Collections.<Formula>singletonList(inductiveCase));
 
         ForallFormula forallFormula = new ForallFormula(N_NAT, new EqualToFormula(N_NAT, N_NAT));
 
         MathematicalInductionSchemaGenerator generator =
                 new MathematicalInductionSchemaGenerator(termStringBuilder, atomicTermCollector, termSubstitutor);
-        InductionSchema inductionSchema = generator.generateSchema(forallFormula);
+        InductionSchema inductionSchema = generator.generateSchema(forallFormula, N_NAT);
 
         assertThat(inductionSchema).isEqualTo(expected);
     }
 
     @Test
     public void generateSchemaInequalityWithAddition() throws SchemaGeneratorException {
-        // \FORALL ?n in Nat (?n + 2 > ?n + 1)
+        // \FORALL n in Nat. (?n + 2 > ?n + 1)
         GreaterThanFormula baseCase = new GreaterThanFormula(new Addition(ZERO, TWO), new Addition(ZERO, ONE));
-        GreaterThanFormula indHyp = new GreaterThanFormula(new Addition(K, TWO), new Addition(K, ONE));
+        GreaterThanFormula indHyp = new GreaterThanFormula(new Addition(K_CONST, TWO), new Addition(K_CONST, ONE));
 
         GreaterThanFormula inductiveCase = new GreaterThanFormula(
-                new Addition(new Addition(K, ONE), TWO), new Addition(new Addition(K, ONE), ONE));
+                new Addition(new Addition(K_CONST, ONE), TWO), new Addition(new Addition(K_CONST, ONE), ONE));
 
-        InductionSchema expected = new InductionSchema(Collections.<Formula>singletonList(baseCase), K,
+        InductionSchema expected = new InductionSchema(Collections.<Formula>singletonList(baseCase), K_CONST,
                 indHyp, Collections.<Formula>singletonList(inductiveCase));
 
         ForallFormula forallFormula = new ForallFormula(N_NAT,
@@ -75,14 +77,14 @@ public class MathematicalInductionSchemaGeneratorTest {
 
         MathematicalInductionSchemaGenerator generator =
                 new MathematicalInductionSchemaGenerator(termStringBuilder, atomicTermCollector, termSubstitutor);
-        InductionSchema inductionSchema = generator.generateSchema(forallFormula);
+        InductionSchema inductionSchema = generator.generateSchema(forallFormula, N_NAT);
 
         assertThat(inductionSchema).isEqualTo(expected);
     }
 
     @Test
     public void generateSchemaEqualityWithSummation() throws SchemaGeneratorException {
-        // \FORALL ?n in Nat (\SUM ?i 0 ?n ?i^2 = ?n * (?n + 1) * (2 * ?n + 1)
+        // \FORALL n in Nat. (\SUM i 0 n i^2 = n * (n + 1) * (2 * n + 1)
 
         Summation baseSum = new Summation(I_NAT, ZERO, ZERO, new Power(I_NAT, 2));
 
@@ -91,22 +93,22 @@ public class MathematicalInductionSchemaGeneratorTest {
 
         EqualToFormula baseCase = new EqualToFormula(baseSum, baseMult);
 
-        Summation indHypSum = new Summation(I_NAT, ZERO, K, new Power(I_NAT, 2));
+        Summation indHypSum = new Summation(I_NAT, ZERO, K_CONST, new Power(I_NAT, 2));
 
         Multiplication indHypMult = new Multiplication(
-                new Multiplication(K, new Addition(K, ONE)), new Addition(new Multiplication(TWO, K), ONE));
+                new Multiplication(K_CONST, new Addition(K_CONST, ONE)), new Addition(new Multiplication(TWO, K_CONST), ONE));
 
         EqualToFormula indHyp = new EqualToFormula(indHypSum, indHypMult);
 
-        Summation indCaseSum = new Summation(I_NAT, ZERO, new Addition(K, ONE), new Power(I_NAT, 2));
+        Summation indCaseSum = new Summation(I_NAT, ZERO, new Addition(K_CONST, ONE), new Power(I_NAT, 2));
 
         Multiplication indCaseMult = new Multiplication(
-                new Multiplication(new Addition(K, ONE), new Addition(new Addition(K, ONE), ONE)),
-                new Addition(new Multiplication(TWO, new Addition(K, ONE)), ONE));
+                new Multiplication(new Addition(K_CONST, ONE), new Addition(new Addition(K_CONST, ONE), ONE)),
+                new Addition(new Multiplication(TWO, new Addition(K_CONST, ONE)), ONE));
 
         EqualToFormula inductiveCase = new EqualToFormula(indCaseSum, indCaseMult);
 
-        InductionSchema expected = new InductionSchema(Collections.<Formula>singletonList(baseCase), K,
+        InductionSchema expected = new InductionSchema(Collections.<Formula>singletonList(baseCase), K_CONST,
                 indHyp, Collections.<Formula>singletonList(inductiveCase));
 
         // Create the forall formula
@@ -121,28 +123,28 @@ public class MathematicalInductionSchemaGeneratorTest {
 
         MathematicalInductionSchemaGenerator generator =
                 new MathematicalInductionSchemaGenerator(termStringBuilder, atomicTermCollector, termSubstitutor);
-        InductionSchema inductionSchema = generator.generateSchema(forallFormula);
+        InductionSchema inductionSchema = generator.generateSchema(forallFormula, N_NAT);
 
         assertThat(inductionSchema).isEqualTo(expected);
     }
 
     @Test
     public void generateSchemaNestedForallWithDifferentVariable() throws SchemaGeneratorException {
-        // \FORALL ?n in Nat \FORALL ?m in Nat (?n > ?m -> ?n + 1 > ?m + 1)
+        // \FORALL n in Nat. \FORALL m in Nat. (n > m -> n + 1 > m + 1)
 
         ForallFormula baseCase = new ForallFormula(M_NAT, new ImpliesFormula(
                 new GreaterThanFormula(ZERO, M_NAT),
                 new GreaterThanFormula(new Addition(ZERO, ONE), new Addition(M_NAT, ONE))));
 
         ForallFormula indHyp = new ForallFormula(M_NAT, new ImpliesFormula(
-                new GreaterThanFormula(K, M_NAT),
-                new GreaterThanFormula(new Addition(K, ONE), new Addition(M_NAT, ONE))));
+                new GreaterThanFormula(K_CONST, M_NAT),
+                new GreaterThanFormula(new Addition(K_CONST, ONE), new Addition(M_NAT, ONE))));
 
         ForallFormula inductiveCase = new ForallFormula(M_NAT, new ImpliesFormula(
-                new GreaterThanFormula(new Addition(K, ONE), M_NAT),
-                new GreaterThanFormula(new Addition(new Addition(K, ONE), ONE), new Addition(M_NAT, ONE))));
+                new GreaterThanFormula(new Addition(K_CONST, ONE), M_NAT),
+                new GreaterThanFormula(new Addition(new Addition(K_CONST, ONE), ONE), new Addition(M_NAT, ONE))));
 
-        InductionSchema expected = new InductionSchema(Collections.<Formula>singletonList(baseCase), K,
+        InductionSchema expected = new InductionSchema(Collections.<Formula>singletonList(baseCase), K_CONST,
                 indHyp, Collections.<Formula>singletonList(inductiveCase));
 
         // Create the forall formula
@@ -155,55 +157,100 @@ public class MathematicalInductionSchemaGeneratorTest {
 
         MathematicalInductionSchemaGenerator generator =
                 new MathematicalInductionSchemaGenerator(termStringBuilder, atomicTermCollector, termSubstitutor);
-        InductionSchema inductionSchema = generator.generateSchema(forallFormula);
+        InductionSchema inductionSchema = generator.generateSchema(forallFormula, N_NAT);
 
         assertThat(inductionSchema).isEqualTo(expected);
     }
 
     @Test
     public void generateSchemaNestedForallWithSameVariable() throws SchemaGeneratorException {
-        // \FORALL ?n in Nat \FORALL ?n in Nat (2 * ?n = ?n + ?n)
+        // \FORALL n in Nat. \FORALL n in Nat (2 * n = n + n)
 
         ForallFormula inner = new ForallFormula(N_NAT,
                 new EqualToFormula(new Multiplication(TWO, N_NAT), new Addition(N_NAT, N_NAT)));
 
-        InductionSchema expected = new InductionSchema(Collections.<Formula>singletonList(inner), K,
+        InductionSchema expected = new InductionSchema(Collections.<Formula>singletonList(inner), K_CONST,
                 inner, Collections.<Formula>singletonList(inner));
 
         ForallFormula forallFormula = new ForallFormula(N_NAT, inner);
 
         MathematicalInductionSchemaGenerator generator =
                 new MathematicalInductionSchemaGenerator(termStringBuilder, atomicTermCollector, termSubstitutor);
-        InductionSchema inductionSchema = generator.generateSchema(forallFormula);
+        InductionSchema inductionSchema = generator.generateSchema(forallFormula, N_NAT);
 
         assertThat(inductionSchema).isEqualTo(expected);
     }
 
     @Test(expected = SchemaGeneratorException.class)
     public void generateSchemaShouldThrowIfVariableNotOfTypeNat() throws SchemaGeneratorException {
-        // \FORALL ?n ?n = ?n
+        // \FORALL n. n = n
 
-        Variable untypedVar = new Variable("?n");
+        Variable untypedVar = new Variable("n");
         ForallFormula forallFormula = new ForallFormula(untypedVar, new EqualToFormula(untypedVar, untypedVar));
 
         MathematicalInductionSchemaGenerator generator =
                 new MathematicalInductionSchemaGenerator(termStringBuilder, atomicTermCollector, termSubstitutor);
-        generator.generateSchema(forallFormula);
+        generator.generateSchema(forallFormula, N_NAT);
     }
 
     @Test
     public void generateSchemaShouldUseK2IfKAndK1NamesAlreadyUsed() throws SchemaGeneratorException {
-        // \FORALL ?k in Nat \FORALL ?k1 in Nat (?k + ?k1 = 2)
-        ForallFormula inner = new ForallFormula(K1_VAR, new EqualToFormula(new Addition(K_VAR, K1_VAR), new Number(2)));
-        ForallFormula forallFormula = new ForallFormula(K_VAR, inner);
+        // \FORALL k in Nat. \FORALL k1 in Nat. (k + k1 = 2)
+        ForallFormula inner = new ForallFormula(K1_NAT, new EqualToFormula(new Addition(K_NAT, K1_NAT), new Number(2)));
+        ForallFormula forallFormula = new ForallFormula(K_NAT, inner);
 
         MathematicalInductionSchemaGenerator generator =
                 new MathematicalInductionSchemaGenerator(termStringBuilder, atomicTermCollector, termSubstitutor);
 
-        InductionSchema inductionSchema = generator.generateSchema(forallFormula);
+        InductionSchema inductionSchema = generator.generateSchema(forallFormula, K_NAT);
         Constant inductiveTerm = inductionSchema.getInductiveTerm();
 
-        assertThat(inductiveTerm).isEqualTo(K2);
+        assertThat(inductiveTerm).isEqualTo(K2_CONST);
+    }
+
+    @Test
+    public void generateSchemaShouldUseK1IfKAlreadyUsedAsQuantifiedVariable() throws SchemaGeneratorException {
+        // \FORALL m, k in Nat. m + k = 0
+
+        ForallFormula baseCase = new ForallFormula(new EqualToFormula(new Addition(ZERO, K_NAT), ZERO), K_NAT);
+        ForallFormula indHyp = new ForallFormula(new EqualToFormula(new Addition(K1_CONST, K_NAT), ZERO), K_NAT);
+        ForallFormula indCase = new ForallFormula(new EqualToFormula(
+                new Addition(new Addition(K1_CONST, ONE), K_NAT), ZERO), K_NAT);
+
+        InductionSchema expected = new InductionSchema(Collections.<Formula>singletonList(baseCase), K1_CONST,
+                indHyp, Collections.<Formula>singletonList(indCase));
+
+        ForallFormula forallFormula = new ForallFormula(
+                new EqualToFormula(new Addition(M_NAT, K_NAT), ZERO), M_NAT, K_NAT);
+
+        MathematicalInductionSchemaGenerator generator =
+                new MathematicalInductionSchemaGenerator(termStringBuilder, atomicTermCollector, termSubstitutor);
+
+        InductionSchema inductionSchema = generator.generateSchema(forallFormula, M_NAT);
+
+        assertThat(inductionSchema).isEqualTo(expected);
+    }
+
+    @Test
+    public void generateSchemaShouldLeaveQuantifiedVariablesIntactIfMultipleQuantVars() throws SchemaGeneratorException {
+        // \FORALL m, n in Nat, x. m > n
+
+        ForallFormula baseCase = new ForallFormula(new GreaterThanFormula(M_NAT, ZERO), M_NAT, X_UNKNOWN);
+        ForallFormula indHyp = new ForallFormula(new GreaterThanFormula(M_NAT, K_CONST), M_NAT, X_UNKNOWN);
+        ForallFormula indCase = new ForallFormula(new GreaterThanFormula(M_NAT, new Addition(K_CONST, ONE)),
+                M_NAT, X_UNKNOWN);
+
+        InductionSchema expected = new InductionSchema(Collections.<Formula>singletonList(baseCase), K_CONST, indHyp,
+                Collections.<Formula>singletonList(indCase));
+
+        ForallFormula forallFormula = new ForallFormula(new GreaterThanFormula(M_NAT, N_NAT), M_NAT, N_NAT, X_UNKNOWN);
+
+        MathematicalInductionSchemaGenerator generator =
+                new MathematicalInductionSchemaGenerator(termStringBuilder, atomicTermCollector, termSubstitutor);
+
+        InductionSchema inductionSchema = generator.generateSchema(forallFormula, N_NAT);
+
+        assertThat(inductionSchema).isEqualTo(expected);
     }
 
 }

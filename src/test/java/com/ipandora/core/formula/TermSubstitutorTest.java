@@ -53,11 +53,11 @@ public class TermSubstitutorTest {
 
     @Test
     public void cloneAndSubstituteInScopeShouldntSubstituteNewlyScopedVariables() {
-        // \FORALL ?n ?n = 2
+        // \FORALL ?n, ?m (?n = ?m)
         TermSubstitutor substitutor = new TermSubstitutor();
 
-        ForallFormula original = new ForallFormula(N_NAT, new EqualToFormula(N_NAT, NUM_2));
-        Formula substituted = substitutor.cloneAndSubstituteInScope(original, N_NAT, M_NAT);
+        ForallFormula original = new ForallFormula(new EqualToFormula(N_NAT, M_NAT), N_NAT, M_NAT);
+        Formula substituted = substitutor.cloneAndSubstituteInScope(original, N_NAT, P_NAT);
 
         assertThat(substituted).isEqualTo(original);
     }

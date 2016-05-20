@@ -79,7 +79,7 @@ public class ANTLRFormulaParserTest {
 
     @Test
     public void fromStringForallWithNoDomain() throws FormulaParsingException {
-        Formula formula = parser.fromString("\\FORALL x Foo(x)");
+        Formula formula = parser.fromString("\\FORALL x. Foo(x)");
         ForallFormula expected = new ForallFormula(new Variable("x"),
                 new PredicateFormula("Foo", Collections.<Term>singletonList(new Variable("x"))));
 
@@ -88,7 +88,7 @@ public class ANTLRFormulaParserTest {
 
     @Test
     public void fromStringForallWithDomain() throws FormulaParsingException {
-        Formula formula = parser.fromString("\\FORALL x in Nat Foo(x)");
+        Formula formula = parser.fromString("\\FORALL x in Nat. Foo(x)");
         ForallFormula expected = new ForallFormula(Variable.withTypeNat("x"),
                 new PredicateFormula("Foo", Collections.<Term>singletonList(Variable.withTypeNat("x"))));
 
@@ -96,8 +96,22 @@ public class ANTLRFormulaParserTest {
     }
 
     @Test
+    public void fromStringForallWithManyVarsDifferingDomains() throws FormulaParsingException {
+        Formula formula = parser.fromString("\\FORALL x, y in Nat, z. (x + y = 0 & Foo(z))");
+
+        Variable x = Variable.withTypeNat("x");
+        Variable y = Variable.withTypeNat("y");
+        Variable z = new Variable("z");
+        ForallFormula expected = new ForallFormula(new AndFormula(
+                new EqualToFormula(new Addition(x, y), new Number(0)),
+                new PredicateFormula("Foo", Collections.<Term>singletonList(z))), x, y, z);
+
+        assertThat(formula).isEqualTo(expected);
+    }
+
+    @Test
     public void fromStringExistsWithNoDomain() throws FormulaParsingException {
-        Formula formula = parser.fromString("\\EXISTS x Foo(x)");
+        Formula formula = parser.fromString("\\EXISTS x. Foo(x)");
         ExistsFormula expected = new ExistsFormula(new Variable("x"),
                 new PredicateFormula("Foo", Collections.<Term>singletonList(new Variable("x"))));
 
@@ -106,7 +120,7 @@ public class ANTLRFormulaParserTest {
 
     @Test
     public void fromStringExistsWithDomain() throws FormulaParsingException {
-        Formula formula = parser.fromString("\\EXISTS x in Nat Foo(x)");
+        Formula formula = parser.fromString("\\EXISTS x in Nat. Foo(x)");
         ExistsFormula expected = new ExistsFormula(Variable.withTypeNat("x"),
                 new PredicateFormula("Foo", Collections.<Term>singletonList(Variable.withTypeNat("x"))));
 
@@ -115,7 +129,7 @@ public class ANTLRFormulaParserTest {
 
     @Test
     public void fromStringNestedQuantifiersWithOverridingDomains() throws FormulaParsingException {
-        Formula formula = parser.fromString("\\FORALL x \\FORALL x in Nat Foo(x)");
+        Formula formula = parser.fromString("\\FORALL x. \\FORALL x in Nat. Foo(x)");
 
         Variable xNat = Variable.withTypeNat("x");
         Variable xUnknown = new Variable("x");
@@ -130,7 +144,7 @@ public class ANTLRFormulaParserTest {
 
     @Test
     public void fromStringNestedQuantifiersWithOverridingDomains2() throws FormulaParsingException {
-        Formula formula = parser.fromString("\\FORALL x in Nat \\FORALL x Foo(x)");
+        Formula formula = parser.fromString("\\FORALL x in Nat. \\FORALL x. Foo(x)");
 
         Variable xNat = Variable.withTypeNat("x");
         Variable xUnknown = new Variable("x");
@@ -260,7 +274,7 @@ public class ANTLRFormulaParserTest {
         TypeCheckAnalyser mockTypeCheckAnalyser = Mockito.mock(TypeCheckAnalyser.class);
         parser = new ANTLRFormulaParser(visitor, mockTypeCheckAnalyser);
 
-        Formula formula = parser.fromString("\\FORALL x in Nat x > 2");
+        Formula formula = parser.fromString("\\FORALL x in Nat. x > 2");
 
         verify(mockTypeCheckAnalyser).analyse(formula);
     }
