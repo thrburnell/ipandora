@@ -12,6 +12,7 @@ public class SchemaResponse {
     private String variable;
     private BaseCase baseCase;
     private InductiveCase inductiveCase;
+    private String errorMsg;
 
     @JsonProperty
     public String getGoal() {
@@ -66,6 +67,16 @@ public class SchemaResponse {
         public void setToShow(List<String> toShow) {
             this.toShow = toShow;
         }
+    }
+
+    @JsonProperty
+    public String getErrorMsg() {
+        return errorMsg;
+    }
+
+    @JsonProperty
+    public void setErrorMsg(String errorMsg) {
+        this.errorMsg = errorMsg;
     }
 
     public static class InductiveCase {
