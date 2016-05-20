@@ -122,7 +122,6 @@
                 <version>4.5.1</version>
                 <configuration>
                     <visitor>true</visitor>
-                    <outputDirectory>${project.build.directory}/generated-sources/antlr4/com/ipandora/parser</outputDirectory>
                 </configuration>
                 <executions>
                     <execution>
