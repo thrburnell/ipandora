@@ -66,5 +66,9 @@ public class TermCreators {
 
         return division;
     }
+
+    public static Power pow(Term t, int n) {
+        return new Power(t, n);
+    }
     
 }
