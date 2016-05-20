@@ -5,7 +5,7 @@ import com.ipandora.api.predicate.formula.ImpliesFormula;
 import com.ipandora.api.predicate.formula.NotFormula;
 import com.ipandora.core.formula.FormulaReducer;
 import com.ipandora.core.proof.ImpliesChecker;
-import com.ipandora.core.proof.ImpliesCheckerException;
+import com.ipandora.core.proof.ProofStepCheckException;
 import com.ipandora.core.util.ProcessTimeoutException;
 
 import java.io.IOException;
@@ -25,11 +25,11 @@ public class Z3ImpliesChecker implements ImpliesChecker {
     }
 
     @Override
-    public boolean check(List<Formula> assumptions, Formula goal) throws ImpliesCheckerException {
+    public boolean check(List<Formula> assumptions, Formula goal) throws ProofStepCheckException {
 
         if (assumptions.isEmpty()) {
             // Could check whether goal is equivalent to true
-            throw new ImpliesCheckerException("No assumptions given");
+            throw new ProofStepCheckException("No assumptions given");
         }
 
         Formula assumption = conjunctor.reduce(assumptions);
@@ -43,7 +43,7 @@ public class Z3ImpliesChecker implements ImpliesChecker {
             return !z3Client.isSat(program);
         } catch (IOException | Z3UnrecognisableOutputException | ProcessTimeoutException e) {
             e.printStackTrace();
-            throw new ImpliesCheckerException(e);
+            throw new ProofStepCheckException(e);
         }
     }
 

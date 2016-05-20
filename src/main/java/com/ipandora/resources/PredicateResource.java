@@ -71,7 +71,7 @@ public class PredicateResource {
     @POST
     @Path("/step")
     public StepResponse checkProofStep(StepRequest stepRequest)
-            throws ImpliesCheckerException, FormulaParsingException {
+            throws ProofStepCheckException, FormulaParsingException {
 
         String method = stepRequest.getMethod();
 

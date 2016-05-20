@@ -4,7 +4,7 @@ import com.ipandora.api.predicate.formula.*;
 import com.ipandora.api.predicate.term.Term;
 import com.ipandora.api.predicate.term.Variable;
 import com.ipandora.core.formula.FormulaReducer;
-import com.ipandora.core.proof.ImpliesCheckerException;
+import com.ipandora.core.proof.ProofStepCheckException;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -40,7 +40,7 @@ public class Z3ImpliesCheckerTest {
         checker = new Z3ImpliesChecker(mockCodeGenerator, mockZ3Client, mockConjunctor);
     }
 
-    @Test(expected = ImpliesCheckerException.class)
+    @Test(expected = ProofStepCheckException.class)
     public void checkThrowsImpliesCheckerExceptionIfGivenNoAssumptions() throws Exception {
         checker.check(Collections.<Formula>emptyList(), new TruthFormula());
     }

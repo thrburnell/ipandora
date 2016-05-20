@@ -4,7 +4,9 @@ import com.ipandora.api.predicate.term.*;
 import com.ipandora.api.predicate.term.Number;
 
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 public class AtomCollectingTermVisitor implements TermVisitor<Void> {
 
@@ -16,8 +18,16 @@ public class AtomCollectingTermVisitor implements TermVisitor<Void> {
         return constants;
     }
 
+    public Set<Constant> getUniqueConstants() {
+        return new HashSet<>(getConstants());
+    }
+
     public List<Variable> getVariables() {
         return variables;
+    }
+
+    public Set<Variable> getUniqueVariables() {
+        return new HashSet<>(getVariables());
     }
 
     public List<Function> getFunctions() {

@@ -6,6 +6,6 @@ import java.util.List;
 
 public interface ImpliesChecker {
 
-    boolean check(List<Formula> assumptions, Formula goal) throws ImpliesCheckerException;
+    boolean check(List<Formula> assumptions, Formula goal) throws ProofStepCheckException;
 
 }
