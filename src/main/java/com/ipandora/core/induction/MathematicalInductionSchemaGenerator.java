@@ -4,8 +4,9 @@ import com.ipandora.api.predicate.formula.ForallFormula;
 import com.ipandora.api.predicate.formula.Formula;
 import com.ipandora.api.predicate.term.*;
 import com.ipandora.api.predicate.term.Number;
-import com.ipandora.core.formula.AtomicTermCollector;
+import com.ipandora.core.formula.TermVisitingFormulaVisitor;
 import com.ipandora.core.formula.TermSubstitutor;
+import com.ipandora.core.term.AtomCollectingTermVisitor;
 import com.ipandora.core.term.TermStringBuilder;
 
 import java.util.*;
@@ -15,19 +16,16 @@ import static com.ipandora.core.util.CollectionUtils.flatten;
 
 public class MathematicalInductionSchemaGenerator implements InductionSchemaGenerator {
 
-    public static final String DEFAULT_INDUCTIVE_TERM_NAME = "k";
-    public static final int SPECIAL_INDUCTIVE_TERM_NAME_INITIAL_SUFFIX = 1;
+    private static final String DEFAULT_INDUCTIVE_TERM_NAME = "k";
+    private static final int SPECIAL_INDUCTIVE_TERM_NAME_INITIAL_SUFFIX = 1;
 
     private final TermSubstitutor termSubstitutor;
-    private final AtomicTermCollector atomicTermCollector;
     private final TermStringBuilder termStringBuilder;
 
     public MathematicalInductionSchemaGenerator(TermStringBuilder termStringBuilder,
-                                                AtomicTermCollector atomicTermCollector,
                                                 TermSubstitutor termSubstitutor) {
         this.termStringBuilder = termStringBuilder;
         this.termSubstitutor = termSubstitutor;
-        this.atomicTermCollector = atomicTermCollector;
     }
 
     @Override
@@ -49,7 +47,7 @@ public class MathematicalInductionSchemaGenerator implements InductionSchemaGene
         // Find all atoms in the remaining formula. This includes all those in the formula as well as remaining
         // variables introduced by forall...
         HashSet<Atom> remainingAtoms = flatten(extractMapValues(newVariablesByType), new HashSet<Atom>());
-        remainingAtoms.addAll(atomicTermCollector.collectAtoms(formula));
+        remainingAtoms.addAll(getAtomsFromFormula(formula));
 
         Formula baseCase = termSubstitutor.cloneAndSubstituteInScope(formula, variable, new Number(0));
         Constant k = getConstantWithNewName(remainingAtoms);
@@ -65,6 +63,19 @@ public class MathematicalInductionSchemaGenerator implements InductionSchemaGene
         }
 
         return new InductionSchema(Collections.singletonList(baseCase), k, indHyp, Collections.singletonList(indCase));
+    }
+
+    private Set<Atom> getAtomsFromFormula(Formula formula) {
+        AtomCollectingTermVisitor termVisitor = new AtomCollectingTermVisitor();
+        TermVisitingFormulaVisitor formulaVisitor = new TermVisitingFormulaVisitor(termVisitor);
+        formulaVisitor.visit(formula);
+
+        Set<Atom> atoms = new HashSet<>();
+        atoms.addAll(termVisitor.getVariables());
+        atoms.addAll(termVisitor.getConstants());
+        atoms.addAll(termVisitor.getFunctions());
+        
+        return atoms;
     }
 
     private Map<Type, List<Variable>> getCopyWithNatVariableRemoved(Map<Type, List<Variable>> variablesByType,

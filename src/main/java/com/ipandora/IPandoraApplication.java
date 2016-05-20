@@ -3,10 +3,7 @@ package com.ipandora;
 import com.ipandora.core.formula.*;
 import com.ipandora.core.induction.MathematicalInductionSchemaGenerator;
 import com.ipandora.core.proof.ProofStreamReaderCreator;
-import com.ipandora.core.term.SymbolTableCreator;
-import com.ipandora.core.term.TermBuildingVisitor;
-import com.ipandora.core.term.TermStringBuilder;
-import com.ipandora.core.term.TermTypeChecker;
+import com.ipandora.core.term.*;
 import com.ipandora.core.util.EnvironmentVariableProviderImpl;
 import com.ipandora.core.util.ProcessExecutorImpl;
 import com.ipandora.core.z3.SMTCodeGeneratorImpl;
@@ -56,13 +53,13 @@ public class IPandoraApplication extends Application<IPandoraConfiguration> {
         ProofStreamReaderCreator proofStreamReaderCreator = new ProofStreamReaderCreator();
 
         MathematicalInductionSchemaGenerator inductionSchemaGenerator = new MathematicalInductionSchemaGenerator(
-                new TermStringBuilder(), new AtomicTermCollector(), new TermSubstitutor());
+                new TermStringBuilder(), new TermSubstitutor());
 
         FormulaStringBuilder formulaStringBuilder = new FormulaStringBuilder(new TermStringBuilder());
         TermStringBuilder termStringBuilder = new TermStringBuilder();
 
-        PredicateResource resource = new PredicateResource(formulaParser, impliesChecker, proofStreamReaderCreator,
-                inductionSchemaGenerator, formulaStringBuilder, termStringBuilder);
+        PredicateResource resource = new PredicateResource(formulaParser, impliesChecker,
+                proofStreamReaderCreator, inductionSchemaGenerator, formulaStringBuilder, termStringBuilder);
         environment.jersey().register(resource);
 
         environment.jersey().register(MultiPartFeature.class);

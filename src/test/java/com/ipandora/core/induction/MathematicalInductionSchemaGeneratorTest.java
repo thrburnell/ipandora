@@ -3,7 +3,6 @@ package com.ipandora.core.induction;
 import com.ipandora.api.predicate.formula.*;
 import com.ipandora.api.predicate.term.*;
 import com.ipandora.api.predicate.term.Number;
-import com.ipandora.core.formula.AtomicTermCollector;
 import com.ipandora.core.formula.TermSubstitutor;
 import com.ipandora.core.term.TermStringBuilder;
 import org.junit.Before;
@@ -30,13 +29,11 @@ public class MathematicalInductionSchemaGeneratorTest {
 
     private TermStringBuilder termStringBuilder;
     private TermSubstitutor termSubstitutor;
-    private AtomicTermCollector atomicTermCollector;
 
     @Before
     public void before() {
         termStringBuilder = new TermStringBuilder();
         termSubstitutor = new TermSubstitutor();
-        atomicTermCollector = new AtomicTermCollector();
     }
 
     @Test
@@ -54,7 +51,7 @@ public class MathematicalInductionSchemaGeneratorTest {
         ForallFormula forallFormula = new ForallFormula(N_NAT, new EqualToFormula(N_NAT, N_NAT));
 
         MathematicalInductionSchemaGenerator generator =
-                new MathematicalInductionSchemaGenerator(termStringBuilder, atomicTermCollector, termSubstitutor);
+                new MathematicalInductionSchemaGenerator(termStringBuilder, termSubstitutor);
         InductionSchema inductionSchema = generator.generateSchema(forallFormula, N_NAT);
 
         assertThat(inductionSchema).isEqualTo(expected);
@@ -76,7 +73,7 @@ public class MathematicalInductionSchemaGeneratorTest {
                 new GreaterThanFormula(new Addition(N_NAT, TWO), new Addition(N_NAT, ONE)));
 
         MathematicalInductionSchemaGenerator generator =
-                new MathematicalInductionSchemaGenerator(termStringBuilder, atomicTermCollector, termSubstitutor);
+                new MathematicalInductionSchemaGenerator(termStringBuilder, termSubstitutor);
         InductionSchema inductionSchema = generator.generateSchema(forallFormula, N_NAT);
 
         assertThat(inductionSchema).isEqualTo(expected);
@@ -122,7 +119,7 @@ public class MathematicalInductionSchemaGeneratorTest {
         ForallFormula forallFormula = new ForallFormula(N_NAT, new EqualToFormula(summation, multiplication));
 
         MathematicalInductionSchemaGenerator generator =
-                new MathematicalInductionSchemaGenerator(termStringBuilder, atomicTermCollector, termSubstitutor);
+                new MathematicalInductionSchemaGenerator(termStringBuilder, termSubstitutor);
         InductionSchema inductionSchema = generator.generateSchema(forallFormula, N_NAT);
 
         assertThat(inductionSchema).isEqualTo(expected);
@@ -156,7 +153,7 @@ public class MathematicalInductionSchemaGeneratorTest {
         ForallFormula forallFormula = new ForallFormula(N_NAT, inner);
 
         MathematicalInductionSchemaGenerator generator =
-                new MathematicalInductionSchemaGenerator(termStringBuilder, atomicTermCollector, termSubstitutor);
+                new MathematicalInductionSchemaGenerator(termStringBuilder, termSubstitutor);
         InductionSchema inductionSchema = generator.generateSchema(forallFormula, N_NAT);
 
         assertThat(inductionSchema).isEqualTo(expected);
@@ -175,7 +172,7 @@ public class MathematicalInductionSchemaGeneratorTest {
         ForallFormula forallFormula = new ForallFormula(N_NAT, inner);
 
         MathematicalInductionSchemaGenerator generator =
-                new MathematicalInductionSchemaGenerator(termStringBuilder, atomicTermCollector, termSubstitutor);
+                new MathematicalInductionSchemaGenerator(termStringBuilder, termSubstitutor);
         InductionSchema inductionSchema = generator.generateSchema(forallFormula, N_NAT);
 
         assertThat(inductionSchema).isEqualTo(expected);
@@ -189,7 +186,7 @@ public class MathematicalInductionSchemaGeneratorTest {
         ForallFormula forallFormula = new ForallFormula(untypedVar, new EqualToFormula(untypedVar, untypedVar));
 
         MathematicalInductionSchemaGenerator generator =
-                new MathematicalInductionSchemaGenerator(termStringBuilder, atomicTermCollector, termSubstitutor);
+                new MathematicalInductionSchemaGenerator(termStringBuilder, termSubstitutor);
         generator.generateSchema(forallFormula, N_NAT);
     }
 
@@ -200,7 +197,7 @@ public class MathematicalInductionSchemaGeneratorTest {
         ForallFormula forallFormula = new ForallFormula(K_NAT, inner);
 
         MathematicalInductionSchemaGenerator generator =
-                new MathematicalInductionSchemaGenerator(termStringBuilder, atomicTermCollector, termSubstitutor);
+                new MathematicalInductionSchemaGenerator(termStringBuilder, termSubstitutor);
 
         InductionSchema inductionSchema = generator.generateSchema(forallFormula, K_NAT);
         Constant inductiveTerm = inductionSchema.getInductiveTerm();
@@ -224,7 +221,7 @@ public class MathematicalInductionSchemaGeneratorTest {
                 new EqualToFormula(new Addition(M_NAT, K_NAT), ZERO), M_NAT, K_NAT);
 
         MathematicalInductionSchemaGenerator generator =
-                new MathematicalInductionSchemaGenerator(termStringBuilder, atomicTermCollector, termSubstitutor);
+                new MathematicalInductionSchemaGenerator(termStringBuilder, termSubstitutor);
 
         InductionSchema inductionSchema = generator.generateSchema(forallFormula, M_NAT);
 
@@ -246,7 +243,7 @@ public class MathematicalInductionSchemaGeneratorTest {
         ForallFormula forallFormula = new ForallFormula(new GreaterThanFormula(M_NAT, N_NAT), M_NAT, N_NAT, X_UNKNOWN);
 
         MathematicalInductionSchemaGenerator generator =
-                new MathematicalInductionSchemaGenerator(termStringBuilder, atomicTermCollector, termSubstitutor);
+                new MathematicalInductionSchemaGenerator(termStringBuilder, termSubstitutor);
 
         InductionSchema inductionSchema = generator.generateSchema(forallFormula, N_NAT);
 
