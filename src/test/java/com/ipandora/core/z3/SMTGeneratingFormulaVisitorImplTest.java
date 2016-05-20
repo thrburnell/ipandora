@@ -209,7 +209,7 @@ public class SMTGeneratingFormulaVisitorImplTest {
     }
 
     @Test
-    public void getPredicateDefinitionsReturnsCorrectCode() {
+    public void getPredicateNamesToArgCountReturnsCorrectMapping() {
         // Should contain (Foo Type Type Type) and (Bar Type)
 
         // Foo(x, y, z) AND Bar(x)
@@ -222,35 +222,16 @@ public class SMTGeneratingFormulaVisitorImplTest {
         SMTGeneratingTermVisitor termVisitor = new SMTGeneratingTermVisitor();
         SMTGeneratingFormulaVisitor visitor = new SMTGeneratingFormulaVisitorImpl(termVisitor);
         visitor.visit(new AndFormula(fooPredicate, barPredicate));
-        String predicateDefinitions = visitor.getPredicateDefinitions();
 
-        assertThat(predicateDefinitions).contains("(declare-fun Foo (Type Type Type) Bool)");
-        assertThat(predicateDefinitions).contains("(declare-fun Bar (Type) Bool)");
+        Map<String, Integer> predicates =  visitor.getPredicateNamesToArgCount();
+
+        assertThat(predicates).hasSize(2);
+        assertThat(predicates).containsEntry("Foo", 3);
+        assertThat(predicates).containsEntry("Bar", 1);
     }
 
     @Test
-    public void getTypeDefinitionReturnsEmptyIfNoPredicatesVisited() {
-        SMTGeneratingFormulaVisitor visitor = new SMTGeneratingFormulaVisitorImpl(mockTermVisitor);
-        visitor.visit(new TruthFormula());
-        String typeDefinition = visitor.getTypeDefinition();
-        assertThat(typeDefinition).isEmpty();
-    }
-
-    @Test
-    public void getTypeDefinitionReturnsCorrectCodeIfPredicatesVisited() {
-        Variable x = new Variable("x");
-        PredicateFormula predicateFormula = new PredicateFormula("Foo", Collections.<Term>singletonList(x));
-
-        SMTGeneratingTermVisitor termVisitor = new SMTGeneratingTermVisitor();
-        SMTGeneratingFormulaVisitor visitor = new SMTGeneratingFormulaVisitorImpl(termVisitor);
-        visitor.visit(predicateFormula);
-        String typeDefinition = visitor.getTypeDefinition();
-
-        assertThat(typeDefinition).isEqualTo("(declare-sort Type)");
-    }
-
-    @Test
-    public void getPropositionDefinitionsReturnsCorrectCode() {
+    public void getPropositionNamesReturnsCorrectSet() {
 
         // P AND Q AND R
         PropositionFormula p = new PropositionFormula("P");
@@ -260,30 +241,26 @@ public class SMTGeneratingFormulaVisitorImplTest {
 
         SMTGeneratingFormulaVisitorImpl visitor = new SMTGeneratingFormulaVisitorImpl(mockTermVisitor);
         visitor.visit(andFormula);
-        String propositionDefinitions = visitor.getPropositionDefinitions();
+        Set<String> propositionDefinitions = visitor.getPropositionNames();
 
-        assertThat(propositionDefinitions).contains("(declare-const P Bool)");
-        assertThat(propositionDefinitions).contains("(declare-const Q Bool)");
-        assertThat(propositionDefinitions).contains("(declare-const R Bool)");
+        assertThat(propositionDefinitions).containsExactlyInAnyOrder("P", "Q", "R");
     }
 
     @Test
-    public void getConstantDefinitionsReturnsCorrectCode() {
+    public void getConstantNamesReturnsCorrectSet() {
 
         when(mockTermVisitor.getConstants())
                 .thenReturn(new HashSet<>(Arrays.asList("x", "z", "q")));
 
         SMTGeneratingFormulaVisitorImpl visitor = new SMTGeneratingFormulaVisitorImpl(mockTermVisitor);
         visitor.visit(new TruthFormula());
-        String constantDefinitions = visitor.getConstantDefinitions();
+        Set<String> constantDefinitions = visitor.getConstantNames();
 
-        assertThat(constantDefinitions).contains("(declare-const x Type)");
-        assertThat(constantDefinitions).contains("(declare-const z Type)");
-        assertThat(constantDefinitions).contains("(declare-const q Type)");
+        assertThat(constantDefinitions).containsExactlyInAnyOrder("x", "z", "q");
     }
 
     @Test
-    public void getFunctionDefinitionsReturnsCorrectCode() {
+    public void getFunctionNamesToArgCountReturnsCorrectMapping() {
 
         Map<String, Integer> functions = new HashMap<>();
         functions.put("f", 3);
@@ -293,10 +270,11 @@ public class SMTGeneratingFormulaVisitorImplTest {
 
         SMTGeneratingFormulaVisitorImpl visitor = new SMTGeneratingFormulaVisitorImpl(mockTermVisitor);
         visitor.visit(new TruthFormula());
-        String functionDefinitions = visitor.getFunctionDefinitions();
+        Map<String, Integer> functionDefinitions = visitor.getFunctionNamesToArgCount();
 
-        assertThat(functionDefinitions).contains("(declare-fun f (Type Type Type) Type)");
-        assertThat(functionDefinitions).contains("(declare-fun g (Type Type) Type)");
+        assertThat(functionDefinitions).hasSize(2);
+        assertThat(functionDefinitions).containsEntry("f", 3);
+        assertThat(functionDefinitions).containsEntry("g", 2);
     }
 
 }

@@ -22,55 +22,23 @@ public class SMTGeneratingFormulaVisitorImpl implements SMTGeneratingFormulaVisi
     }
 
     @Override
-    public String getPredicateDefinitions() {
-        StringBuilder sb = new StringBuilder();
-
-        for (Map.Entry<String, Integer> predicate : predicates.entrySet()) {
-            String params = StringUtils.repeat(TYPE_NAME, " ", predicate.getValue());
-            sb.append(String.format("(declare-fun %s (%s) Bool)\n", predicate.getKey(), params));
-        }
-
-        return sb.toString();
+    public Map<String, Integer> getPredicateNamesToArgCount() {
+        return predicates;
     }
 
     @Override
-    public String getTypeDefinition() {
-        return predicates.isEmpty() ? "" : "(declare-sort Type)";
+    public Set<String> getPropositionNames() {
+        return propositions;
     }
 
     @Override
-    public String getPropositionDefinitions() {
-        StringBuilder sb = new StringBuilder();
-
-        for (String proposition : propositions) {
-            sb.append(String.format("(declare-const %s Bool)", proposition));
-        }
-
-        return sb.toString();
+    public Set<String> getConstantNames() {
+        return termVisitor.getConstants();
     }
 
     @Override
-    public String getConstantDefinitions() {
-        StringBuilder sb = new StringBuilder();
-
-        for (String constant : termVisitor.getConstants()) {
-            sb.append(String.format("(declare-const %s %s)", constant, TYPE_NAME));
-        }
-
-        return sb.toString();
-    }
-
-    @Override
-    public String getFunctionDefinitions() {
-        StringBuilder sb = new StringBuilder();
-
-        for (Map.Entry<String, Integer> function : termVisitor.getFunctions().entrySet()) {
-            String name = function.getKey();
-            String params = StringUtils.repeat("Type", " ", function.getValue());
-            sb.append(String.format("(declare-fun %s (%s) Type)", name, params));
-        }
-
-        return sb.toString();
+    public Map<String, Integer> getFunctionNamesToArgCount() {
+        return termVisitor.getFunctions();
     }
 
     @Override

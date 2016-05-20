@@ -7,6 +7,11 @@ import org.junit.runner.RunWith;
 import org.mockito.Mock;
 import org.mockito.runners.MockitoJUnitRunner;
 
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Map;
+import java.util.Set;
+
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.when;
 
@@ -27,50 +32,97 @@ public class SMTCodeGeneratorImplTest {
 
     @Test
     public void generateCheckSatCodeGivesCodeBeginningWithTypeDefinition() {
-
-        when(mockSmtGeneratingFormulaVisitor.getTypeDefinition())
-                .thenReturn("type-definition-code");
-
         SMTCodeGenerator smtCodeGenerator = new SMTCodeGeneratorImpl(mockSmtGeneratingFormulaVisitorCreator);
         String code = smtCodeGenerator.generateCheckSatCode(new TruthFormula());
-        assertThat(code).startsWith("type-definition-code");
+        assertThat(code).startsWith("(declare-sort Type)");
     }
 
     @Test
     public void generateCheckSatCodeGivesCodeIncludingPredicateDefinitionsBeforeAssert() {
 
-        when(mockSmtGeneratingFormulaVisitor.getPredicateDefinitions())
-                .thenReturn("predicate-definitions-code");
+        Map<String, Integer> predicateNamesToArgCount = new HashMap<>();
+        predicateNamesToArgCount.put("Foo", 2);
+        predicateNamesToArgCount.put("Bar", 3);
+
+        when(mockSmtGeneratingFormulaVisitor.getPredicateNamesToArgCount())
+                .thenReturn(predicateNamesToArgCount);
 
         SMTCodeGenerator smtCodeGenerator = new SMTCodeGeneratorImpl(mockSmtGeneratingFormulaVisitorCreator);
         String code = smtCodeGenerator.generateCheckSatCode(new TruthFormula());
 
-        assertThat(code).contains("predicate-definitions-code");
-        assertThat(code.indexOf("predicate-definitions-code")).isLessThan(code.indexOf("(assert"));
+        assertThat(code.indexOf("(declare-fun Foo (Type Type) Bool)"))
+                .isPositive().isLessThan(code.indexOf("(assert"));
+
+        assertThat(code.indexOf("(declare-fun Bar (Type Type Type) Bool)"))
+                .isPositive().isLessThan(code.indexOf("(assert"));
     }
 
     @Test
     public void generateCheckSatCodeGivesCodeIncludingPropositionDefinitionsBeforeAssert() {
 
-        when(mockSmtGeneratingFormulaVisitor.getPropositionDefinitions())
-                .thenReturn("proposition-definitions-code");
+        Set<String> propositionNames = new HashSet<>();
+        propositionNames.add("P");
+        propositionNames.add("Q");
+        propositionNames.add("R");
+
+        when(mockSmtGeneratingFormulaVisitor.getPropositionNames())
+                .thenReturn(propositionNames);
 
         SMTCodeGeneratorImpl smtCodeGenerator = new SMTCodeGeneratorImpl(mockSmtGeneratingFormulaVisitorCreator);
         String code = smtCodeGenerator.generateCheckSatCode(new TruthFormula());
-        assertThat(code).contains("proposition-definitions-code");
-        assertThat(code.indexOf("proposition-definitions-code")).isLessThan(code.indexOf("(assert"));
+
+        assertThat(code.indexOf("(declare-const P Bool)"))
+                .isPositive().isLessThan(code.indexOf("(assert"));
+
+        assertThat(code.indexOf("(declare-const Q Bool)"))
+                .isPositive().isLessThan(code.indexOf("(assert"));
+
+        assertThat(code.indexOf("(declare-const R Bool)"))
+                .isPositive().isLessThan(code.indexOf("(assert"));
     }
 
     @Test
     public void generateCheckSatCodeGivesCodeIncludingConstantDefinitionsBeforeAssert() {
 
-        when(mockSmtGeneratingFormulaVisitor.getConstantDefinitions())
-                .thenReturn("constant-definitions-code");
+        Set<String> constantNames = new HashSet<>();
+        constantNames.add("a");
+        constantNames.add("b");
+        constantNames.add("c");
+
+        when(mockSmtGeneratingFormulaVisitor.getConstantNames())
+                .thenReturn(constantNames);
 
         SMTCodeGeneratorImpl smtCodeGenerator = new SMTCodeGeneratorImpl(mockSmtGeneratingFormulaVisitorCreator);
         String code = smtCodeGenerator.generateCheckSatCode(new TruthFormula());
-        assertThat(code).contains("constant-definitions-code");
-        assertThat(code.indexOf("constant-definitions-code")).isLessThan(code.indexOf("(assert"));
+
+        assertThat(code.indexOf("(declare-const a Type)"))
+                .isPositive().isLessThan(code.indexOf("(assert"));
+
+        assertThat(code.indexOf("(declare-const b Type)"))
+                .isPositive().isLessThan(code.indexOf("(assert"));
+
+        assertThat(code.indexOf("(declare-const c Type)"))
+                .isPositive().isLessThan(code.indexOf("(assert"));
+    }
+
+    @Test
+    public void generateCheckSatCodeGivesCodeIncludingFunctionDefinitionsBeforeAssert() {
+
+        Map<String, Integer> functionNamesToArgCount = new HashMap<>();
+        functionNamesToArgCount.put("f", 2);
+        functionNamesToArgCount.put("g", 3);
+
+        when(mockSmtGeneratingFormulaVisitor.getFunctionNamesToArgCount())
+                .thenReturn(functionNamesToArgCount);
+
+        SMTCodeGeneratorImpl smtCodeGenerator = new SMTCodeGeneratorImpl(mockSmtGeneratingFormulaVisitorCreator);
+        String code = smtCodeGenerator.generateCheckSatCode(new TruthFormula());
+
+        assertThat(code.indexOf("(declare-fun f (Type Type) Type)"))
+                .isPositive().isLessThan(code.indexOf("(assert"));
+
+        assertThat(code.indexOf("(declare-fun g (Type Type Type) Type)"))
+                .isPositive().isLessThan(code.indexOf("(assert"));
     }
 
     @Test
