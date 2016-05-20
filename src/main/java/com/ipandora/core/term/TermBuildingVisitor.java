@@ -5,9 +5,7 @@ import com.ipandora.api.predicate.term.Number;
 import com.ipandora.core.formula.InvalidSyntaxException;
 import com.ipandora.core.util.Creator;
 import com.ipandora.core.util.WrappingRuntimeException;
-import com.ipandora.parser.PredicateLogicBaseVisitor;
-import com.ipandora.parser.PredicateLogicLexer;
-import com.ipandora.parser.PredicateLogicParser;
+import com.ipandora.parser.*;
 import org.antlr.v4.runtime.Token;
 
 import java.util.ArrayList;
@@ -21,6 +19,11 @@ public class TermBuildingVisitor extends PredicateLogicBaseVisitor<Term> {
     public TermBuildingVisitor(Creator<SymbolTable> symbolTableCreator) {
         this.symbolTableCreator = symbolTableCreator;
         this.symbolTable = symbolTableCreator.create();
+    }
+
+    @Override
+    public Term visitMathExprOnly(PredicateLogicParser.MathExprOnlyContext ctx) {
+        return visit(ctx.expr);
     }
 
     @Override
