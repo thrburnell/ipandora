@@ -19,4 +19,5 @@ public enum Type implements Comparable<Type> {
     public String getName() {
         return name;
     }
+
 }

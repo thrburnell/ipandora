@@ -1,7 +1,11 @@
 package com.ipandora.core.z3;
 
 import com.ipandora.api.predicate.formula.Formula;
+import com.ipandora.api.predicate.formula.NotFormula;
+import com.ipandora.api.predicate.term.Addition;
 import com.ipandora.api.predicate.term.Multiplication;
+import com.ipandora.api.predicate.term.Number;
+import com.ipandora.core.proof.ProofStepCheckException;
 import com.ipandora.testutils.ContainedInCondition;
 import org.junit.Before;
 import org.junit.Test;
@@ -13,6 +17,7 @@ import org.mockito.runners.MockitoJUnitRunner;
 import static com.ipandora.testutils.FormulaCreators.*;
 import static com.ipandora.testutils.TermCreators.*;
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.fail;
 import static org.mockito.Matchers.any;
 import static org.mockito.Matchers.anyString;
 import static org.mockito.Mockito.verify;
@@ -59,7 +64,7 @@ public class Z3ArithmeticEqualityCheckerTest {
     }
 
     @Test
-    public void checkGeneratesCodeForCorrectFormula() throws Exception {
+    public void checkCallsCodeGeneratorWithCorrectForallFormula() throws Exception {
         // (f(x, y) / g(B) + 1) * 4 = (((f(x, y) + g(B)) / g(B)) / 8) * 32
 
         Multiplication t1 = mul(add(div(fun("f", natVar("x"), natVar("y")), fun("g", con("B"))), num(1)), num(4));
@@ -79,6 +84,34 @@ public class Z3ArithmeticEqualityCheckerTest {
 
         Formula calledFormula = formulaArgumentCaptor.getValue();
         assertThat(calledFormula).has(new ContainedInCondition<>(f1, f2));
+    }
+
+    @Test
+    public void checkCallsCodeGeneratorWithCorrectEqualToFormula() throws Exception {
+        // 1 + 2 + 3 = 6
+
+        Addition t1 = add(num(1), num(2), num(3));
+        Number t2 = num(6);
+        NotFormula expected = not(eq(t1, t2));
+
+        checker.check(t1, t2);
+
+        verify(mockCodeGenerator).generateCheckSatCode(expected);
+    }
+
+    @Test
+    public void checkThrowsProofStepExceptionWithMessageIfCodeGeneratorThrows()
+            throws Z3InvalidProblemException {
+
+        when(mockCodeGenerator.generateCheckSatCode(any(Formula.class)))
+                .thenThrow(new Z3InvalidProblemException("test-message"));
+
+        try {
+            checker.check(new Number(1), new Number(2));
+            fail("ProofStepCheckException should have been thrown!");
+        } catch (ProofStepCheckException e) {
+            assertThat(e.getMessage()).isEqualTo("test-message");
+        }
     }
 
 }

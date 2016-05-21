@@ -37,7 +37,13 @@ public class Z3ImpliesChecker implements ImpliesChecker {
 
         // Recall F is valid <=> !F is not satisfiable
         NotFormula notFormula = new NotFormula(impliesFormula);
-        String program = codeGenerator.generateCheckSatCode(notFormula);
+
+        String program;
+        try {
+            program = codeGenerator.generateCheckSatCode(notFormula);
+        } catch (Z3InvalidProblemException e) {
+            throw new ProofStepCheckException(e.getMessage());
+        }
 
         try {
             return !z3Client.isSat(program);

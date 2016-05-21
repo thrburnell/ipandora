@@ -4,6 +4,6 @@ import com.ipandora.api.predicate.formula.Formula;
 
 public interface SMTCodeGenerator {
 
-    String generateCheckSatCode(Formula formula);
+    String generateCheckSatCode(Formula formula) throws Z3InvalidProblemException;
 
 }

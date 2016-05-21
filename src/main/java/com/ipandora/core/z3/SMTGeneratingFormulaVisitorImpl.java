@@ -1,18 +1,21 @@
 package com.ipandora.core.z3;
 
 import com.ipandora.api.predicate.formula.*;
+import com.ipandora.api.predicate.term.FunctionPrototype;
+import com.ipandora.api.predicate.formula.PredicatePrototype;
 import com.ipandora.api.predicate.term.Term;
 import com.ipandora.api.predicate.term.Type;
+import com.ipandora.api.predicate.term.TypeMismatchException;
 import com.ipandora.api.predicate.term.Variable;
+import com.ipandora.core.util.CollectionUtils;
+import com.ipandora.core.util.WrappingRuntimeException;
 import org.apache.commons.lang3.StringUtils;
 
 import java.util.*;
 
 public class SMTGeneratingFormulaVisitorImpl implements SMTGeneratingFormulaVisitor {
 
-    private static final String TYPE_NAME = "Type";
-
-    private final Map<String, Integer> predicates = new HashMap<>();
+    private final Map<String, PredicatePrototype> predicatePrototypesByName = new HashMap<>();
     private final Set<String> propositions = new HashSet<>();
 
     private final SMTGeneratingTermVisitor termVisitor;
@@ -22,8 +25,8 @@ public class SMTGeneratingFormulaVisitorImpl implements SMTGeneratingFormulaVisi
     }
 
     @Override
-    public Map<String, Integer> getPredicateNamesToArgCount() {
-        return predicates;
+    public List<PredicatePrototype> getPredicatePrototypes() {
+        return CollectionUtils.extractMapValues(predicatePrototypesByName);
     }
 
     @Override
@@ -32,13 +35,13 @@ public class SMTGeneratingFormulaVisitorImpl implements SMTGeneratingFormulaVisi
     }
 
     @Override
-    public Set<String> getConstantNames() {
-        return termVisitor.getConstants();
+    public Map<String, Type> getConstantNamesToTypes() {
+        return termVisitor.getConstantNamesToTypes();
     }
 
     @Override
-    public Map<String, Integer> getFunctionNamesToArgCount() {
-        return termVisitor.getFunctions();
+    public List<FunctionPrototype> getFunctionPrototypes() {
+        return termVisitor.getFunctionPrototypes();
     }
 
     @Override
@@ -65,7 +68,8 @@ public class SMTGeneratingFormulaVisitorImpl implements SMTGeneratingFormulaVisi
 
         StringBuilder sb = new StringBuilder();
         for (Variable variable : forallFormula.getVariables()) {
-            sb.append("(").append(variable.getName()).append(" ").append(TYPE_NAME).append(")");
+            String type = Z3Sort.forType(variable.getType()).getCode();
+            sb.append("(").append(variable.getName()).append(" ").append(type).append(")");
         }
         String vars = sb.toString();
 
@@ -121,18 +125,15 @@ public class SMTGeneratingFormulaVisitorImpl implements SMTGeneratingFormulaVisi
 
     @Override
     public String visitPredicateFormula(PredicateFormula predicateFormula) {
-        String name = predicateFormula.getName();
-        List<Term> params = predicateFormula.getParams();
-
-        predicates.put(name, params.size());
+        savePredicate(predicateFormula);
 
         ArrayList<String> paramStrings = new ArrayList<>();
-        for (Term term : params) {
+        for (Term term : predicateFormula.getParams()) {
             paramStrings.add(termVisitor.visit(term));
         }
 
         String paramsString = StringUtils.join(paramStrings, " ");
-        return String.format("(%s %s)", name, paramsString);
+        return String.format("(%s %s)", predicateFormula.getName(), paramsString);
     }
 
     @Override
@@ -168,6 +169,24 @@ public class SMTGeneratingFormulaVisitorImpl implements SMTGeneratingFormulaVisi
         Term left = lessThanEqualFormula.getLeft();
         Term right = lessThanEqualFormula.getRight();
         return String.format("(<= %s %s)", termVisitor.visit(left), termVisitor.visit(right));
+    }
+
+    private void savePredicate(PredicateFormula predicateFormula) {
+        String name = predicateFormula.getName();
+
+        PredicatePrototype newPrototype = PredicatePrototype.fromPredicateFormula(predicateFormula);
+        PredicatePrototype existingPrototype = predicatePrototypesByName.get(name);
+
+        if (existingPrototype != null && !existingPrototype.equals(newPrototype)) {
+
+            String errorMsg = String.format("Predicate %s called multiple times with different argument types: " +
+                            "One invocation: %s; Another invocation: %s.", name, existingPrototype.getArgTypes(),
+                    newPrototype.getArgTypes());
+            throw new WrappingRuntimeException(new TypeMismatchException(errorMsg));
+
+        } else if (existingPrototype == null) {
+            predicatePrototypesByName.put(name, newPrototype);
+        }
     }
 
 }

@@ -16,6 +16,7 @@ import java.util.Collections;
 import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.fail;
 import static org.mockito.Matchers.any;
 import static org.mockito.Matchers.anyString;
 import static org.mockito.Mockito.verify;
@@ -80,6 +81,21 @@ public class Z3ImpliesCheckerTest {
         when(mockZ3Client.isSat(anyString())).thenReturn(true);
         boolean result = checker.check(Collections.<Formula>singletonList(new FalsityFormula()), new TruthFormula());
         assertThat(result).isFalse();
+    }
+
+    @Test
+    public void checkThrowsProofStepExceptionWithMessageIfCodeGeneratorThrows()
+            throws Z3InvalidProblemException {
+
+        when(mockCodeGenerator.generateCheckSatCode(any(Formula.class)))
+                .thenThrow(new Z3InvalidProblemException("test-message"));
+
+        try {
+            checker.check(Collections.<Formula>singletonList(new FalsityFormula()), new TruthFormula());
+            fail("ProofStepCheckException should have been thrown!");
+        } catch (ProofStepCheckException e) {
+            assertThat(e.getMessage()).isEqualTo("test-message");
+        }
     }
 
 }

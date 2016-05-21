@@ -1,23 +1,29 @@
 package com.ipandora.core.z3;
 
+import com.ipandora.api.predicate.term.FunctionPrototype;
 import com.ipandora.api.predicate.term.*;
 import com.ipandora.api.predicate.term.Number;
 import com.ipandora.core.term.TermVisitor;
+import com.ipandora.core.util.CollectionUtils;
+import com.ipandora.core.util.WrappingRuntimeException;
 import org.apache.commons.lang3.StringUtils;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 public class SMTGeneratingTermVisitor implements TermVisitor<String> {
 
-    private final Set<String> constants = new HashSet<>();
-    private final Map<String, Integer> functions = new HashMap<>();
+    private final Map<String, Type> constantNamesToTypes = new HashMap<>();
+    private final Map<String, FunctionPrototype> functionPrototypesByName = new HashMap<>();
 
-    public Set<String> getConstants() {
-        return constants;
+    public Map<String, Type> getConstantNamesToTypes() {
+        return constantNamesToTypes;
     }
 
-    public Map<String, Integer> getFunctions() {
-        return functions;
+    public List<FunctionPrototype> getFunctionPrototypes() {
+        return CollectionUtils.extractMapValues(functionPrototypesByName);
     }
 
     @Override
@@ -27,9 +33,8 @@ public class SMTGeneratingTermVisitor implements TermVisitor<String> {
 
     @Override
     public String visitConstant(Constant constant) {
-        String name = constant.getName();
-        constants.add(name);
-        return name;
+        saveConstant(constant);
+        return constant.getName();
     }
 
     @Override
@@ -72,18 +77,15 @@ public class SMTGeneratingTermVisitor implements TermVisitor<String> {
 
     @Override
     public String visitFunction(Function function) {
-        String name = function.getName();
-        List<Term> args = function.getArgs();
-        functions.put(name, args.size());
+        saveFunction(function);
 
         List<String> argStrings = new ArrayList<>();
-        for (Term arg : args) {
+        for (Term arg : function.getArgs()) {
             argStrings.add(visit(arg));
         }
 
         String argString = StringUtils.join(argStrings, " ");
-
-        return String.format("(%s %s)", name, argString);
+        return String.format("(%s %s)", function.getName(), argString);
     }
 
     @Override
@@ -98,6 +100,39 @@ public class SMTGeneratingTermVisitor implements TermVisitor<String> {
     @Override
     public String visitSummation(Summation summation) {
         throw new RuntimeException("visitSummation() not yet implemented");
+    }
+
+    private void saveConstant(Constant constant) {
+        String name = constant.getName();
+        Type type = constant.getType();
+
+        Type existingType = constantNamesToTypes.get(name);
+
+        if (existingType != null && !existingType.equals(type)) {
+            String errorMsg = String.format("Constant %s used in conflicting type contexts: " +
+                    "One use: %s; Another use: %s.", name, existingType, type);
+            throw new WrappingRuntimeException(new TypeMismatchException(errorMsg));
+        } else if (existingType == null) {
+            constantNamesToTypes.put(name, type);
+        }
+    }
+
+    private void saveFunction(Function function) {
+        String name = function.getName();
+
+        FunctionPrototype newPrototype = FunctionPrototype.fromFunctionTerm(function);
+        FunctionPrototype existingPrototype = functionPrototypesByName.get(name);
+
+        if (existingPrototype != null && !existingPrototype.equals(newPrototype)) {
+
+            String errorMsg = String.format("Function %s called multiple times with different argument types: " +
+                    "One invocation: %s; Another invocation: %s.", name, existingPrototype.getArgTypes(),
+                    newPrototype.getArgTypes());
+            throw new WrappingRuntimeException(new TypeMismatchException(errorMsg));
+
+        } else if (existingPrototype == null) {
+            functionPrototypesByName.put(name, newPrototype);
+        }
     }
 
 }

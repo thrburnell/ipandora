@@ -8,8 +8,12 @@ public class Constant implements Atom {
     private final Type type;
 
     public Constant(String name) {
+        this(name, Type.UNKNOWN);
+    }
+
+    public Constant(String name, Type type) {
         this.name = name;
-        this.type = Type.UNKNOWN;
+        this.type = type;
     }
 
     public String getName() {

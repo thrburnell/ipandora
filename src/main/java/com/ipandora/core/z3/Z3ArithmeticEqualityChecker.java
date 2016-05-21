@@ -2,6 +2,7 @@ package com.ipandora.core.z3;
 
 import com.ipandora.api.predicate.formula.EqualToFormula;
 import com.ipandora.api.predicate.formula.ForallFormula;
+import com.ipandora.api.predicate.formula.Formula;
 import com.ipandora.api.predicate.formula.NotFormula;
 import com.ipandora.api.predicate.term.Term;
 import com.ipandora.api.predicate.term.Variable;
@@ -27,19 +28,26 @@ public class Z3ArithmeticEqualityChecker implements ArithmeticEqualityChecker {
     @Override
     public boolean check(Term t1, Term t2) throws ProofStepCheckException {
 
-        EqualToFormula equalToFormula = new EqualToFormula(t1, t2);
+        Formula formula = new EqualToFormula(t1, t2);
 
         AtomCollectingTermVisitor termVisitor = new AtomCollectingTermVisitor();
         TermVisitingFormulaVisitor formulaVisitor = new TermVisitingFormulaVisitor(termVisitor);
-        formulaVisitor.visit(equalToFormula);
+        formulaVisitor.visit(formula);
 
         Set<Variable> freeVariables = termVisitor.getUniqueVariables();
-        ForallFormula forallFormula = new ForallFormula(equalToFormula,
-                freeVariables.toArray(new Variable[freeVariables.size()]));
 
-        NotFormula notFormula = new NotFormula(forallFormula);
+        if (!freeVariables.isEmpty()) {
+            formula = new ForallFormula(formula, freeVariables.toArray(new Variable[freeVariables.size()]));
+        }
 
-        String program = smtCodeGenerator.generateCheckSatCode(notFormula);
+        NotFormula notFormula = new NotFormula(formula);
+
+        String program;
+        try {
+            program = smtCodeGenerator.generateCheckSatCode(notFormula);
+        } catch (Z3InvalidProblemException e) {
+            throw new ProofStepCheckException(e.getMessage());
+        }
 
         try {
             return !z3Client.isSat(program);

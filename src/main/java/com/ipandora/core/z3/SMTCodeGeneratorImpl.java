@@ -1,15 +1,20 @@
 package com.ipandora.core.z3;
 
 import com.ipandora.api.predicate.formula.Formula;
+import com.ipandora.api.predicate.term.FunctionPrototype;
+import com.ipandora.api.predicate.formula.PredicatePrototype;
+import com.ipandora.api.predicate.term.Type;
+import com.ipandora.api.predicate.term.TypeMismatchException;
 import com.ipandora.core.util.Creator;
+import com.ipandora.core.util.WrappingRuntimeException;
 import org.apache.commons.lang3.StringUtils;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
 public class SMTCodeGeneratorImpl implements SMTCodeGenerator {
-
-    private static final String TYPE_NAME = "Type";
 
     private final Creator<SMTGeneratingFormulaVisitor> visitorCreator;
 
@@ -18,18 +23,28 @@ public class SMTCodeGeneratorImpl implements SMTCodeGenerator {
     }
 
     @Override
-    public String generateCheckSatCode(Formula formula) {
+    public String generateCheckSatCode(Formula formula) throws Z3InvalidProblemException {
 
         StringBuilder sb = new StringBuilder();
-
         SMTGeneratingFormulaVisitor visitor = visitorCreator.create();
-        String formulaCode = visitor.visit(formula);
+        String formulaCode;
+
+        try {
+            formulaCode = visitor.visit(formula);
+        } catch (WrappingRuntimeException wre) {
+            // Catch type mismatch errors and throw checked exception; let others propagate as RuntimeExceptions
+            Exception wrapped = wre.getWrappedException();
+            if (wrapped instanceof TypeMismatchException) {
+                throw new Z3InvalidProblemException("Invalid formula: " + wrapped.getMessage());
+            }
+            throw wre;
+        }
 
         appendTypeDefinition(sb);
-        appendPredicateDefinitions(visitor.getPredicateNamesToArgCount(), sb);
+        appendPredicateDefinitions(visitor.getPredicatePrototypes(), sb);
         appendPropositionDefinitions(visitor.getPropositionNames(), sb);
-        appendConstantDefinitions(visitor.getConstantNames(), sb);
-        appendFunctionDefinitions(visitor.getFunctionNamesToArgCount(), sb);
+        appendConstantDefinitions(visitor.getConstantNamesToTypes(), sb);
+        appendFunctionDefinitions(visitor.getFunctionPrototypes(), sb);
 
         sb.append("(assert ").append(formulaCode).append(") (check-sat)");
 
@@ -37,14 +52,15 @@ public class SMTCodeGeneratorImpl implements SMTCodeGenerator {
     }
 
     private StringBuilder appendTypeDefinition(StringBuilder sb) {
-        return sb.append("(declare-sort ").append(TYPE_NAME).append(")");
+        return sb.append("(declare-sort ").append(Z3Sort.ARBITRARY.getCode()).append(")");
     }
 
-    private StringBuilder appendPredicateDefinitions(Map<String, Integer> predicateNamesToArgCount, StringBuilder sb) {
+    private StringBuilder appendPredicateDefinitions(List<PredicatePrototype> predicatePrototypes,
+                                                     StringBuilder sb) {
 
-        for (Map.Entry<String, Integer> predicate : predicateNamesToArgCount.entrySet()) {
-            String params = StringUtils.repeat(TYPE_NAME, " ", predicate.getValue());
-            sb.append(String.format("(declare-fun %s (%s) Bool)\n", predicate.getKey(), params));
+        for (PredicatePrototype prototype : predicatePrototypes) {
+            String args = getZ3SortParamString(prototype.getArgTypes());
+            sb.append(String.format("(declare-fun %s (%s) %s)\n", prototype.getName(), args, Z3Sort.BOOL.getCode()));
         }
 
         return sb;
@@ -53,30 +69,42 @@ public class SMTCodeGeneratorImpl implements SMTCodeGenerator {
     private StringBuilder appendPropositionDefinitions(Set<String> propositionNames, StringBuilder sb) {
 
         for (String proposition : propositionNames) {
-            sb.append(String.format("(declare-const %s Bool)", proposition));
+            sb.append(String.format("(declare-const %s %s)", proposition, Z3Sort.BOOL.getCode()));
         }
 
         return sb;
     }
 
-    private StringBuilder appendConstantDefinitions(Set<String> constantNames, StringBuilder sb) {
+    private StringBuilder appendConstantDefinitions(Map<String, Type> constantNamesToTypes, StringBuilder sb) {
 
-        for (String constant : constantNames) {
-            sb.append(String.format("(declare-const %s %s)", constant, TYPE_NAME));
+        for (Map.Entry<String, Type> constant : constantNamesToTypes.entrySet()) {
+            String name = constant.getKey();
+            String typeCode = Z3Sort.forType(constant.getValue()).getCode();
+            sb.append(String.format("(declare-const %s %s)", name, typeCode));
         }
 
         return sb;
     }
 
-    private StringBuilder appendFunctionDefinitions(Map<String, Integer> functionNamesToArgCount, StringBuilder sb) {
+    private StringBuilder appendFunctionDefinitions(List<FunctionPrototype> functionPrototypes, StringBuilder sb) {
 
-        for (Map.Entry<String, Integer> function : functionNamesToArgCount.entrySet()) {
-            String name = function.getKey();
-            String params = StringUtils.repeat("Type", " ", function.getValue());
-            sb.append(String.format("(declare-fun %s (%s) Type)", name, params));
+        for (FunctionPrototype prototype : functionPrototypes) {
+            String name = prototype.getName();
+            String args = getZ3SortParamString(prototype.getArgTypes());
+            String returnType = Z3Sort.forType(prototype.getReturnType()).getCode();
+            sb.append(String.format("(declare-fun %s (%s) %s)", name, args, returnType));
         }
 
         return sb;
+    }
+
+    private String getZ3SortParamString(List<Type> types) {
+        List<String> z3Types = new ArrayList<>();
+        for (Type type : types) {
+            z3Types.add(Z3Sort.forType(type).getCode());
+        }
+
+        return StringUtils.join(z3Types, " ");
     }
 
 }

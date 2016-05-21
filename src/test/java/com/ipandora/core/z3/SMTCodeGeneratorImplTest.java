@@ -1,18 +1,22 @@
 package com.ipandora.core.z3;
 
+import com.ipandora.api.predicate.formula.Formula;
 import com.ipandora.api.predicate.formula.TruthFormula;
+import com.ipandora.api.predicate.term.FunctionPrototype;
+import com.ipandora.api.predicate.formula.PredicatePrototype;
+import com.ipandora.api.predicate.term.Type;
+import com.ipandora.api.predicate.term.TypeMismatchException;
+import com.ipandora.core.util.WrappingRuntimeException;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.Mock;
 import org.mockito.runners.MockitoJUnitRunner;
 
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.mockito.Matchers.any;
 import static org.mockito.Mockito.when;
 
 @RunWith(MockitoJUnitRunner.class)
@@ -31,34 +35,36 @@ public class SMTCodeGeneratorImplTest {
     }
 
     @Test
-    public void generateCheckSatCodeGivesCodeBeginningWithTypeDefinition() {
+    public void generateCheckSatCodeGivesCodeBeginningWithTypeDefinition() throws Z3InvalidProblemException {
         SMTCodeGenerator smtCodeGenerator = new SMTCodeGeneratorImpl(mockSmtGeneratingFormulaVisitorCreator);
         String code = smtCodeGenerator.generateCheckSatCode(new TruthFormula());
         assertThat(code).startsWith("(declare-sort Type)");
     }
 
     @Test
-    public void generateCheckSatCodeGivesCodeIncludingPredicateDefinitionsBeforeAssert() {
+    public void generateCheckSatCodeGivesCodeIncludingPredicateDefinitionsBeforeAssert()
+            throws Z3InvalidProblemException {
 
-        Map<String, Integer> predicateNamesToArgCount = new HashMap<>();
-        predicateNamesToArgCount.put("Foo", 2);
-        predicateNamesToArgCount.put("Bar", 3);
+        List<PredicatePrototype> predicatePrototypes = new ArrayList<>();
+        predicatePrototypes.add(new PredicatePrototype("Foo", Arrays.asList(Type.NAT, Type.UNKNOWN)));
+        predicatePrototypes.add(new PredicatePrototype("Bar", Arrays.asList(Type.NAT, Type.NAT, Type.NAT)));
 
-        when(mockSmtGeneratingFormulaVisitor.getPredicateNamesToArgCount())
-                .thenReturn(predicateNamesToArgCount);
+        when(mockSmtGeneratingFormulaVisitor.getPredicatePrototypes())
+                .thenReturn(predicatePrototypes);
 
         SMTCodeGenerator smtCodeGenerator = new SMTCodeGeneratorImpl(mockSmtGeneratingFormulaVisitorCreator);
         String code = smtCodeGenerator.generateCheckSatCode(new TruthFormula());
 
-        assertThat(code.indexOf("(declare-fun Foo (Type Type) Bool)"))
+        assertThat(code.indexOf("(declare-fun Foo (Int Type) Bool)"))
                 .isPositive().isLessThan(code.indexOf("(assert"));
 
-        assertThat(code.indexOf("(declare-fun Bar (Type Type Type) Bool)"))
+        assertThat(code.indexOf("(declare-fun Bar (Int Int Int) Bool)"))
                 .isPositive().isLessThan(code.indexOf("(assert"));
     }
 
     @Test
-    public void generateCheckSatCodeGivesCodeIncludingPropositionDefinitionsBeforeAssert() {
+    public void generateCheckSatCodeGivesCodeIncludingPropositionDefinitionsBeforeAssert()
+            throws Z3InvalidProblemException {
 
         Set<String> propositionNames = new HashSet<>();
         propositionNames.add("P");
@@ -82,15 +88,16 @@ public class SMTCodeGeneratorImplTest {
     }
 
     @Test
-    public void generateCheckSatCodeGivesCodeIncludingConstantDefinitionsBeforeAssert() {
+    public void generateCheckSatCodeGivesCodeIncludingConstantDefinitionsBeforeAssert()
+            throws Z3InvalidProblemException {
 
-        Set<String> constantNames = new HashSet<>();
-        constantNames.add("a");
-        constantNames.add("b");
-        constantNames.add("c");
+        Map<String, Type> constantNamesToTypes = new HashMap<>();
+        constantNamesToTypes.put("a", Type.UNKNOWN);
+        constantNamesToTypes.put("b", Type.NAT);
+        constantNamesToTypes.put("c", Type.UNKNOWN);
 
-        when(mockSmtGeneratingFormulaVisitor.getConstantNames())
-                .thenReturn(constantNames);
+        when(mockSmtGeneratingFormulaVisitor.getConstantNamesToTypes())
+                .thenReturn(constantNamesToTypes);
 
         SMTCodeGeneratorImpl smtCodeGenerator = new SMTCodeGeneratorImpl(mockSmtGeneratingFormulaVisitorCreator);
         String code = smtCodeGenerator.generateCheckSatCode(new TruthFormula());
@@ -98,7 +105,7 @@ public class SMTCodeGeneratorImplTest {
         assertThat(code.indexOf("(declare-const a Type)"))
                 .isPositive().isLessThan(code.indexOf("(assert"));
 
-        assertThat(code.indexOf("(declare-const b Type)"))
+        assertThat(code.indexOf("(declare-const b Int)"))
                 .isPositive().isLessThan(code.indexOf("(assert"));
 
         assertThat(code.indexOf("(declare-const c Type)"))
@@ -106,44 +113,56 @@ public class SMTCodeGeneratorImplTest {
     }
 
     @Test
-    public void generateCheckSatCodeGivesCodeIncludingFunctionDefinitionsBeforeAssert() {
+    public void generateCheckSatCodeGivesCodeIncludingFunctionDefinitionsBeforeAssert()
+            throws Z3InvalidProblemException {
 
-        Map<String, Integer> functionNamesToArgCount = new HashMap<>();
-        functionNamesToArgCount.put("f", 2);
-        functionNamesToArgCount.put("g", 3);
+        List<FunctionPrototype> functionPrototypes = new ArrayList<>();
+        functionPrototypes.add(new FunctionPrototype("f", Arrays.asList(Type.NAT, Type.UNKNOWN), Type.NAT));
+        functionPrototypes.add(new FunctionPrototype("g", Arrays.asList(Type.UNKNOWN, Type.NAT, Type.NAT), Type.UNKNOWN));
 
-        when(mockSmtGeneratingFormulaVisitor.getFunctionNamesToArgCount())
-                .thenReturn(functionNamesToArgCount);
+        when(mockSmtGeneratingFormulaVisitor.getFunctionPrototypes())
+                .thenReturn(functionPrototypes);
 
         SMTCodeGeneratorImpl smtCodeGenerator = new SMTCodeGeneratorImpl(mockSmtGeneratingFormulaVisitorCreator);
         String code = smtCodeGenerator.generateCheckSatCode(new TruthFormula());
 
-        assertThat(code.indexOf("(declare-fun f (Type Type) Type)"))
+        assertThat(code.indexOf("(declare-fun f (Int Type) Int)"))
                 .isPositive().isLessThan(code.indexOf("(assert"));
 
-        assertThat(code.indexOf("(declare-fun g (Type Type Type) Type)"))
+        assertThat(code.indexOf("(declare-fun g (Type Int Int) Type)"))
                 .isPositive().isLessThan(code.indexOf("(assert"));
     }
 
     @Test
-    public void generateCheckSatCodeGivesCodeIncludingSingleAssert() {
+    public void generateCheckSatCodeGivesCodeIncludingSingleAssert() throws Z3InvalidProblemException {
         SMTCodeGenerator smtCodeGenerator = new SMTCodeGeneratorImpl(mockSmtGeneratingFormulaVisitorCreator);
         String code = smtCodeGenerator.generateCheckSatCode(new TruthFormula());
         assertThat(code).containsOnlyOnce("(assert");
     }
 
     @Test
-    public void generateCheckSatCodeGivesCodeIncludingAssertBeforeCheckSat() {
+    public void generateCheckSatCodeGivesCodeIncludingAssertBeforeCheckSat() throws Z3InvalidProblemException {
         SMTCodeGenerator smtCodeGenerator = new SMTCodeGeneratorImpl(mockSmtGeneratingFormulaVisitorCreator);
         String code = smtCodeGenerator.generateCheckSatCode(new TruthFormula());
         assertThat(code.indexOf("(assert")).isLessThan(code.indexOf("(check-sat)"));
     }
 
     @Test
-    public void generateCheckSatCodeGivesCodeIncludingSingleCheckSat() {
+    public void generateCheckSatCodeGivesCodeIncludingSingleCheckSat() throws Z3InvalidProblemException {
         SMTCodeGenerator smtCodeGenerator = new SMTCodeGeneratorImpl(mockSmtGeneratingFormulaVisitorCreator);
         String code = smtCodeGenerator.generateCheckSatCode(new TruthFormula());
         assertThat(code).containsOnlyOnce("(check-sat)");
+    }
+
+    @Test(expected = Z3InvalidProblemException.class)
+    public void generateCheckSatCodeThrowsInvalidProblemExceptionIfVisitorReportsTypeMismatch()
+            throws Z3InvalidProblemException {
+
+        when(mockSmtGeneratingFormulaVisitor.visit(any(Formula.class)))
+                .thenThrow(new WrappingRuntimeException(new TypeMismatchException("Test")));
+
+        SMTCodeGeneratorImpl smtCodeGenerator = new SMTCodeGeneratorImpl(mockSmtGeneratingFormulaVisitorCreator);
+        smtCodeGenerator.generateCheckSatCode(new TruthFormula());
     }
 
 }

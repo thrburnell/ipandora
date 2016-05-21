@@ -1,9 +1,11 @@
 package com.ipandora.core.z3;
 
 import com.ipandora.api.predicate.formula.*;
+import com.ipandora.api.predicate.term.FunctionPrototype;
+import com.ipandora.api.predicate.formula.PredicatePrototype;
+import com.ipandora.api.predicate.term.*;
 import com.ipandora.api.predicate.term.Number;
-import com.ipandora.api.predicate.term.Term;
-import com.ipandora.api.predicate.term.Variable;
+import com.ipandora.core.util.WrappingRuntimeException;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.Mock;
@@ -12,6 +14,7 @@ import org.mockito.runners.MockitoJUnitRunner;
 import java.util.*;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.fail;
 import static org.mockito.Mockito.when;
 
 @RunWith(MockitoJUnitRunner.class)
@@ -46,11 +49,11 @@ public class SMTGeneratingFormulaVisitorImplTest {
 
     @Test
     public void visitForallFormulaReturnsCorrectCode() {
-        // (forall ((x Type) (y Type) (z Type)) (Foo x))
+        // (forall ((x Int) (y Type) (z Int)) (Foo x))
 
-        Variable x = new Variable("x");
+        Variable x = Variable.withTypeNat("x");
         Variable y = new Variable("y");
-        Variable z = new Variable("z");
+        Variable z = Variable.withTypeNat("z");
         PredicateFormula predicateFormula = new PredicateFormula("Foo", Collections.<Term>singletonList(x));
         ForallFormula forallFormula = new ForallFormula(predicateFormula, x, y, z);
 
@@ -58,7 +61,7 @@ public class SMTGeneratingFormulaVisitorImplTest {
         SMTGeneratingFormulaVisitor visitor = new SMTGeneratingFormulaVisitorImpl(termVisitor);
         String result = visitor.visit(forallFormula);
 
-        assertThat(result).isEqualTo("(forall ((x Type)(y Type)(z Type)) (Foo x))");
+        assertThat(result).isEqualTo("(forall ((x Int)(z Int)(y Type)) (Foo x))");
     }
 
     @Test
@@ -153,6 +156,21 @@ public class SMTGeneratingFormulaVisitorImplTest {
         assertThat(result).isEqualTo("(Foo x y z)");
     }
 
+    @Test(expected = TypeMismatchException.class)
+    public void visitPredicateFormulaThrowsIfPredicateUsedMultipleTimesWithDifferentArgTypes() throws Exception {
+        SMTGeneratingTermVisitor termVisitor = new SMTGeneratingTermVisitor();
+        SMTGeneratingFormulaVisitor visitor = new SMTGeneratingFormulaVisitorImpl(termVisitor);
+
+        visitor.visit(new PredicateFormula("Foo", Arrays.<Term>asList(Variable.withTypeNat("x"), new Variable("y"))));
+
+        try {
+            visitor.visit(new PredicateFormula("Foo", Arrays.<Term>asList(new Variable("x"), Variable.withTypeNat("y"))));
+            fail("WrappingRuntimeException should have been thrown!");
+        } catch (WrappingRuntimeException wre) {
+            throw wre.getWrappedException();
+        }
+    }
+
     @Test
     public void visitEqualToFormulaReturnsCorrectCode() {
         EqualToFormula equalToFormula = new EqualToFormula(Variable.withTypeNat("x"), new Number(3));
@@ -209,11 +227,11 @@ public class SMTGeneratingFormulaVisitorImplTest {
     }
 
     @Test
-    public void getPredicateNamesToArgCountReturnsCorrectMapping() {
-        // Should contain (Foo Type Type Type) and (Bar Type)
+    public void getPredicatePrototypesReturnsCorrectList() {
+        // Should contain (Foo Int Type Type) and (Bar Int)
 
         // Foo(x, y, z) AND Bar(x)
-        Variable x = new Variable("x");
+        Variable x = Variable.withTypeNat("x");
         Variable y = new Variable("y");
         Variable z = new Variable("z");
         PredicateFormula fooPredicate = new PredicateFormula("Foo", Arrays.<Term>asList(x, y, z));
@@ -223,11 +241,11 @@ public class SMTGeneratingFormulaVisitorImplTest {
         SMTGeneratingFormulaVisitor visitor = new SMTGeneratingFormulaVisitorImpl(termVisitor);
         visitor.visit(new AndFormula(fooPredicate, barPredicate));
 
-        Map<String, Integer> predicates =  visitor.getPredicateNamesToArgCount();
+        List<PredicatePrototype> predicates =  visitor.getPredicatePrototypes();
 
         assertThat(predicates).hasSize(2);
-        assertThat(predicates).containsEntry("Foo", 3);
-        assertThat(predicates).containsEntry("Bar", 1);
+        assertThat(predicates).contains(new PredicatePrototype("Foo", Arrays.asList(Type.NAT, Type.UNKNOWN, Type.UNKNOWN)));
+        assertThat(predicates).contains(new PredicatePrototype("Bar", Collections.singletonList(Type.NAT)));
     }
 
     @Test
@@ -247,34 +265,35 @@ public class SMTGeneratingFormulaVisitorImplTest {
     }
 
     @Test
-    public void getConstantNamesReturnsCorrectSet() {
+    public void getConstantNamesToTypesReturnsResultFromTermVisitor() {
 
-        when(mockTermVisitor.getConstants())
-                .thenReturn(new HashSet<>(Arrays.asList("x", "z", "q")));
+        Map<String, Type> constNamesToTypes = new HashMap<>();
+        constNamesToTypes.put("x", Type.UNKNOWN);
+        constNamesToTypes.put("y", Type.NAT);
+
+        when(mockTermVisitor.getConstantNamesToTypes()).thenReturn(constNamesToTypes);
 
         SMTGeneratingFormulaVisitorImpl visitor = new SMTGeneratingFormulaVisitorImpl(mockTermVisitor);
         visitor.visit(new TruthFormula());
-        Set<String> constantDefinitions = visitor.getConstantNames();
+        Map<String, Type> constantDefinitions = visitor.getConstantNamesToTypes();
 
-        assertThat(constantDefinitions).containsExactlyInAnyOrder("x", "z", "q");
+        assertThat(constantDefinitions).isEqualTo(constNamesToTypes);
     }
 
     @Test
-    public void getFunctionNamesToArgCountReturnsCorrectMapping() {
+    public void getFunctionNamesToArgCountReturnsResultFromTermVisitor() {
 
-        Map<String, Integer> functions = new HashMap<>();
-        functions.put("f", 3);
-        functions.put("g", 2);
+        List<FunctionPrototype> prototypes = new ArrayList<>();
+        prototypes.add(new FunctionPrototype("f", Arrays.asList(Type.UNKNOWN, Type.NAT, Type.NAT), Type.UNKNOWN));
+        prototypes.add(new FunctionPrototype("g", Arrays.asList(Type.NAT, Type.UNKNOWN), Type.NAT));
 
-        when(mockTermVisitor.getFunctions()).thenReturn(functions);
+        when(mockTermVisitor.getFunctionPrototypes()).thenReturn(prototypes);
 
         SMTGeneratingFormulaVisitorImpl visitor = new SMTGeneratingFormulaVisitorImpl(mockTermVisitor);
         visitor.visit(new TruthFormula());
-        Map<String, Integer> functionDefinitions = visitor.getFunctionNamesToArgCount();
+        List<FunctionPrototype> functionDefinitions = visitor.getFunctionPrototypes();
 
-        assertThat(functionDefinitions).hasSize(2);
-        assertThat(functionDefinitions).containsEntry("f", 3);
-        assertThat(functionDefinitions).containsEntry("g", 2);
+        assertThat(functionDefinitions).isEqualTo(prototypes);
     }
 
 }

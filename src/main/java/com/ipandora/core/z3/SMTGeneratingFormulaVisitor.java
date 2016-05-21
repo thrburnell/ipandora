@@ -1,15 +1,19 @@
 package com.ipandora.core.z3;
 
+import com.ipandora.api.predicate.term.FunctionPrototype;
+import com.ipandora.api.predicate.formula.PredicatePrototype;
+import com.ipandora.api.predicate.term.Type;
 import com.ipandora.core.formula.FormulaVisitor;
 
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
 public interface SMTGeneratingFormulaVisitor extends FormulaVisitor<String> {
 
-    Map<String, Integer> getPredicateNamesToArgCount();
+    List<PredicatePrototype> getPredicatePrototypes();
     Set<String> getPropositionNames();
-    Set<String> getConstantNames();
-    Map<String, Integer> getFunctionNamesToArgCount();
+    Map<String, Type> getConstantNamesToTypes();
+    List<FunctionPrototype> getFunctionPrototypes();
 
 }
