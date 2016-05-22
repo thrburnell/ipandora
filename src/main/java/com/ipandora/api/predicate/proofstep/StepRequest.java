@@ -8,6 +8,8 @@ public class StepRequest {
 
     private String method;
     private String goal;
+    private String from;
+
     private List<String> assumptions;
 
     @JsonProperty
@@ -28,6 +30,16 @@ public class StepRequest {
     @JsonProperty
     public void setGoal(String goal) {
         this.goal = goal;
+    }
+
+    @JsonProperty
+    public String getFrom() {
+        return from;
+    }
+
+    @JsonProperty
+    public void setFrom(String from) {
+        this.from = from;
     }
 
     @JsonProperty

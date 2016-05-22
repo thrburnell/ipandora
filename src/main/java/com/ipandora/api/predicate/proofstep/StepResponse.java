@@ -10,6 +10,7 @@ public class StepResponse {
 
     private String method;
     private String goal;
+    private String from;
     private List<String> assumptions;
     private Boolean valid;
     private String errorMsg;
@@ -32,6 +33,16 @@ public class StepResponse {
     @JsonProperty
     public void setGoal(String goal) {
         this.goal = goal;
+    }
+
+    @JsonProperty
+    public String getFrom() {
+        return from;
+    }
+
+    @JsonProperty
+    public void setFrom(String from) {
+        this.from = from;
     }
 
     @JsonProperty

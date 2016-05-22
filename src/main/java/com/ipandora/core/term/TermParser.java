@@ -5,5 +5,6 @@ import com.ipandora.api.predicate.term.Term;
 public interface TermParser {
 
     Term fromString(String term) throws TermParsingException;
+    Term fromStringWithTypeChecking(String term) throws TermParsingException;
 
 }

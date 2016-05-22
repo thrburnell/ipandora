@@ -6,10 +6,7 @@ import com.ipandora.core.proof.ProofStreamReaderCreator;
 import com.ipandora.core.term.*;
 import com.ipandora.core.util.EnvironmentVariableProviderImpl;
 import com.ipandora.core.util.ProcessExecutorImpl;
-import com.ipandora.core.z3.SMTCodeGeneratorImpl;
-import com.ipandora.core.z3.SMTGeneratingFormulaVisitorCreator;
-import com.ipandora.core.z3.Z3ClientImpl;
-import com.ipandora.core.z3.Z3ImpliesChecker;
+import com.ipandora.core.z3.*;
 import com.ipandora.resources.PredicateResource;
 import io.dropwizard.Application;
 import io.dropwizard.bundles.assets.ConfiguredAssetsBundle;
@@ -50,6 +47,10 @@ public class IPandoraApplication extends Application<IPandoraConfiguration> {
                 new Z3ClientImpl(new ProcessExecutorImpl(), new EnvironmentVariableProviderImpl()),
                 new FormulaConjunctionReducer());
 
+        Z3ArithmeticEqualityChecker equalityChecker = new Z3ArithmeticEqualityChecker(
+                new SMTCodeGeneratorImpl(new SMTGeneratingFormulaVisitorCreator()),
+                new Z3ClientImpl(new ProcessExecutorImpl(), new EnvironmentVariableProviderImpl()));
+
         ProofStreamReaderCreator proofStreamReaderCreator = new ProofStreamReaderCreator();
 
         MathematicalInductionSchemaGenerator inductionSchemaGenerator = new MathematicalInductionSchemaGenerator(
@@ -58,8 +59,14 @@ public class IPandoraApplication extends Application<IPandoraConfiguration> {
         FormulaStringBuilder formulaStringBuilder = new FormulaStringBuilder(new TermStringBuilder());
         TermStringBuilder termStringBuilder = new TermStringBuilder();
 
-        PredicateResource resource = new PredicateResource(formulaParser, impliesChecker,
-                proofStreamReaderCreator, inductionSchemaGenerator, formulaStringBuilder, termStringBuilder);
+        ANTLRTermParser termParser = new ANTLRTermParser(
+                new TermBuildingVisitor(new SymbolTableCreator()), new TermTypeChecker());
+
+        TermTypeInferrer termTypeInferrer = new TermTypeInferrer();
+
+        PredicateResource resource = new PredicateResource(formulaParser, termParser, impliesChecker, equalityChecker,
+                proofStreamReaderCreator, inductionSchemaGenerator, formulaStringBuilder, termStringBuilder,
+                termTypeInferrer);
         environment.jersey().register(resource);
 
         environment.jersey().register(MultiPartFeature.class);

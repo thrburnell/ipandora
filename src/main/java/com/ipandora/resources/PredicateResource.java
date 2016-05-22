@@ -8,6 +8,7 @@ import com.ipandora.api.predicate.proofstep.StepRequest;
 import com.ipandora.api.predicate.proofstep.StepResponse;
 import com.ipandora.api.predicate.read.ReadResponse;
 import com.ipandora.api.predicate.term.Term;
+import com.ipandora.api.predicate.term.TypeMismatchException;
 import com.ipandora.api.predicate.term.Variable;
 import com.ipandora.api.predicate.validate.ValidateRequest;
 import com.ipandora.api.predicate.validate.ValidateResponse;
@@ -17,6 +18,9 @@ import com.ipandora.core.induction.InductionSchema;
 import com.ipandora.core.induction.InductionSchemaGenerator;
 import com.ipandora.core.induction.SchemaGeneratorException;
 import com.ipandora.core.proof.*;
+import com.ipandora.core.term.TermParser;
+import com.ipandora.core.term.TermParsingException;
+import com.ipandora.core.term.TermTypeInferrer;
 import com.ipandora.core.util.PrettyStringBuilder;
 import org.glassfish.jersey.media.multipart.FormDataContentDisposition;
 import org.glassfish.jersey.media.multipart.FormDataParam;
@@ -37,24 +41,34 @@ import java.util.List;
 @Consumes(MediaType.APPLICATION_JSON)
 public class PredicateResource {
 
+    private static final int INVALID_REQUEST_CODE = 422;
+
     private final FormulaParser formulaParser;
+    private final TermParser termParser;
     private final ImpliesChecker impliesChecker;
+    private final ArithmeticEqualityChecker equalityChecker;
     private final ProofStreamReaderCreator proofStreamReaderCreator;
     private final InductionSchemaGenerator inductionSchemaGenerator;
     private final PrettyStringBuilder<Formula> formulaStringBuilder;
     private final PrettyStringBuilder<Term> termStringBuilder;
+    private final TermTypeInferrer termTypeInferrer;
 
-    public PredicateResource(FormulaParser formulaParser, ImpliesChecker impliesChecker,
+    public PredicateResource(FormulaParser formulaParser, TermParser termParser, ImpliesChecker impliesChecker,
+                             ArithmeticEqualityChecker equalityChecker,
                              ProofStreamReaderCreator proofStreamReaderCreator,
                              InductionSchemaGenerator inductionSchemaGenerator,
                              PrettyStringBuilder<Formula> formulaStringBuilder,
-                             PrettyStringBuilder<Term> termStringBuilder) {
+                             PrettyStringBuilder<Term> termStringBuilder,
+                             TermTypeInferrer termTypeInferrer) {
         this.formulaParser = formulaParser;
+        this.termParser = termParser;
         this.impliesChecker = impliesChecker;
+        this.equalityChecker = equalityChecker;
         this.proofStreamReaderCreator = proofStreamReaderCreator;
         this.inductionSchemaGenerator = inductionSchemaGenerator;
         this.formulaStringBuilder = formulaStringBuilder;
         this.termStringBuilder = termStringBuilder;
+        this.termTypeInferrer = termTypeInferrer;
     }
 
     @POST
@@ -70,41 +84,22 @@ public class PredicateResource {
 
     @POST
     @Path("/step")
-    public StepResponse checkProofStep(StepRequest stepRequest)
-            throws ProofStepCheckException, FormulaParsingException {
+    public Response checkProofStep(StepRequest stepRequest) throws ProofStepCheckException {
 
         String method = stepRequest.getMethod();
 
-        if (method.equals(ProofStepMethods.LOGICAL_IMPLICATION)) {
+        switch (method) {
+            case ProofStepMethods.LOGICAL_IMPLICATION:
+                return checkProofStepLogicalImplication(stepRequest);
 
-            List<String> assumptions = stepRequest.getAssumptions();
-
-            List<Formula> assumptionFormulas = new ArrayList<>();
-            for (String assumption : assumptions) {
-                assumptionFormulas.add(formulaParser.fromString(assumption));
-            }
-
-            Formula goalFormula = formulaParser.fromString(stepRequest.getGoal());
-
-            boolean result = impliesChecker.check(assumptionFormulas, goalFormula);
-
-            StepResponse stepResponse = new StepResponse();
-            stepResponse.setMethod(method);
-            stepResponse.setGoal(stepRequest.getGoal());
-            stepResponse.setAssumptions(stepRequest.getAssumptions());
-            stepResponse.setValid(result);
-
-            if (!result) {
-                stepResponse.setErrorMsg("Error messages not yet implemented.");
-            }
-
-            return stepResponse;
+            case ProofStepMethods.ARITHMETIC:
+                return checkProofStepArithmetic(stepRequest);
         }
 
         StepResponse unknownMethodResponse = new StepResponse();
         unknownMethodResponse.setMethod(method);
         unknownMethodResponse.setErrorMsg("Unknown proof step method");
-        return unknownMethodResponse;
+        return invalidRequestResponse(unknownMethodResponse);
     }
 
     @POST
@@ -141,7 +136,8 @@ public class PredicateResource {
 
         Formula formula = formulaParser.fromString(goal);
         if (!(formula instanceof ForallFormula)) {
-            return Response.status(422).entity(response).build();
+            response.setErrorMsg("Formula must be universally quantified.");
+            return invalidRequestResponse(response);
         }
 
         Variable variable = Variable.withTypeNat(varName);
@@ -170,6 +166,104 @@ public class PredicateResource {
         response.setInductiveCase(inductiveCase);
 
         return Response.ok(response).build();
+    }
+
+    private Response checkProofStepLogicalImplication(StepRequest stepRequest) throws ProofStepCheckException {
+        assert stepRequest.getMethod().equals(ProofStepMethods.LOGICAL_IMPLICATION);
+
+        StepResponse stepResponse = new StepResponse();
+        stepResponse.setMethod(ProofStepMethods.LOGICAL_IMPLICATION);
+
+        List<String> assumptions = stepRequest.getAssumptions();
+        if (assumptions == null) {
+            stepResponse.setErrorMsg("Required assumptions missing");
+            return invalidRequestResponse(stepResponse);
+        }
+
+        String goal = stepRequest.getGoal();
+        if (goal == null) {
+            stepResponse.setErrorMsg("Required goal missing");
+            return invalidRequestResponse(stepResponse);
+        }
+
+        List<Formula> assumptionFormulas = new ArrayList<>();
+        for (String assumption : assumptions) {
+            try {
+                assumptionFormulas.add(formulaParser.fromString(assumption));
+            } catch (FormulaParsingException e) {
+                stepResponse.setErrorMsg("Invalid assumption formula: " + assumption);
+                return invalidRequestResponse(stepResponse);
+            }
+        }
+
+        Formula goalFormula;
+        try {
+            goalFormula = formulaParser.fromString(goal);
+        } catch (FormulaParsingException e) {
+            stepResponse.setErrorMsg("Invalid goal formula: " + goal);
+            return invalidRequestResponse(stepResponse);
+        }
+
+        boolean result = impliesChecker.check(assumptionFormulas, goalFormula);
+
+        stepResponse.setGoal(goal);
+        stepResponse.setAssumptions(assumptions);
+        stepResponse.setValid(result);
+
+        if (!result) {
+            stepResponse.setErrorMsg("Error messages not yet implemented.");
+        }
+
+        return Response.ok(stepResponse).build();
+    }
+
+    private Response checkProofStepArithmetic(StepRequest stepRequest) throws ProofStepCheckException {
+        assert stepRequest.getMethod().equals(ProofStepMethods.ARITHMETIC);
+
+        StepResponse stepResponse = new StepResponse();
+        stepResponse.setMethod(ProofStepMethods.ARITHMETIC);
+
+        String goal = stepRequest.getGoal();
+        if (goal == null) {
+            stepResponse.setErrorMsg("Required goal missing");
+            return invalidRequestResponse(stepResponse);
+        }
+
+        String from = stepRequest.getFrom();
+        if (from == null) {
+            stepResponse.setErrorMsg("Required from missing");
+            return invalidRequestResponse(stepResponse);
+        }
+
+        Term fromTerm;
+        try {
+            fromTerm = termParser.fromString(from);
+            termTypeInferrer.infer(fromTerm);
+        } catch (TermParsingException | TypeMismatchException e) {
+            stepResponse.setErrorMsg("Invalid from term: " + from);
+            return invalidRequestResponse(stepResponse);
+        }
+
+        Term goalTerm;
+        try {
+            goalTerm = termParser.fromString(goal);
+            termTypeInferrer.infer(goalTerm);
+        } catch (TermParsingException | TypeMismatchException e) {
+            stepResponse.setErrorMsg("Invalid goal term: " + goal);
+            return invalidRequestResponse(stepResponse);
+        }
+
+        boolean result = equalityChecker.check(fromTerm, goalTerm);
+
+        stepResponse.setGoal(goal);
+        stepResponse.setFrom(from);
+        stepResponse.setValid(result);
+
+        return Response.ok(stepResponse).build();
+    }
+
+    private Response invalidRequestResponse(Object entity) {
+        return Response.status(INVALID_REQUEST_CODE).entity(entity).build();
     }
 
 }

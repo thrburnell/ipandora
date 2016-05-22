@@ -28,11 +28,20 @@ public class ANTLRTermParser implements TermParser {
         parser.setErrorHandler(new BailErrorStrategy());
 
         try {
-            Term t = termBuildingVisitor.visit(parser.mathExprOnly());
-            termTypeChecker.visit(t);
-            return t;
+            return termBuildingVisitor.visit(parser.mathExprOnly());
         } catch (ParseCancellationException e) {
             throw new TermParsingException("Invalid term: " + term);
+        } catch (WrappingRuntimeException e) {
+            throw new TermParsingException(e.getWrappedException());
+        }
+    }
+
+    @Override
+    public Term fromStringWithTypeChecking(String term) throws TermParsingException {
+        try {
+            Term t = fromString(term);
+            termTypeChecker.visit(t);
+            return t;
         } catch (WrappingRuntimeException e) {
             throw new TermParsingException(e.getWrappedException());
         }
