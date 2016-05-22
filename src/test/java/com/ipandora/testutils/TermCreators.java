@@ -14,13 +14,21 @@ public class TermCreators {
     public static Variable var(String name) {
         return new Variable(name);
     }
-    
+
+    public static Constant natCon(String name) {
+        return new Constant(name, Type.NAT);
+    }
+
     public static Constant con(String name) {
         return new Constant(name);
     }
     
     public static Function fun(String name, Term... args) {
         return new Function(name, Arrays.asList(args));
+    }
+
+    public static Function natFun(String name, Term... args) {
+        return new Function(name, Arrays.asList(args), Type.NAT);
     }
 
     public static Number num(int n) {

@@ -5,7 +5,7 @@ import com.ipandora.core.term.TermVisitor;
 public class Constant implements Atom {
 
     private final String name;
-    private final Type type;
+    private Type type;
 
     public Constant(String name) {
         this(name, Type.UNKNOWN);
@@ -23,6 +23,11 @@ public class Constant implements Atom {
     @Override
     public <T> T accept(TermVisitor<T> visitor) {
         return visitor.visitConstant(this);
+    }
+
+    @Override
+    public void setType(Type type) {
+        this.type = type;
     }
 
     @Override

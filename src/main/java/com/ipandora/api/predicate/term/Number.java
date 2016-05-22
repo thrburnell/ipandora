@@ -27,6 +27,11 @@ public class Number implements Atom {
     }
 
     @Override
+    public void setType(Type type) {
+        throw new UnsupportedOperationException("Cannot change type of Number!");
+    }
+
+    @Override
     public String toString() {
         return String.valueOf(number);
     }

@@ -5,7 +5,7 @@ import com.ipandora.core.term.TermVisitor;
 public class Variable implements Atom {
 
     private final String name;
-    private final Type type;
+    private Type type;
 
     public Variable(String name) {
         this(name, Type.UNKNOWN);
@@ -32,6 +32,11 @@ public class Variable implements Atom {
     @Override
     public Type getType() {
         return type;
+    }
+
+    @Override
+    public void setType(Type type) {
+        this.type = type;
     }
 
     @Override

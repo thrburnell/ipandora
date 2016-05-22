@@ -8,7 +8,7 @@ public class Function implements Atom {
 
     private final String name;
     private final List<Term> args;
-    private final Type type;
+    private Type type;
 
     public Function(String name, List<Term> args) {
         this(name, args, Type.UNKNOWN);
@@ -31,6 +31,11 @@ public class Function implements Atom {
     @Override
     public <T> T accept(TermVisitor<T> visitor) {
         return visitor.visitFunction(this);
+    }
+
+    @Override
+    public void setType(Type type) {
+        this.type = type;
     }
 
     @Override
