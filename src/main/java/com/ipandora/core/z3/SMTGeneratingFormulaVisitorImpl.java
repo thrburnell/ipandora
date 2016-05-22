@@ -1,12 +1,10 @@
 package com.ipandora.core.z3;
 
 import com.ipandora.api.predicate.formula.*;
-import com.ipandora.api.predicate.term.FunctionPrototype;
+import com.ipandora.api.predicate.term.*;
 import com.ipandora.api.predicate.formula.PredicatePrototype;
-import com.ipandora.api.predicate.term.Term;
-import com.ipandora.api.predicate.term.Type;
-import com.ipandora.api.predicate.term.TypeMismatchException;
-import com.ipandora.api.predicate.term.Variable;
+import com.ipandora.api.predicate.term.Number;
+import com.ipandora.core.formula.FormulaConjunctionReducer;
 import com.ipandora.core.util.CollectionUtils;
 import com.ipandora.core.util.WrappingRuntimeException;
 import org.apache.commons.lang3.StringUtils;
@@ -15,12 +13,15 @@ import java.util.*;
 
 public class SMTGeneratingFormulaVisitorImpl implements SMTGeneratingFormulaVisitor {
 
+    private final FormulaConjunctionReducer conjunctionReducer;
     private final Map<String, PredicatePrototype> predicatePrototypesByName = new HashMap<>();
     private final Set<String> propositions = new HashSet<>();
 
     private final SMTGeneratingTermVisitor termVisitor;
 
-    public SMTGeneratingFormulaVisitorImpl(SMTGeneratingTermVisitor termVisitor) {
+    public SMTGeneratingFormulaVisitorImpl(FormulaConjunctionReducer conjunctionReducer,
+                                           SMTGeneratingTermVisitor termVisitor) {
+        this.conjunctionReducer = conjunctionReducer;
         this.termVisitor = termVisitor;
     }
 
@@ -67,13 +68,28 @@ public class SMTGeneratingFormulaVisitorImpl implements SMTGeneratingFormulaVisi
     public String visitForallFormula(ForallFormula forallFormula) {
 
         StringBuilder sb = new StringBuilder();
+        List<Variable> natVars = new ArrayList<>();
         for (Variable variable : forallFormula.getVariables()) {
-            String type = Z3Sort.forType(variable.getType()).getCode();
+            Type varType = variable.getType();
+            if (varType == Type.NAT) {
+                natVars.add(variable);
+            }
+            String type = Z3Sort.forType(varType).getCode();
             sb.append("(").append(variable.getName()).append(" ").append(type).append(")");
         }
         String vars = sb.toString();
 
         Formula formula = forallFormula.getFormula();
+
+        if (!natVars.isEmpty()) {
+            List<Formula> natGuardFormulas = new ArrayList<>();
+            for (Variable natVar : natVars) {
+                natGuardFormulas.add(new GreaterThanEqualFormula(natVar, new Number(0)));
+            }
+            Formula natsGuard = conjunctionReducer.reduce(natGuardFormulas);
+            formula = new ImpliesFormula(natsGuard, formula);
+        }
+
         return String.format("(forall (%s) %s)", vars, visit(formula));
     }
 

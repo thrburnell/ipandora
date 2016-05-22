@@ -79,8 +79,12 @@ public class SMTCodeGeneratorImpl implements SMTCodeGenerator {
 
         for (Map.Entry<String, Type> constant : constantNamesToTypes.entrySet()) {
             String name = constant.getKey();
-            String typeCode = Z3Sort.forType(constant.getValue()).getCode();
+            Type type = constant.getValue();
+            String typeCode = Z3Sort.forType(type).getCode();
             sb.append(String.format("(declare-const %s %s)", name, typeCode));
+            if (type == Type.NAT) {
+                sb.append(String.format("(assert (>= %s 0))", name));
+            }
         }
 
         return sb;
@@ -91,11 +95,44 @@ public class SMTCodeGeneratorImpl implements SMTCodeGenerator {
         for (FunctionPrototype prototype : functionPrototypes) {
             String name = prototype.getName();
             String args = getZ3SortParamString(prototype.getArgTypes());
-            String returnType = Z3Sort.forType(prototype.getReturnType()).getCode();
-            sb.append(String.format("(declare-fun %s (%s) %s)", name, args, returnType));
+            Type returnType = prototype.getReturnType();
+            String returnTypeStr = Z3Sort.forType(returnType).getCode();
+            sb.append(String.format("(declare-fun %s (%s) %s)", name, args, returnTypeStr));
+
+            if (returnType == Type.NAT) {
+                appendFunctionReturnValueNatGuard(prototype, sb);
+            }
         }
 
         return sb;
+    }
+
+    private void appendFunctionReturnValueNatGuard(FunctionPrototype prototype, StringBuilder sb) {
+        assert prototype.getReturnType() == Type.NAT;
+
+        // appends an assertion such as:
+        // (assert (forall ((x0 Int)(x1 Type)(x2 Int)) (>= (f x0 x1 x2) 0)))
+
+        final String FUNCTION_ARG_NAME_BASE = "x";
+        String name = prototype.getName();
+        List<Type> argTypes = prototype.getArgTypes();
+
+        sb.append("(assert (forall (");
+
+        for (int i = 0; i < argTypes.size(); i++) {
+            sb.append("(").append(FUNCTION_ARG_NAME_BASE).append(i).append(" ")
+                    .append(Z3Sort.forType(argTypes.get(i)).getCode()).append(")");
+        }
+
+        sb.append(") (>= (");
+        sb.append(name);
+
+        for (int i = 0; i < argTypes.size(); i++) {
+            sb.append(" ");
+            sb.append(FUNCTION_ARG_NAME_BASE).append(i);
+        }
+
+        sb.append(") 0)))");
     }
 
     private String getZ3SortParamString(List<Type> types) {

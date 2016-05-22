@@ -42,7 +42,7 @@ public class SMTCodeGeneratorImplTest {
     }
 
     @Test
-    public void generateCheckSatCodeGivesCodeIncludingPredicateDefinitionsBeforeAssert()
+    public void generateCheckSatCodeGivesCodeIncludingPredicateDefinitions()
             throws Z3InvalidProblemException {
 
         List<PredicatePrototype> predicatePrototypes = new ArrayList<>();
@@ -55,15 +55,12 @@ public class SMTCodeGeneratorImplTest {
         SMTCodeGenerator smtCodeGenerator = new SMTCodeGeneratorImpl(mockSmtGeneratingFormulaVisitorCreator);
         String code = smtCodeGenerator.generateCheckSatCode(new TruthFormula());
 
-        assertThat(code.indexOf("(declare-fun Foo (Int Type) Bool)"))
-                .isPositive().isLessThan(code.indexOf("(assert"));
-
-        assertThat(code.indexOf("(declare-fun Bar (Int Int Int) Bool)"))
-                .isPositive().isLessThan(code.indexOf("(assert"));
+        assertThat(code).contains("(declare-fun Foo (Int Type) Bool)");
+        assertThat(code).contains("(declare-fun Bar (Int Int Int) Bool)");
     }
 
     @Test
-    public void generateCheckSatCodeGivesCodeIncludingPropositionDefinitionsBeforeAssert()
+    public void generateCheckSatCodeGivesCodeIncludingPropositionDefinitions()
             throws Z3InvalidProblemException {
 
         Set<String> propositionNames = new HashSet<>();
@@ -77,18 +74,13 @@ public class SMTCodeGeneratorImplTest {
         SMTCodeGeneratorImpl smtCodeGenerator = new SMTCodeGeneratorImpl(mockSmtGeneratingFormulaVisitorCreator);
         String code = smtCodeGenerator.generateCheckSatCode(new TruthFormula());
 
-        assertThat(code.indexOf("(declare-const P Bool)"))
-                .isPositive().isLessThan(code.indexOf("(assert"));
-
-        assertThat(code.indexOf("(declare-const Q Bool)"))
-                .isPositive().isLessThan(code.indexOf("(assert"));
-
-        assertThat(code.indexOf("(declare-const R Bool)"))
-                .isPositive().isLessThan(code.indexOf("(assert"));
+        assertThat(code).contains("(declare-const P Bool)");
+        assertThat(code).contains("(declare-const Q Bool)");
+        assertThat(code).contains("(declare-const R Bool)");
     }
 
     @Test
-    public void generateCheckSatCodeGivesCodeIncludingConstantDefinitionsBeforeAssert()
+    public void generateCheckSatCodeGivesCodeIncludingConstantDefinitions()
             throws Z3InvalidProblemException {
 
         Map<String, Type> constantNamesToTypes = new HashMap<>();
@@ -102,18 +94,37 @@ public class SMTCodeGeneratorImplTest {
         SMTCodeGeneratorImpl smtCodeGenerator = new SMTCodeGeneratorImpl(mockSmtGeneratingFormulaVisitorCreator);
         String code = smtCodeGenerator.generateCheckSatCode(new TruthFormula());
 
-        assertThat(code.indexOf("(declare-const a Type)"))
-                .isPositive().isLessThan(code.indexOf("(assert"));
-
-        assertThat(code.indexOf("(declare-const b Int)"))
-                .isPositive().isLessThan(code.indexOf("(assert"));
-
-        assertThat(code.indexOf("(declare-const c Type)"))
-                .isPositive().isLessThan(code.indexOf("(assert"));
+        assertThat(code).contains("(declare-const a Type)");
+        assertThat(code).contains("(declare-const b Int)");
+        assertThat(code).contains("(declare-const c Type)");
     }
 
     @Test
-    public void generateCheckSatCodeGivesCodeIncludingFunctionDefinitionsBeforeAssert()
+    public void generateCheckSatCodeGivesCodeIncludingConstantNatGuardsBeforeCheckSat()
+            throws Z3InvalidProblemException {
+
+        Map<String, Type> constantNamesToTypes = new HashMap<>();
+        constantNamesToTypes.put("a", Type.NAT);
+        constantNamesToTypes.put("b", Type.UNKNOWN);
+        constantNamesToTypes.put("c", Type.NAT);
+
+        when(mockSmtGeneratingFormulaVisitor.getConstantNamesToTypes())
+                .thenReturn(constantNamesToTypes);
+
+        SMTCodeGeneratorImpl smtCodeGenerator = new SMTCodeGeneratorImpl(mockSmtGeneratingFormulaVisitorCreator);
+        String code = smtCodeGenerator.generateCheckSatCode(new TruthFormula());
+
+        assertThat(code.indexOf("(assert (>= a 0))"))
+                .isPositive().isLessThan(code.indexOf("(check-sat"));
+
+        assertThat(code.indexOf("(assert (>= c 0))"))
+                .isPositive().isLessThan(code.indexOf("(check-sat"));
+
+        assertThat(code.indexOf("(assert (>= b 0))")).isNegative();
+    }
+
+    @Test
+    public void generateCheckSatCodeGivesCodeIncludingFunctionDefinitions()
             throws Z3InvalidProblemException {
 
         List<FunctionPrototype> functionPrototypes = new ArrayList<>();
@@ -126,11 +137,25 @@ public class SMTCodeGeneratorImplTest {
         SMTCodeGeneratorImpl smtCodeGenerator = new SMTCodeGeneratorImpl(mockSmtGeneratingFormulaVisitorCreator);
         String code = smtCodeGenerator.generateCheckSatCode(new TruthFormula());
 
-        assertThat(code.indexOf("(declare-fun f (Int Type) Int)"))
-                .isPositive().isLessThan(code.indexOf("(assert"));
+        assertThat(code).contains("(declare-fun f (Int Type) Int)");
+        assertThat(code).contains("(declare-fun g (Type Int Int) Type)");
+    }
 
-        assertThat(code.indexOf("(declare-fun g (Type Int Int) Type)"))
-                .isPositive().isLessThan(code.indexOf("(assert"));
+    @Test
+    public void generateCheckSatCodeGivesCodeIncludingFunctionReturnValueNatGuards() throws Z3InvalidProblemException {
+        // (assert (forall ((x Int)) (>= (f x) 0))
+
+        List<FunctionPrototype> functionPrototypes = new ArrayList<>();
+        functionPrototypes.add(new FunctionPrototype("f", Arrays.asList(Type.NAT, Type.UNKNOWN, Type.NAT), Type.NAT));
+        functionPrototypes.add(new FunctionPrototype("g", Arrays.asList(Type.UNKNOWN, Type.NAT, Type.NAT), Type.UNKNOWN));
+
+        when(mockSmtGeneratingFormulaVisitor.getFunctionPrototypes())
+                .thenReturn(functionPrototypes);
+
+        SMTCodeGeneratorImpl smtCodeGenerator = new SMTCodeGeneratorImpl(mockSmtGeneratingFormulaVisitorCreator);
+        String code = smtCodeGenerator.generateCheckSatCode(new TruthFormula());
+
+        assertThat(code).contains("(assert (forall ((x0 Int)(x1 Type)(x2 Int)) (>= (f x0 x1 x2) 0)))");
     }
 
     @Test

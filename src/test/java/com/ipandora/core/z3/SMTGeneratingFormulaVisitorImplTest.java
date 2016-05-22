@@ -1,10 +1,9 @@
 package com.ipandora.core.z3;
 
 import com.ipandora.api.predicate.formula.*;
-import com.ipandora.api.predicate.term.FunctionPrototype;
-import com.ipandora.api.predicate.formula.PredicatePrototype;
 import com.ipandora.api.predicate.term.*;
 import com.ipandora.api.predicate.term.Number;
+import com.ipandora.core.formula.FormulaConjunctionReducer;
 import com.ipandora.core.util.WrappingRuntimeException;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -23,13 +22,15 @@ public class SMTGeneratingFormulaVisitorImplTest {
     @Mock
     private SMTGeneratingTermVisitor mockTermVisitor;
 
+    private FormulaConjunctionReducer conjunctionReducer = new FormulaConjunctionReducer();
+
     @Test
     public void visitAndFormulaReturnsCorrectCode() {
         // (and true (and false true))
         AndFormula andFormula = new AndFormula(new TruthFormula(),
                 new AndFormula(new FalsityFormula(), new TruthFormula()));
 
-        SMTGeneratingFormulaVisitor visitor = new SMTGeneratingFormulaVisitorImpl(mockTermVisitor);
+        SMTGeneratingFormulaVisitor visitor = new SMTGeneratingFormulaVisitorImpl(conjunctionReducer, mockTermVisitor);
         String result = visitor.visit(andFormula);
 
         assertThat(result).isEqualTo("(and true (and false true))");
@@ -41,7 +42,7 @@ public class SMTGeneratingFormulaVisitorImplTest {
         OrFormula left = new OrFormula(new TruthFormula(), new FalsityFormula());
         OrFormula orFormula = new OrFormula(left, new FalsityFormula());
 
-        SMTGeneratingFormulaVisitor visitor = new SMTGeneratingFormulaVisitorImpl(mockTermVisitor);
+        SMTGeneratingFormulaVisitor visitor = new SMTGeneratingFormulaVisitorImpl(conjunctionReducer, mockTermVisitor);
         String result = visitor.visit(orFormula);
 
         assertThat(result).isEqualTo("(or (or true false) false)");
@@ -49,6 +50,38 @@ public class SMTGeneratingFormulaVisitorImplTest {
 
     @Test
     public void visitForallFormulaReturnsCorrectCode() {
+        // (forall ((x Type) (y Type) (z Type)) (Foo x))
+
+        Variable x = new Variable("x");
+        Variable y = new Variable("y");
+        Variable z = new Variable("z");
+        PredicateFormula predicateFormula = new PredicateFormula("Foo", Collections.<Term>singletonList(x));
+        ForallFormula forallFormula = new ForallFormula(predicateFormula, x, y, z);
+
+        SMTGeneratingTermVisitor termVisitor = new SMTGeneratingTermVisitor();
+        SMTGeneratingFormulaVisitor visitor = new SMTGeneratingFormulaVisitorImpl(conjunctionReducer, termVisitor);
+        String result = visitor.visit(forallFormula);
+
+        assertThat(result).isEqualTo("(forall ((x Type)(y Type)(z Type)) (Foo x))");
+    }
+
+    @Test
+    public void visitForallFormulaReturnsCodeWithNatGreaterEqualZeroGuard() {
+        // (forall ((x Int)) (=> (>= x 0) (Foo x)))
+
+        Variable x = Variable.withTypeNat("x");
+        PredicateFormula predicateFormula = new PredicateFormula("Foo", Collections.<Term>singletonList(x));
+        ForallFormula forallFormula = new ForallFormula(predicateFormula, x);
+
+        SMTGeneratingTermVisitor termVisitor = new SMTGeneratingTermVisitor();
+        SMTGeneratingFormulaVisitorImpl visitor = new SMTGeneratingFormulaVisitorImpl(conjunctionReducer, termVisitor);
+        String result = visitor.visit(forallFormula);
+
+        assertThat(result).isEqualTo("(forall ((x Int)) (=> (>= x 0) (Foo x)))");
+    }
+
+    @Test
+    public void visitForallFormulaReturnsCodeWithNatGreaterEqualZeroGuardsForMultipleNatVariables() {
         // (forall ((x Int) (y Type) (z Int)) (Foo x))
 
         Variable x = Variable.withTypeNat("x");
@@ -58,10 +91,10 @@ public class SMTGeneratingFormulaVisitorImplTest {
         ForallFormula forallFormula = new ForallFormula(predicateFormula, x, y, z);
 
         SMTGeneratingTermVisitor termVisitor = new SMTGeneratingTermVisitor();
-        SMTGeneratingFormulaVisitor visitor = new SMTGeneratingFormulaVisitorImpl(termVisitor);
+        SMTGeneratingFormulaVisitor visitor = new SMTGeneratingFormulaVisitorImpl(conjunctionReducer, termVisitor);
         String result = visitor.visit(forallFormula);
 
-        assertThat(result).isEqualTo("(forall ((x Int)(z Int)(y Type)) (Foo x))");
+        assertThat(result).isEqualTo("(forall ((x Int)(z Int)(y Type)) (=> (and (>= x 0) (>= z 0)) (Foo x)))");
     }
 
     @Test
@@ -75,16 +108,51 @@ public class SMTGeneratingFormulaVisitorImplTest {
         ExistsFormula existsFormula = new ExistsFormula(predicateFormula, x, y, z);
 
         SMTGeneratingTermVisitor termVisitor = new SMTGeneratingTermVisitor();
-        SMTGeneratingFormulaVisitor visitor = new SMTGeneratingFormulaVisitorImpl(termVisitor);
+        SMTGeneratingFormulaVisitor visitor = new SMTGeneratingFormulaVisitorImpl(conjunctionReducer, termVisitor);
         String result = visitor.visit(existsFormula);
 
         assertThat(result).isEqualTo("(not (forall ((x Type)(y Type)(z Type)) (not (Foo x))))");
     }
 
     @Test
+    public void visitExistsFormulaReturnsCodeWithNatGreaterEqualZeroGuard() {
+        // (not (forall ((x Type)) (not (and (>= x 0) (Foo x)))))
+        // exists(G^F) ===  !forall(!(G^F))
+
+        Variable x = Variable.withTypeNat("x");
+        PredicateFormula predicateFormula = new PredicateFormula("Foo", Collections.<Term>singletonList(x));
+        ExistsFormula forallFormula = new ExistsFormula(predicateFormula, x);
+
+        SMTGeneratingTermVisitor termVisitor = new SMTGeneratingTermVisitor();
+        SMTGeneratingFormulaVisitorImpl visitor = new SMTGeneratingFormulaVisitorImpl(conjunctionReducer, termVisitor);
+        String result = visitor.visit(forallFormula);
+
+        assertThat(result).isEqualTo("(not (forall ((x Int)) (=> (>= x 0) (not (Foo x)))))");
+    }
+
+    @Test
+    public void visitExistsFormulaReturnsCodeWithNatGreaterEqualZeroGuardsForMultipleNatVariables() {
+        // (forall ((x Int) (y Type) (z Int)) (Foo x))
+
+        Variable x = Variable.withTypeNat("x");
+        Variable y = new Variable("y");
+        Variable z = Variable.withTypeNat("z");
+        PredicateFormula predicateFormula = new PredicateFormula("Foo", Collections.<Term>singletonList(x));
+        ExistsFormula forallFormula = new ExistsFormula(predicateFormula, x, y, z);
+
+        SMTGeneratingTermVisitor termVisitor = new SMTGeneratingTermVisitor();
+        SMTGeneratingFormulaVisitor visitor = new SMTGeneratingFormulaVisitorImpl(conjunctionReducer, termVisitor);
+        String result = visitor.visit(forallFormula);
+
+        assertThat(result)
+                .isEqualTo("(not (forall ((x Int)(z Int)(y Type)) (=> (and (>= x 0) (>= z 0)) (not (Foo x)))))");
+
+    }
+
+    @Test
     public void visitTrueFormulaReturnsCorrectCode() {
         TruthFormula truthFormula = new TruthFormula();
-        SMTGeneratingFormulaVisitor visitor = new SMTGeneratingFormulaVisitorImpl(mockTermVisitor);
+        SMTGeneratingFormulaVisitor visitor = new SMTGeneratingFormulaVisitorImpl(conjunctionReducer, mockTermVisitor);
         String result = visitor.visit(truthFormula);
         assertThat(result).isEqualTo("true");
     }
@@ -92,7 +160,7 @@ public class SMTGeneratingFormulaVisitorImplTest {
     @Test
     public void visitFalseFormulaReturnsCorrectCode() {
         FalsityFormula falsityFormula = new FalsityFormula();
-        SMTGeneratingFormulaVisitor visitor = new SMTGeneratingFormulaVisitorImpl(mockTermVisitor);
+        SMTGeneratingFormulaVisitor visitor = new SMTGeneratingFormulaVisitorImpl(conjunctionReducer, mockTermVisitor);
         String result = visitor.visit(falsityFormula);
         assertThat(result).isEqualTo("false");
     }
@@ -102,7 +170,7 @@ public class SMTGeneratingFormulaVisitorImplTest {
         // (=> false true)
         ImpliesFormula impliesFormula = new ImpliesFormula(new FalsityFormula(), new TruthFormula());
 
-        SMTGeneratingFormulaVisitor visitor = new SMTGeneratingFormulaVisitorImpl(mockTermVisitor);
+        SMTGeneratingFormulaVisitor visitor = new SMTGeneratingFormulaVisitorImpl(conjunctionReducer, mockTermVisitor);
         String result = visitor.visit(impliesFormula);
 
         assertThat(result).isEqualTo("(=> false true)");
@@ -113,7 +181,7 @@ public class SMTGeneratingFormulaVisitorImplTest {
         // (= false false)
         IffFormula iffFormula = new IffFormula(new FalsityFormula(), new FalsityFormula());
 
-        SMTGeneratingFormulaVisitor visitor = new SMTGeneratingFormulaVisitorImpl(mockTermVisitor);
+        SMTGeneratingFormulaVisitor visitor = new SMTGeneratingFormulaVisitorImpl(conjunctionReducer, mockTermVisitor);
         String result = visitor.visit(iffFormula);
 
         assertThat(result).isEqualTo("(= false false)");
@@ -124,7 +192,7 @@ public class SMTGeneratingFormulaVisitorImplTest {
         // (not false)
         NotFormula notFormula = new NotFormula(new FalsityFormula());
 
-        SMTGeneratingFormulaVisitor visitor = new SMTGeneratingFormulaVisitorImpl(mockTermVisitor);
+        SMTGeneratingFormulaVisitor visitor = new SMTGeneratingFormulaVisitorImpl(conjunctionReducer, mockTermVisitor);
         String result = visitor.visit(notFormula);
 
         assertThat(result).isEqualTo("(not false)");
@@ -135,7 +203,7 @@ public class SMTGeneratingFormulaVisitorImplTest {
         // P
         PropositionFormula p = new PropositionFormula("P");
 
-        SMTGeneratingFormulaVisitorImpl visitor = new SMTGeneratingFormulaVisitorImpl(mockTermVisitor);
+        SMTGeneratingFormulaVisitorImpl visitor = new SMTGeneratingFormulaVisitorImpl(conjunctionReducer, mockTermVisitor);
         String result = visitor.visit(p);
 
         assertThat(result).isEqualTo("P");
@@ -150,7 +218,7 @@ public class SMTGeneratingFormulaVisitorImplTest {
         PredicateFormula predicateFormula = new PredicateFormula("Foo", Arrays.<Term>asList(x, y, z));
 
         SMTGeneratingTermVisitor termVisitor = new SMTGeneratingTermVisitor();
-        SMTGeneratingFormulaVisitor visitor = new SMTGeneratingFormulaVisitorImpl(termVisitor);
+        SMTGeneratingFormulaVisitor visitor = new SMTGeneratingFormulaVisitorImpl(conjunctionReducer, termVisitor);
         String result = visitor.visit(predicateFormula);
 
         assertThat(result).isEqualTo("(Foo x y z)");
@@ -159,7 +227,7 @@ public class SMTGeneratingFormulaVisitorImplTest {
     @Test(expected = TypeMismatchException.class)
     public void visitPredicateFormulaThrowsIfPredicateUsedMultipleTimesWithDifferentArgTypes() throws Exception {
         SMTGeneratingTermVisitor termVisitor = new SMTGeneratingTermVisitor();
-        SMTGeneratingFormulaVisitor visitor = new SMTGeneratingFormulaVisitorImpl(termVisitor);
+        SMTGeneratingFormulaVisitor visitor = new SMTGeneratingFormulaVisitorImpl(conjunctionReducer, termVisitor);
 
         visitor.visit(new PredicateFormula("Foo", Arrays.<Term>asList(Variable.withTypeNat("x"), new Variable("y"))));
 
@@ -176,7 +244,7 @@ public class SMTGeneratingFormulaVisitorImplTest {
         EqualToFormula equalToFormula = new EqualToFormula(Variable.withTypeNat("x"), new Number(3));
 
         SMTGeneratingTermVisitor termVisitor = new SMTGeneratingTermVisitor();
-        SMTGeneratingFormulaVisitorImpl visitor = new SMTGeneratingFormulaVisitorImpl(termVisitor);
+        SMTGeneratingFormulaVisitorImpl visitor = new SMTGeneratingFormulaVisitorImpl(conjunctionReducer, termVisitor);
         String result = visitor.visit(equalToFormula);
 
         assertThat(result).isEqualTo("(= x 3)");
@@ -187,7 +255,7 @@ public class SMTGeneratingFormulaVisitorImplTest {
         GreaterThanFormula greaterThanFormula = new GreaterThanFormula(Variable.withTypeNat("x"), new Number(2));
 
         SMTGeneratingTermVisitor termVisitor = new SMTGeneratingTermVisitor();
-        SMTGeneratingFormulaVisitorImpl visitor = new SMTGeneratingFormulaVisitorImpl(termVisitor);
+        SMTGeneratingFormulaVisitorImpl visitor = new SMTGeneratingFormulaVisitorImpl(conjunctionReducer, termVisitor);
         String result = visitor.visit(greaterThanFormula);
 
         assertThat(result).isEqualTo("(> x 2)");
@@ -198,7 +266,7 @@ public class SMTGeneratingFormulaVisitorImplTest {
         LessThanFormula lessThanFormula = new LessThanFormula(Variable.withTypeNat("x"), new Number(13));
 
         SMTGeneratingTermVisitor termVisitor = new SMTGeneratingTermVisitor();
-        SMTGeneratingFormulaVisitorImpl visitor = new SMTGeneratingFormulaVisitorImpl(termVisitor);
+        SMTGeneratingFormulaVisitorImpl visitor = new SMTGeneratingFormulaVisitorImpl(conjunctionReducer, termVisitor);
         String result = visitor.visit(lessThanFormula);
 
         assertThat(result).isEqualTo("(< x 13)");
@@ -209,7 +277,7 @@ public class SMTGeneratingFormulaVisitorImplTest {
         GreaterThanEqualFormula greaterThanEqualFormula = new GreaterThanEqualFormula(Variable.withTypeNat("x"), new Number(3));
 
         SMTGeneratingTermVisitor termVisitor = new SMTGeneratingTermVisitor();
-        SMTGeneratingFormulaVisitorImpl visitor = new SMTGeneratingFormulaVisitorImpl(termVisitor);
+        SMTGeneratingFormulaVisitorImpl visitor = new SMTGeneratingFormulaVisitorImpl(conjunctionReducer, termVisitor);
         String result = visitor.visit(greaterThanEqualFormula);
 
         assertThat(result).isEqualTo("(>= x 3)");
@@ -220,7 +288,7 @@ public class SMTGeneratingFormulaVisitorImplTest {
         LessThanEqualFormula lessThanEqualFormula = new LessThanEqualFormula(Variable.withTypeNat("z"), Variable.withTypeNat("m"));
 
         SMTGeneratingTermVisitor termVisitor = new SMTGeneratingTermVisitor();
-        SMTGeneratingFormulaVisitorImpl visitor = new SMTGeneratingFormulaVisitorImpl(termVisitor);
+        SMTGeneratingFormulaVisitorImpl visitor = new SMTGeneratingFormulaVisitorImpl(conjunctionReducer, termVisitor);
         String result = visitor.visit(lessThanEqualFormula);
 
         assertThat(result).isEqualTo("(<= z m)");
@@ -238,7 +306,7 @@ public class SMTGeneratingFormulaVisitorImplTest {
         PredicateFormula barPredicate = new PredicateFormula("Bar", Arrays.<Term>asList(x));
 
         SMTGeneratingTermVisitor termVisitor = new SMTGeneratingTermVisitor();
-        SMTGeneratingFormulaVisitor visitor = new SMTGeneratingFormulaVisitorImpl(termVisitor);
+        SMTGeneratingFormulaVisitor visitor = new SMTGeneratingFormulaVisitorImpl(conjunctionReducer, termVisitor);
         visitor.visit(new AndFormula(fooPredicate, barPredicate));
 
         List<PredicatePrototype> predicates =  visitor.getPredicatePrototypes();
@@ -257,7 +325,7 @@ public class SMTGeneratingFormulaVisitorImplTest {
         PropositionFormula r = new PropositionFormula("R");
         AndFormula andFormula = new AndFormula(p, new OrFormula(q, r));
 
-        SMTGeneratingFormulaVisitorImpl visitor = new SMTGeneratingFormulaVisitorImpl(mockTermVisitor);
+        SMTGeneratingFormulaVisitorImpl visitor = new SMTGeneratingFormulaVisitorImpl(conjunctionReducer, mockTermVisitor);
         visitor.visit(andFormula);
         Set<String> propositionDefinitions = visitor.getPropositionNames();
 
@@ -273,7 +341,7 @@ public class SMTGeneratingFormulaVisitorImplTest {
 
         when(mockTermVisitor.getConstantNamesToTypes()).thenReturn(constNamesToTypes);
 
-        SMTGeneratingFormulaVisitorImpl visitor = new SMTGeneratingFormulaVisitorImpl(mockTermVisitor);
+        SMTGeneratingFormulaVisitorImpl visitor = new SMTGeneratingFormulaVisitorImpl(conjunctionReducer, mockTermVisitor);
         visitor.visit(new TruthFormula());
         Map<String, Type> constantDefinitions = visitor.getConstantNamesToTypes();
 
@@ -289,7 +357,7 @@ public class SMTGeneratingFormulaVisitorImplTest {
 
         when(mockTermVisitor.getFunctionPrototypes()).thenReturn(prototypes);
 
-        SMTGeneratingFormulaVisitorImpl visitor = new SMTGeneratingFormulaVisitorImpl(mockTermVisitor);
+        SMTGeneratingFormulaVisitorImpl visitor = new SMTGeneratingFormulaVisitorImpl(conjunctionReducer, mockTermVisitor);
         visitor.visit(new TruthFormula());
         List<FunctionPrototype> functionDefinitions = visitor.getFunctionPrototypes();
 
