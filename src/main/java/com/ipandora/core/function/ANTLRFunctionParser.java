@@ -20,23 +20,22 @@ public class ANTLRFunctionParser implements FunctionParser {
         CommonTokenStream tokens = new CommonTokenStream(lexer);
         PredicateLogicParser parser = new PredicateLogicParser(tokens);
         PredicateLogicParser.FunctionDefinitionContext fnCtx = parser.functionDefinition();
-        SymbolTableCreator symbolTableCreator = new SymbolTableCreator();
-
-
-        // TEMP: Func and Form visitors need same Term visitor for symbol table reasons
-        // This won't be necessary once semantic analysis is abstracted and not performed at parse time
-        TermBuildingVisitor termVisitor = new TermBuildingVisitor(symbolTableCreator.create(), symbolTableCreator);
-        FormulaBuildingVisitor formulaVisitor = new FormulaBuildingVisitor(termVisitor);
-
-        FunctionBuildingVisitor visitor = new FunctionBuildingVisitor(formulaVisitor, termVisitor);
 
         try {
-            return visitor.visit(fnCtx);
+            return makeFunctionBuildingVisitor().visit(fnCtx);
         } catch (IllegalFunctionException e) {
             throw new FunctionParsingException(e);
         } catch (WrappingRuntimeException e) {
             throw new FunctionParsingException(e.getWrappedException());
         }
+    }
+
+    private FunctionBuildingVisitor makeFunctionBuildingVisitor() {
+        SymbolTableCreator symbolTableCreator = new SymbolTableCreator();
+        TermBuildingVisitor termVisitor = new TermBuildingVisitor(symbolTableCreator.create(), symbolTableCreator);
+        FormulaBuildingVisitor formulaVisitor = new FormulaBuildingVisitor(termVisitor);
+
+        return new FunctionBuildingVisitor(formulaVisitor, termVisitor);
     }
 
 }

@@ -36,11 +36,9 @@ public class IPandoraApplication extends Application<IPandoraConfiguration> {
                     Environment environment) throws Exception {
 
         SymbolTableCreator symbolTableCreator = new SymbolTableCreator();
-        FormulaBuildingVisitor formulaBuildingVisitor = new FormulaBuildingVisitor(
-                new TermBuildingVisitor(symbolTableCreator.create(), symbolTableCreator));
-        FormulaTypeChecker formulaTypeChecker = new FormulaTypeChecker(new TermTypeChecker());
 
-        ANTLRFormulaParser formulaParser = new ANTLRFormulaParser(formulaBuildingVisitor, formulaTypeChecker);
+        FormulaTypeChecker formulaTypeChecker = new FormulaTypeChecker(new TermTypeChecker());
+        ANTLRFormulaParser formulaParser = new ANTLRFormulaParser(formulaTypeChecker);
 
         Z3ImpliesChecker impliesChecker = new Z3ImpliesChecker(
                 new SMTCodeGeneratorImpl(new SMTGeneratingFormulaVisitorCreator()),

@@ -2,6 +2,8 @@ package com.ipandora.core.formula;
 
 import com.ipandora.api.predicate.formula.Formula;
 import com.ipandora.api.predicate.term.TypeMismatchException;
+import com.ipandora.core.term.SymbolTableCreator;
+import com.ipandora.core.term.TermBuildingVisitor;
 import com.ipandora.core.util.WrappingRuntimeException;
 import com.ipandora.parser.PredicateLogicLexer;
 import com.ipandora.parser.PredicateLogicParser;
@@ -12,11 +14,9 @@ import org.antlr.v4.runtime.misc.ParseCancellationException;
 
 public class ANTLRFormulaParser implements FormulaParser {
 
-    private final FormulaBuildingVisitor formulaBuildingVisitor;
     private final FormulaTypeChecker formulaTypeChecker;
 
-    public ANTLRFormulaParser(FormulaBuildingVisitor formulaBuildingVisitor, FormulaTypeChecker formulaTypeChecker) {
-        this.formulaBuildingVisitor = formulaBuildingVisitor;
+    public ANTLRFormulaParser(FormulaTypeChecker formulaTypeChecker) {
         this.formulaTypeChecker = formulaTypeChecker;
     }
 
@@ -48,10 +48,16 @@ public class ANTLRFormulaParser implements FormulaParser {
         }
 
         try {
-            return formulaBuildingVisitor.visit(formulaCtx);
+            return makeFormulaBuildingVisitor().visit(formulaCtx);
         } catch (WrappingRuntimeException e) {
             throw new FormulaParsingException(e.getWrappedException());
         }
+    }
+
+    private FormulaBuildingVisitor makeFormulaBuildingVisitor() {
+        SymbolTableCreator stCreator = new SymbolTableCreator();
+        TermBuildingVisitor termBuildingVisitor = new TermBuildingVisitor(stCreator.create(), stCreator);
+        return new FormulaBuildingVisitor(termBuildingVisitor);
     }
 
 }

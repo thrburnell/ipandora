@@ -3,8 +3,6 @@ package com.ipandora.core.formula;
 import com.ipandora.api.predicate.formula.*;
 import com.ipandora.api.predicate.term.*;
 import com.ipandora.api.predicate.term.Number;
-import com.ipandora.core.term.SymbolTableCreator;
-import com.ipandora.core.term.TermBuildingVisitor;
 import com.ipandora.core.term.TermTypeChecker;
 import org.junit.Before;
 import org.junit.Test;
@@ -22,11 +20,8 @@ public class ANTLRFormulaParserTest {
 
     @Before
     public void before() {
-        SymbolTableCreator symbolTableCreator = new SymbolTableCreator();
-        FormulaBuildingVisitor visitor = new FormulaBuildingVisitor(
-                new TermBuildingVisitor(symbolTableCreator.create(), symbolTableCreator));
         FormulaTypeChecker formulaTypeChecker = new FormulaTypeChecker(new TermTypeChecker());
-        parser = new ANTLRFormulaParser(visitor, formulaTypeChecker);
+        parser = new ANTLRFormulaParser(formulaTypeChecker);
     }
 
     @Test
@@ -270,12 +265,8 @@ public class ANTLRFormulaParserTest {
 
     @Test
     public void fromStringShouldTypeCheckFormula() throws FormulaParsingException, TypeMismatchException {
-        SymbolTableCreator symbolTableCreator = new SymbolTableCreator();
-        FormulaBuildingVisitor visitor = new FormulaBuildingVisitor(
-                new TermBuildingVisitor(symbolTableCreator.create(), symbolTableCreator));
-
         FormulaTypeChecker mockFormulaTypeChecker = Mockito.mock(FormulaTypeChecker.class);
-        parser = new ANTLRFormulaParser(visitor, mockFormulaTypeChecker);
+        parser = new ANTLRFormulaParser(mockFormulaTypeChecker);
 
         Formula formula = parser.fromStringWithTypeChecking("\\FORALL x in Nat. x > 2");
 
