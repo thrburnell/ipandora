@@ -134,7 +134,7 @@ public class PredicateResource {
         response.setGoal(goal);
         response.setVariable(varName);
 
-        Formula formula = formulaParser.fromString(goal);
+        Formula formula = formulaParser.fromStringWithTypeChecking(goal);
         if (!(formula instanceof ForallFormula)) {
             response.setErrorMsg("Formula must be universally quantified.");
             return invalidRequestResponse(response);
@@ -192,7 +192,7 @@ public class PredicateResource {
         List<Formula> assumptionFormulas = new ArrayList<>();
         for (String assumption : assumptions) {
             try {
-                assumptionFormulas.add(formulaParser.fromString(assumption));
+                assumptionFormulas.add(formulaParser.fromStringWithTypeChecking(assumption));
             } catch (FormulaParsingException e) {
                 stepResponse.setErrorMsg("Invalid assumption formula: " + assumption);
                 return invalidRequestResponse(stepResponse);
@@ -201,7 +201,7 @@ public class PredicateResource {
 
         Formula goalFormula;
         try {
-            goalFormula = formulaParser.fromString(goal);
+            goalFormula = formulaParser.fromStringWithTypeChecking(goal);
         } catch (FormulaParsingException e) {
             stepResponse.setErrorMsg("Invalid goal formula: " + goal);
             return invalidRequestResponse(stepResponse);

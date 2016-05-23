@@ -13,7 +13,6 @@ import org.mockito.runners.MockitoJUnitRunner;
 
 import java.util.Arrays;
 
-import static org.assertj.core.api.Assertions.fail;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
@@ -32,7 +31,7 @@ public class FormulaTypeCheckerTest {
 
 
     @Test
-    public void analyseShouldAskTermTypeCheckerForEachParamOfPredicate() {
+    public void analyseShouldAskTermTypeCheckerForEachParamOfPredicate() throws TypeMismatchException {
         Number number = new Number(1);
         Constant constant = new Constant("y");
         Variable variable = new Variable("?x");
@@ -46,7 +45,7 @@ public class FormulaTypeCheckerTest {
     }
 
     @Test
-    public void analyseShouldAskTermTypeCheckerForEachParamOfEqual() {
+    public void analyseShouldAskTermTypeCheckerForEachParamOfEqual() throws TypeMismatchException {
         Number number = new Number(2);
         Variable variable = Variable.withTypeNat("?x");
         EqualToFormula equalToFormula = new EqualToFormula(number, variable);
@@ -58,7 +57,7 @@ public class FormulaTypeCheckerTest {
     }
 
     @Test
-    public void analyseShouldAskTermTypeCheckerForEachParamOfGreaterThan() {
+    public void analyseShouldAskTermTypeCheckerForEachParamOfGreaterThan() throws TypeMismatchException {
         Number number = new Number(2);
         Variable variable = Variable.withTypeNat("?x");
         GreaterThanFormula greaterThanFormula = new GreaterThanFormula(number, variable);
@@ -70,7 +69,7 @@ public class FormulaTypeCheckerTest {
     }
 
     @Test
-    public void analyseShouldAskTermTypeCheckerForEachParamOfGreaterThanEqual() {
+    public void analyseShouldAskTermTypeCheckerForEachParamOfGreaterThanEqual() throws TypeMismatchException {
         Number number = new Number(2);
         Variable variable = Variable.withTypeNat("?x");
         GreaterThanEqualFormula greaterThanEqualFormula = new GreaterThanEqualFormula(number, variable);
@@ -82,7 +81,7 @@ public class FormulaTypeCheckerTest {
     }
 
     @Test
-    public void analyseShouldAskTermTypeCheckerForEachParamOfLessThan() {
+    public void analyseShouldAskTermTypeCheckerForEachParamOfLessThan() throws TypeMismatchException {
         Number number = new Number(2);
         Variable variable = Variable.withTypeNat("?x");
         LessThanFormula lessThanFormula = new LessThanFormula(number, variable);
@@ -94,7 +93,7 @@ public class FormulaTypeCheckerTest {
     }
 
     @Test
-    public void analyseShouldAskTermTypeCheckerForEachParamOfLessThanEqual() {
+    public void analyseShouldAskTermTypeCheckerForEachParamOfLessThanEqual() throws TypeMismatchException {
         Number number = new Number(2);
         Variable variable = Variable.withTypeNat("?x");
         LessThanEqualFormula lessThanEqualFormula = new LessThanEqualFormula(number, variable);
@@ -113,7 +112,7 @@ public class FormulaTypeCheckerTest {
         when(mockTermTypeChecker.visit(addition))
                 .thenThrow(new WrappingRuntimeException(new TypeMismatchException("Test")));
 
-        analyseAndExpectWrappedRuntimeException(equalToFormula);
+        typeChecker.analyse(equalToFormula);
     }
 
     @Test(expected = TypeMismatchException.class)
@@ -122,7 +121,7 @@ public class FormulaTypeCheckerTest {
         Variable variable = new Variable("?x");
         EqualToFormula equalToFormula = new EqualToFormula(number, variable);
 
-        analyseAndExpectWrappedRuntimeException(equalToFormula);
+        typeChecker.analyse(equalToFormula);
     }
 
     @Test(expected = TypeMismatchException.class)
@@ -131,7 +130,7 @@ public class FormulaTypeCheckerTest {
         Variable variable = new Variable("?x");
         GreaterThanFormula greaterThanFormula = new GreaterThanFormula(number, variable);
 
-        analyseAndExpectWrappedRuntimeException(greaterThanFormula);
+        typeChecker.analyse(greaterThanFormula);
     }
 
     @Test(expected = TypeMismatchException.class)
@@ -140,7 +139,7 @@ public class FormulaTypeCheckerTest {
         Variable variable = new Variable("?x");
         GreaterThanEqualFormula greaterThanEqualFormula = new GreaterThanEqualFormula(number, variable);
 
-        analyseAndExpectWrappedRuntimeException(greaterThanEqualFormula);
+        typeChecker.analyse(greaterThanEqualFormula);
     }
 
     @Test(expected = TypeMismatchException.class)
@@ -149,7 +148,7 @@ public class FormulaTypeCheckerTest {
         Variable variable = new Variable("?x");
         LessThanFormula lessThanFormula = new LessThanFormula(number, variable);
 
-        analyseAndExpectWrappedRuntimeException(lessThanFormula);
+        typeChecker.analyse(lessThanFormula);
     }
 
     @Test(expected = TypeMismatchException.class)
@@ -158,17 +157,7 @@ public class FormulaTypeCheckerTest {
         Variable variable = new Variable("?x");
         LessThanEqualFormula lessThanEqualFormula = new LessThanEqualFormula(number, variable);
 
-        analyseAndExpectWrappedRuntimeException(lessThanEqualFormula);
-    }
-
-    private void analyseAndExpectWrappedRuntimeException(Formula formula) throws Exception {
-        try {
-            typeChecker.analyse(formula);
-        } catch (WrappingRuntimeException e) {
-            throw e.getWrappedException();
-        }
-
-        fail("WrappingRuntimeException should have been thrown!");
+        typeChecker.analyse(lessThanEqualFormula);
     }
 
 }

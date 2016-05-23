@@ -25,7 +25,7 @@ public class ANTLRFunctionParser implements FunctionParser {
 
         // TEMP: Func and Form visitors need same Term visitor for symbol table reasons
         // This won't be necessary once semantic analysis is abstracted and not performed at parse time
-        TermBuildingVisitor termVisitor = new TermBuildingVisitor(symbolTableCreator);
+        TermBuildingVisitor termVisitor = new TermBuildingVisitor(symbolTableCreator.create(), symbolTableCreator);
         FormulaBuildingVisitor formulaVisitor = new FormulaBuildingVisitor(termVisitor);
 
         FunctionBuildingVisitor visitor = new FunctionBuildingVisitor(formulaVisitor, termVisitor);

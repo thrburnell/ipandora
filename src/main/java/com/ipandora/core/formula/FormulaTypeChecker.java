@@ -17,8 +17,16 @@ public class FormulaTypeChecker implements FormulaVisitor<Void> {
         this.termTypeChecker = termTypeChecker;
     }
 
-    public void analyse(Formula formula) {
-        formula.accept(this);
+    public void analyse(Formula formula) throws TypeMismatchException {
+        try {
+            formula.accept(this);
+        } catch (WrappingRuntimeException wre) {
+            Exception wrapped = wre.getWrappedException();
+            if (wrapped instanceof TypeMismatchException) {
+                throw (TypeMismatchException) wrapped;
+            }
+            throw wre;
+        }
     }
 
     @Override
