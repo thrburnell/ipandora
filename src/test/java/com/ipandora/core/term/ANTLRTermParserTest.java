@@ -83,14 +83,6 @@ public class ANTLRTermParserTest {
         assertThat(term).isEqualTo(expected);
     }
 
-    @Test
-    public void fromStringSummation() throws TermParsingException {
-        Term term = parser.fromStringWithTypeChecking("\\SUM i 0 10 i");
-        Summation expected = new Summation(Variable.withTypeNat("i"), new Number(0), new Number(10),
-                Variable.withTypeNat("i"));
-        assertThat(term).isEqualTo(expected);
-    }
-
     @Test(expected = TermParsingException.class)
     public void fromStringShouldThrowIfInvalidTermGiven() throws TermParsingException {
         parser.fromStringWithTypeChecking("1 + 2 = 3");

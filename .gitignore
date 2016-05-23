@@ -3,4 +3,6 @@
 target/
 dependency-reduced-pom.xml
 src/main/java/com/ipandora/demo/
+src/main/antlr4/imports/*.tokens
+src/main/antlr4/com/ipandora/parser/*.tokens
 

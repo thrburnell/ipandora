@@ -97,13 +97,4 @@ public class AtomCollectingTermVisitor implements TermVisitor<Void> {
         return null;
     }
 
-    @Override
-    public Void visitSummation(Summation summation) {
-        visit(summation.getVariable());
-        visit(summation.getLowerBound());
-        visit(summation.getUpperBound());
-        visit(summation.getElement());
-        return null;
-    }
-
 }

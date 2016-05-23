@@ -148,15 +148,6 @@ public class TermStringBuilderTest {
     }
 
     @Test
-    public void buildSummation() {
-        // \SUM i 0 10 i
-        TermStringBuilder builder = new TermStringBuilder();
-        Summation term = new Summation(new Variable("i"), new Number(0), new Number(10), new Variable("i"));
-        String result = builder.build(term);
-        assertThat(result).isEqualTo("\\SUM i 0 10 i");
-    }
-
-    @Test
     public void buildPowerStrongerThanMultiplySoNoBrackets() {
         // x * y^2
         TermStringBuilder builder = new TermStringBuilder();

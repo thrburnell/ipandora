@@ -145,11 +145,6 @@ public class TermTypeInferrer {
             return changed;
         }
 
-        @Override
-        public Boolean visitSummation(Summation summation) {
-            throw new UnsupportedOperationException("Need to remove Summation from grammar");
-        }
-
         private boolean inferTypeFromStack(Atom atom) {
             return !typeStack.isEmpty() && attemptToSetType(atom, typeStack.peek());
 

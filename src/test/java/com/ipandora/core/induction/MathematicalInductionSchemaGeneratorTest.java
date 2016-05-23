@@ -80,52 +80,6 @@ public class MathematicalInductionSchemaGeneratorTest {
     }
 
     @Test
-    public void generateSchemaEqualityWithSummation() throws SchemaGeneratorException {
-        // \FORALL n in Nat. (\SUM i 0 n i^2 = n * (n + 1) * (2 * n + 1)
-
-        Summation baseSum = new Summation(I_NAT, ZERO, ZERO, new Power(I_NAT, 2));
-
-        Multiplication baseMult = new Multiplication(
-                new Multiplication(ZERO, new Addition(ZERO, ONE)), new Addition(new Multiplication(TWO, ZERO), ONE));
-
-        EqualToFormula baseCase = new EqualToFormula(baseSum, baseMult);
-
-        Summation indHypSum = new Summation(I_NAT, ZERO, K_CONST, new Power(I_NAT, 2));
-
-        Multiplication indHypMult = new Multiplication(
-                new Multiplication(K_CONST, new Addition(K_CONST, ONE)), new Addition(new Multiplication(TWO, K_CONST), ONE));
-
-        EqualToFormula indHyp = new EqualToFormula(indHypSum, indHypMult);
-
-        Summation indCaseSum = new Summation(I_NAT, ZERO, new Addition(K_CONST, ONE), new Power(I_NAT, 2));
-
-        Multiplication indCaseMult = new Multiplication(
-                new Multiplication(new Addition(K_CONST, ONE), new Addition(new Addition(K_CONST, ONE), ONE)),
-                new Addition(new Multiplication(TWO, new Addition(K_CONST, ONE)), ONE));
-
-        EqualToFormula inductiveCase = new EqualToFormula(indCaseSum, indCaseMult);
-
-        InductionSchema expected = new InductionSchema(Collections.<Formula>singletonList(baseCase), K_CONST,
-                indHyp, Collections.<Formula>singletonList(inductiveCase));
-
-        // Create the forall formula
-
-        Multiplication multiplication = new Multiplication(
-                new Multiplication(N_NAT, new Addition(N_NAT, ONE)),
-                new Addition(new Multiplication(TWO, N_NAT), ONE));
-
-        Summation summation = new Summation(I_NAT, ZERO, N_NAT, new Power(I_NAT, 2));
-
-        ForallFormula forallFormula = new ForallFormula(N_NAT, new EqualToFormula(summation, multiplication));
-
-        MathematicalInductionSchemaGenerator generator =
-                new MathematicalInductionSchemaGenerator(termStringBuilder, termSubstitutor);
-        InductionSchema inductionSchema = generator.generateSchema(forallFormula, N_NAT);
-
-        assertThat(inductionSchema).isEqualTo(expected);
-    }
-
-    @Test
     public void generateSchemaNestedForallWithDifferentVariable() throws SchemaGeneratorException {
         // \FORALL n in Nat. \FORALL m in Nat. (n > m -> n + 1 > m + 1)
 

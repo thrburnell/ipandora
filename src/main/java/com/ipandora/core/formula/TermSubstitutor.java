@@ -268,25 +268,6 @@ public class TermSubstitutor {
             return new Power(base, power.getExponent());
         }
 
-        @Override
-        public Term visitSummation(Summation summation) {
-
-            if (summation.equals(t1)) {
-                return t2;
-            }
-
-            Variable variable = summation.getVariable();
-            ignoreFromSubstitution(variable.getName());
-
-            Term lowerBound = visit(summation.getLowerBound());
-            Term upperBound = visit(summation.getUpperBound());
-            Term element = visit(summation.getElement());
-
-            removeFromIgnoreList(variable.getName());
-
-            return new Summation(variable, lowerBound, upperBound, element);
-        }
-
         void ignoreFromSubstitution(String name) {
             varsIgnoring.add(name);
         }

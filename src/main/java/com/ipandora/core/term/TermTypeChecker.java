@@ -86,32 +86,4 @@ public class TermTypeChecker implements TermVisitor<Void> {
         return null;
     }
 
-    @Override
-    public Void visitSummation(Summation summation) {
-        Variable variable = summation.getVariable();
-        Term lowerBound = summation.getLowerBound();
-        Term upperBound = summation.getUpperBound();
-        Term element = summation.getElement();
-
-        visit(lowerBound);
-        visit(upperBound);
-        visit(element);
-
-        TypeMismatchException tme = null;
-        if (variable.getType() != Type.NAT) {
-            tme = new TypeMismatchException("Variable term not of type Nat: " + variable);
-        } else if (lowerBound.getType() != Type.NAT) {
-            tme = new TypeMismatchException("Lower bound term not of type Nat: " + lowerBound);
-        } else if (upperBound.getType() != Type.NAT) {
-            tme = new TypeMismatchException("Upper bound term not of type Nat: " + upperBound);
-        } else if (element.getType() != Type.NAT) {
-            tme = new TypeMismatchException("Element term not of type Nat: " + element);
-        }
-        if (tme != null) {
-            throw new WrappingRuntimeException(tme);
-        }
-
-        return null;
-    }
-
 }

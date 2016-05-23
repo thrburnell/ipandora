@@ -15,11 +15,6 @@ mathExprOnly
 
 mathExpr
     : lhs=mathExpr op=(PLUS | MINUS) rhs=mathTerm
-    | term=sumExpr
-    ;
-
-sumExpr
-    : SUM var=NAME lower=mathExpr upper=mathExpr elem=sumExpr
     | term=mathTerm
     ;
 

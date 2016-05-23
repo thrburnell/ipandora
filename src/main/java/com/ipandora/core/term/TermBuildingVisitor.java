@@ -29,7 +29,7 @@ public class TermBuildingVisitor extends PredicateLogicBaseVisitor<Term> {
     @Override
     public Term visitMathExpr(PredicateLogicParser.MathExprContext ctx) {
 
-        PredicateLogicParser.SumExprContext term = ctx.term;
+        PredicateLogicParser.MathTermContext term = ctx.term;
         if (term != null) {
             return visit(term);
         }
@@ -46,29 +46,6 @@ public class TermBuildingVisitor extends PredicateLogicBaseVisitor<Term> {
 
         throw new WrappingRuntimeException(
                 new InvalidSyntaxException("Unknown mathematical operator " + ctx.op.getText()));
-    }
-
-    @Override
-    public Term visitSumExpr(PredicateLogicParser.SumExprContext ctx) {
-
-        PredicateLogicParser.MathTermContext term = ctx.term;
-        if (term != null) {
-            return visit(term);
-        }
-
-        // Variable bound by summation is the index, so always has type Nat
-        String varName = ctx.var.getText();
-        Variable var = new Variable(varName, Type.NAT);
-        Term lower = visit(ctx.lower);
-        Term upper = visit(ctx.upper);
-
-        // Sum is a function, so introduces a new scope for its summing element
-        enterNewScope();
-        addTypeMapping(varName, Type.NAT);
-        Term elem = visit(ctx.elem);
-        exitScope();
-
-        return new Summation(var, lower, upper, elem);
     }
 
     @Override

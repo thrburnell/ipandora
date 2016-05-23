@@ -6,4 +6,3 @@ MINUS: '-';
 MULTIPLY: '*';
 DIVIDE: '/';
 POWER: '^';
-SUM: '\\SUM';

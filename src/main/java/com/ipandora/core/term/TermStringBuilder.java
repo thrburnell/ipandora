@@ -141,25 +141,6 @@ public class TermStringBuilder implements PrettyStringBuilder<Term>, TermVisitor
         return result;
     }
 
-    @Override
-    public String visitSummation(Summation summation) {
-        ArithmeticOperator sum = ArithmeticOperator.SUM;
-        operatorStack.push(sum);
-        String variable = visit(summation.getVariable());
-        String lowerBound = visit(summation.getLowerBound());
-        String upperBound = visit(summation.getUpperBound());
-        String element = visit(summation.getElement());
-        operatorStack.pop();
-
-        String result = String.format("\\SUM %s %s %s %s", variable, lowerBound, upperBound, element);
-
-        if (doesCurrentContextBindStronger(sum)) {
-            result = wrapInParenthesis(result);
-        }
-
-        return result;
-    }
-
     private boolean doesCurrentContextBindStronger(ArithmeticOperator operator) {
         return !operatorStack.isEmpty() && operatorStack.peek().getPrecedence() > operator.getPrecedence();
     }

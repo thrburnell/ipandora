@@ -97,11 +97,6 @@ public class SMTGeneratingTermVisitor implements TermVisitor<String> {
         return String.format("(^ %s %d)", baseString, exponent);
     }
 
-    @Override
-    public String visitSummation(Summation summation) {
-        throw new RuntimeException("visitSummation() not yet implemented");
-    }
-
     private void saveConstant(Constant constant) {
         String name = constant.getName();
         Type type = constant.getType();
