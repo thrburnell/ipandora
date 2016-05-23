@@ -7,9 +7,7 @@ import com.ipandora.api.predicate.induction.SchemaResponse;
 import com.ipandora.api.predicate.proofstep.StepRequest;
 import com.ipandora.api.predicate.proofstep.StepResponse;
 import com.ipandora.api.predicate.read.ReadResponse;
-import com.ipandora.api.predicate.term.Term;
-import com.ipandora.api.predicate.term.TypeMismatchException;
-import com.ipandora.api.predicate.term.Variable;
+import com.ipandora.api.predicate.term.*;
 import com.ipandora.api.predicate.validate.ValidateRequest;
 import com.ipandora.api.predicate.validate.ValidateResponse;
 import com.ipandora.core.formula.FormulaParser;
@@ -125,23 +123,45 @@ public class PredicateResource {
     @POST
     @Path("/induction")
     public Response generateInductionSchema(SchemaRequest schemaRequest)
-            throws FormulaParsingException, SchemaGeneratorException {
+    { //throws SchemaGeneratorException {
 
         String goal = schemaRequest.getGoal();
         String varName = schemaRequest.getVariable();
+        List<SchemaRequest.FunctionPrototype> functions = schemaRequest.getFunctions();
 
         SchemaResponse response = new SchemaResponse();
         response.setGoal(goal);
         response.setVariable(varName);
+        response.setFunctions(functions);
 
-        Formula formula = formulaParser.fromStringWithTypeChecking(goal);
+        List<FunctionPrototype> functionPrototypes;
+        try {
+            functionPrototypes = getFunctionPrototypes(functions);
+        } catch (FormulaParsingException e) {
+            response.setErrorMsg("Invalid function prototype: " + e.getMessage());
+            return invalidRequestResponse(response);
+        }
+
+        Formula formula;
+        try {
+            formula = formulaParser.fromStringWithTypeChecking(goal, functionPrototypes);
+        } catch (FormulaParsingException e) {
+            response.setErrorMsg("Invalid goal formula: " + goal);
+            return invalidRequestResponse(response);
+        }
         if (!(formula instanceof ForallFormula)) {
             response.setErrorMsg("Formula must be universally quantified.");
             return invalidRequestResponse(response);
         }
 
         Variable variable = Variable.withTypeNat(varName);
-        InductionSchema schema = inductionSchemaGenerator.generateSchema((ForallFormula) formula, variable);
+        InductionSchema schema = null;
+        try {
+            schema = inductionSchemaGenerator.generateSchema((ForallFormula) formula, variable);
+        } catch (SchemaGeneratorException e) {
+            response.setErrorMsg("Unable to generate schema: " + e.getMessage());
+            return invalidRequestResponse(response);
+        }
 
         List<String> baseCaseToShow = new ArrayList<>();
         for (Formula bcts : schema.getBaseCaseToShow()) {
@@ -169,6 +189,37 @@ public class PredicateResource {
         response.setInductiveCase(inductiveCase);
 
         return Response.ok(response).build();
+    }
+
+    private List<FunctionPrototype> getFunctionPrototypes(List<SchemaRequest.FunctionPrototype> prototypes)
+            throws FormulaParsingException {
+
+        List<FunctionPrototype> functionPrototypes = new ArrayList<>();
+
+        for (SchemaRequest.FunctionPrototype prototype : prototypes) {
+
+            String name = prototype.getName();
+            ArrayList<Type> types = new ArrayList<>();
+            Type returnType = getTypeOrThrow(prototype.getReturnType());
+
+            for (String type : prototype.getArgTypes()) {
+                types.add(getTypeOrThrow(type));
+            }
+
+            functionPrototypes.add(new FunctionPrototype(name, types, returnType));
+        }
+
+        return functionPrototypes;
+    }
+
+    private Type getTypeOrThrow(String type) throws FormulaParsingException {
+
+        for (Type t : Type.values()) {
+            if (t.getName().equals(type)) {
+                return t;
+            }
+        }
+        throw new FormulaParsingException("Unknown type: " + type);
     }
 
     private Response checkProofStepLogicalImplication(StepRequest stepRequest) throws ProofStepCheckException {

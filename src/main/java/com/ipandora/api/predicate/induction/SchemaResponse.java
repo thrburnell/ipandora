@@ -10,6 +10,7 @@ public class SchemaResponse {
 
     private String goal;
     private String variable;
+    private List<SchemaRequest.FunctionPrototype> functions;
     private BaseCase baseCase;
     private InductiveCase inductiveCase;
     private String errorMsg;
@@ -32,6 +33,16 @@ public class SchemaResponse {
     @JsonProperty
     public void setVariable(String variable) {
         this.variable = variable;
+    }
+
+    @JsonProperty
+    public List<SchemaRequest.FunctionPrototype> getFunctions() {
+        return functions;
+    }
+
+    @JsonProperty
+    public void setFunctions(List<SchemaRequest.FunctionPrototype> functions) {
+        this.functions = functions;
     }
 
     @JsonProperty
