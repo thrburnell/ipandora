@@ -9,7 +9,7 @@ import com.ipandora.core.util.WrappingRuntimeException;
 
 import java.util.List;
 
-public class FormulaTypeChecker implements FormulaSemanticAnalyser, FormulaVisitor<Void> {
+public class FormulaTypeChecker implements FormulaVisitor<Void> {
 
     private final TermTypeChecker termTypeChecker;
 
@@ -17,7 +17,6 @@ public class FormulaTypeChecker implements FormulaSemanticAnalyser, FormulaVisit
         this.termTypeChecker = termTypeChecker;
     }
 
-    @Override
     public void analyse(Formula formula) {
         formula.accept(this);
     }
