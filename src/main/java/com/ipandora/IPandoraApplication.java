@@ -37,7 +37,7 @@ public class IPandoraApplication extends Application<IPandoraConfiguration> {
 
         SymbolTableCreator symbolTableCreator = new SymbolTableCreator();
         FormulaBuildingVisitor formulaBuildingVisitor = new FormulaBuildingVisitor(
-                new TermBuildingVisitor(symbolTableCreator));
+                new TermBuildingVisitor(symbolTableCreator.create(), symbolTableCreator));
         FormulaTypeChecker formulaTypeChecker = new FormulaTypeChecker(new TermTypeChecker());
 
         ANTLRFormulaParser formulaParser = new ANTLRFormulaParser(formulaBuildingVisitor, formulaTypeChecker);
@@ -60,7 +60,7 @@ public class IPandoraApplication extends Application<IPandoraConfiguration> {
         TermStringBuilder termStringBuilder = new TermStringBuilder();
 
         ANTLRTermParser termParser = new ANTLRTermParser(
-                new TermBuildingVisitor(new SymbolTableCreator()), new TermTypeChecker());
+                new TermBuildingVisitor(symbolTableCreator.create(), symbolTableCreator), new TermTypeChecker());
 
         TermTypeInferrer termTypeInferrer = new TermTypeInferrer();
 

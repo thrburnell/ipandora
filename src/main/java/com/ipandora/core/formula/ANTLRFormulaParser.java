@@ -1,6 +1,7 @@
 package com.ipandora.core.formula;
 
 import com.ipandora.api.predicate.formula.Formula;
+import com.ipandora.api.predicate.term.TypeMismatchException;
 import com.ipandora.core.util.WrappingRuntimeException;
 import com.ipandora.parser.PredicateLogicLexer;
 import com.ipandora.parser.PredicateLogicParser;
@@ -19,6 +20,19 @@ public class ANTLRFormulaParser implements FormulaParser {
         this.formulaTypeChecker = formulaTypeChecker;
     }
 
+    @Override
+    public Formula fromStringWithTypeChecking(String formula) throws FormulaParsingException {
+
+        Formula form = fromString(formula);
+        try {
+            formulaTypeChecker.analyse(form);
+        } catch (TypeMismatchException e) {
+            throw new FormulaParsingException(e);
+        }
+        return form;
+    }
+
+    @Override
     public Formula fromString(String formula) throws FormulaParsingException {
         ANTLRInputStream stream = new ANTLRInputStream(formula);
         PredicateLogicLexer lexer = new PredicateLogicLexer(stream);
@@ -34,9 +48,7 @@ public class ANTLRFormulaParser implements FormulaParser {
         }
 
         try {
-            Formula form = formulaBuildingVisitor.visit(formulaCtx);
-            formulaTypeChecker.analyse(form);
-            return form;
+            return formulaBuildingVisitor.visit(formulaCtx);
         } catch (WrappingRuntimeException e) {
             throw new FormulaParsingException(e.getWrappedException());
         }

@@ -13,12 +13,12 @@ import java.util.List;
 
 public class TermBuildingVisitor extends PredicateLogicBaseVisitor<Term> {
 
-    private final Creator<SymbolTable> symbolTableCreator;
     private SymbolTable symbolTable;
+    private final Creator<SymbolTable> symbolTableCreator;
 
-    public TermBuildingVisitor(Creator<SymbolTable> symbolTableCreator) {
+    public TermBuildingVisitor(SymbolTable rootSymbolTable, Creator<SymbolTable> symbolTableCreator) {
+        this.symbolTable = rootSymbolTable;
         this.symbolTableCreator = symbolTableCreator;
-        this.symbolTable = symbolTableCreator.create();
     }
 
     @Override
@@ -124,6 +124,11 @@ public class TermBuildingVisitor extends PredicateLogicBaseVisitor<Term> {
         List<Term> args = new ArrayList<>();
         for (PredicateLogicParser.MathExprContext arg : ctx.args.args) {
             args.add(visit(arg));
+        }
+
+        FunctionPrototype prototype = symbolTable.getFunctionPrototype(name);
+        if (prototype != null) {
+            return new Function(name, args, prototype.getReturnType());
         }
 
         return new Function(name, args);

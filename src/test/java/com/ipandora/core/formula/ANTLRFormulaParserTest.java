@@ -23,7 +23,8 @@ public class ANTLRFormulaParserTest {
     @Before
     public void before() {
         SymbolTableCreator symbolTableCreator = new SymbolTableCreator();
-        FormulaBuildingVisitor visitor = new FormulaBuildingVisitor(new TermBuildingVisitor(symbolTableCreator));
+        FormulaBuildingVisitor visitor = new FormulaBuildingVisitor(new TermBuildingVisitor(
+                symbolTableCreator.create(), symbolTableCreator));
         FormulaTypeChecker formulaTypeChecker = new FormulaTypeChecker(new TermTypeChecker());
         parser = new ANTLRFormulaParser(visitor, formulaTypeChecker);
     }
@@ -270,7 +271,8 @@ public class ANTLRFormulaParserTest {
     @Test
     public void fromStringShouldTypeCheckFormula() throws FormulaParsingException {
         SymbolTableCreator symbolTableCreator = new SymbolTableCreator();
-        FormulaBuildingVisitor visitor = new FormulaBuildingVisitor(new TermBuildingVisitor(symbolTableCreator));
+        FormulaBuildingVisitor visitor = new FormulaBuildingVisitor(
+                new TermBuildingVisitor(symbolTableCreator.create(), symbolTableCreator));
         FormulaTypeChecker mockFormulaTypeChecker = Mockito.mock(FormulaTypeChecker.class);
         parser = new ANTLRFormulaParser(visitor, mockFormulaTypeChecker);
 
