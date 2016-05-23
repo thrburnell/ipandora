@@ -54,6 +54,43 @@ public class SchemaResponse {
         this.inductiveCase = inductiveCase;
     }
 
+    @JsonProperty
+    public String getErrorMsg() {
+        return errorMsg;
+    }
+
+    @JsonProperty
+    public void setErrorMsg(String errorMsg) {
+        this.errorMsg = errorMsg;
+    }
+
+
+    public static class InductiveVariable {
+
+        private String name;
+        private String domain;
+
+        @JsonProperty
+        public String getName() {
+            return name;
+        }
+
+        @JsonProperty
+        public void setName(String name) {
+            this.name = name;
+        }
+
+        @JsonProperty
+        public String getDomain() {
+            return domain;
+        }
+
+        @JsonProperty
+        public void setDomain(String domain) {
+            this.domain = domain;
+        }
+    }
+
     public static class BaseCase {
 
         private List<String> toShow;
@@ -69,29 +106,19 @@ public class SchemaResponse {
         }
     }
 
-    @JsonProperty
-    public String getErrorMsg() {
-        return errorMsg;
-    }
-
-    @JsonProperty
-    public void setErrorMsg(String errorMsg) {
-        this.errorMsg = errorMsg;
-    }
-
     public static class InductiveCase {
 
-        private String arbitrary;
+        private InductiveVariable arbitrary;
         private String hypothesis;
         private List<String> toShow;
 
         @JsonProperty
-        public String getArbitrary() {
+        public InductiveVariable getArbitrary() {
             return arbitrary;
         }
 
         @JsonProperty
-        public void setArbitrary(String arbitrary) {
+        public void setArbitrary(InductiveVariable arbitrary) {
             this.arbitrary = arbitrary;
         }
 

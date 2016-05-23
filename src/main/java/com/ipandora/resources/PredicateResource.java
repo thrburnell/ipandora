@@ -147,7 +147,6 @@ public class PredicateResource {
         for (Formula bcts : schema.getBaseCaseToShow()) {
             baseCaseToShow.add(formulaStringBuilder.build(bcts));
         }
-        String inductiveTerm = termStringBuilder.build(schema.getInductiveTerm());
         String indHyp = formulaStringBuilder.build(schema.getInductiveHypothesis());
         List<String> inductiveCaseToShow = new ArrayList<>();
         for (Formula icts : schema.getInductiveCaseToShow()) {
@@ -157,8 +156,12 @@ public class PredicateResource {
         SchemaResponse.BaseCase baseCase = new SchemaResponse.BaseCase();
         baseCase.setToShow(baseCaseToShow);
 
+        SchemaResponse.InductiveVariable inductiveVariable = new SchemaResponse.InductiveVariable();
+        inductiveVariable.setName(termStringBuilder.build(schema.getInductiveTerm()));
+        inductiveVariable.setDomain(schema.getInductiveTerm().getType().getName());
+        
         SchemaResponse.InductiveCase inductiveCase = new SchemaResponse.InductiveCase();
-        inductiveCase.setArbitrary(inductiveTerm);
+        inductiveCase.setArbitrary(inductiveVariable);
         inductiveCase.setHypothesis(indHyp);
         inductiveCase.setToShow(inductiveCaseToShow);
 

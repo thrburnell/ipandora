@@ -50,7 +50,7 @@ public class MathematicalInductionSchemaGenerator implements InductionSchemaGene
         remainingAtoms.addAll(getAtomsFromFormula(formula));
 
         Formula baseCase = termSubstitutor.cloneAndSubstituteInScope(formula, variable, new Number(0));
-        Constant k = getConstantWithNewName(remainingAtoms);
+        Variable k = getVariableWithNewName(remainingAtoms);
         Formula indHyp = termSubstitutor.cloneAndSubstituteInScope(formula, variable, k);
         Formula indCase = termSubstitutor.cloneAndSubstituteInScope(formula, variable, new Addition(k, new Number(1)));
 
@@ -92,7 +92,7 @@ public class MathematicalInductionSchemaGenerator implements InductionSchemaGene
         return variablesByTypeCopy;
     }
 
-    private Constant getConstantWithNewName(Set<Atom> atoms) {
+    private Variable getVariableWithNewName(Set<Atom> atoms) {
         // Try to use k by default
         String name = DEFAULT_INDUCTIVE_TERM_NAME;
         if (atomSetContainsAtomWithName(atoms, name)) {
@@ -102,7 +102,7 @@ public class MathematicalInductionSchemaGenerator implements InductionSchemaGene
             }
         }
 
-        return new Constant(name);
+        return Variable.withTypeNat(name);
     }
 
     private boolean atomSetContainsAtomWithName(Set<Atom> atoms, String name) {

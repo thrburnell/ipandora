@@ -1,18 +1,18 @@
 package com.ipandora.core.induction;
 
 import com.ipandora.api.predicate.formula.Formula;
-import com.ipandora.api.predicate.term.Constant;
+import com.ipandora.api.predicate.term.Variable;
 
 import java.util.List;
 
 public class InductionSchema {
 
     private final List<Formula> baseCaseToShow;
-    private final Constant inductiveTerm;
+    private final Variable inductiveTerm;
     private final Formula inductiveHypothesis;
     private final List<Formula> inductiveCaseToShow;
 
-    public InductionSchema(List<Formula> baseCaseToShow, Constant inductiveTerm, Formula inductiveHypothesis,
+    public InductionSchema(List<Formula> baseCaseToShow, Variable inductiveTerm, Formula inductiveHypothesis,
                            List<Formula> inductiveCaseToShow) {
         this.baseCaseToShow = baseCaseToShow;
         this.inductiveTerm = inductiveTerm;
@@ -24,7 +24,7 @@ public class InductionSchema {
         return baseCaseToShow;
     }
 
-    public Constant getInductiveTerm() {
+    public Variable getInductiveTerm() {
         return inductiveTerm;
     }
 
