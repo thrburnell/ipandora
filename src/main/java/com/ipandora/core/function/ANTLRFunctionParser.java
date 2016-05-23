@@ -8,18 +8,28 @@ import com.ipandora.core.util.WrappingRuntimeException;
 import com.ipandora.parser.PredicateLogicLexer;
 import com.ipandora.parser.PredicateLogicParser;
 import org.antlr.v4.runtime.ANTLRInputStream;
+import org.antlr.v4.runtime.BailErrorStrategy;
 import org.antlr.v4.runtime.CommonTokenStream;
+import org.antlr.v4.runtime.misc.ParseCancellationException;
 
 public class ANTLRFunctionParser implements FunctionParser {
 
     @Override
     public Function fromString(String function) throws FunctionParsingException {
-        // TODO: fail on any parsing error
         ANTLRInputStream stream = new ANTLRInputStream(function);
         PredicateLogicLexer lexer = new PredicateLogicLexer(stream);
         CommonTokenStream tokens = new CommonTokenStream(lexer);
         PredicateLogicParser parser = new PredicateLogicParser(tokens);
-        PredicateLogicParser.FunctionDefinitionContext fnCtx = parser.functionDefinition();
+        parser.setErrorHandler(new BailErrorStrategy());
+
+
+        PredicateLogicParser.FunctionDefinitionContext fnCtx;
+
+        try {
+            fnCtx = parser.functionDefinition();
+        } catch (ParseCancellationException e) {
+            throw new FunctionParsingException("Invalid function: " + function);
+        }
 
         try {
             return makeFunctionBuildingVisitor().visit(fnCtx);

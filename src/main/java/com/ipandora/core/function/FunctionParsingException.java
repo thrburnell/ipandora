@@ -6,4 +6,8 @@ public class FunctionParsingException extends Exception {
         super(cause);
     }
 
+    public FunctionParsingException(String message) {
+        super(message);
+    }
+
 }
