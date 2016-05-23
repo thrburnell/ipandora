@@ -1,7 +1,9 @@
 package com.ipandora.core.formula;
 
 import com.ipandora.api.predicate.formula.Formula;
+import com.ipandora.api.predicate.term.FunctionPrototype;
 import com.ipandora.api.predicate.term.TypeMismatchException;
+import com.ipandora.core.term.SymbolTable;
 import com.ipandora.core.term.SymbolTableCreator;
 import com.ipandora.core.term.TermBuildingVisitor;
 import com.ipandora.core.util.WrappingRuntimeException;
@@ -11,6 +13,9 @@ import org.antlr.v4.runtime.ANTLRInputStream;
 import org.antlr.v4.runtime.BailErrorStrategy;
 import org.antlr.v4.runtime.CommonTokenStream;
 import org.antlr.v4.runtime.misc.ParseCancellationException;
+
+import java.util.Collections;
+import java.util.List;
 
 public class ANTLRFormulaParser implements FormulaParser {
 
@@ -22,8 +27,14 @@ public class ANTLRFormulaParser implements FormulaParser {
 
     @Override
     public Formula fromStringWithTypeChecking(String formula) throws FormulaParsingException {
+        return fromStringWithTypeChecking(formula, Collections.<FunctionPrototype>emptyList());
+    }
 
-        Formula form = fromString(formula);
+    @Override
+    public Formula fromStringWithTypeChecking(String formula, List<FunctionPrototype> functionPrototypes)
+            throws FormulaParsingException {
+
+        Formula form = fromString(formula, functionPrototypes);
         try {
             formulaTypeChecker.analyse(form);
         } catch (TypeMismatchException e) {
@@ -34,6 +45,13 @@ public class ANTLRFormulaParser implements FormulaParser {
 
     @Override
     public Formula fromString(String formula) throws FormulaParsingException {
+        return fromString(formula, Collections.<FunctionPrototype>emptyList());
+    }
+
+    @Override
+    public Formula fromString(String formula, List<FunctionPrototype> functionPrototypes)
+            throws FormulaParsingException {
+
         ANTLRInputStream stream = new ANTLRInputStream(formula);
         PredicateLogicLexer lexer = new PredicateLogicLexer(stream);
         CommonTokenStream tokens = new CommonTokenStream(lexer);
@@ -47,17 +65,29 @@ public class ANTLRFormulaParser implements FormulaParser {
             throw new FormulaParsingException("Invalid formula: " + formula);
         }
 
+        SymbolTableCreator stCreator = new SymbolTableCreator();
+        SymbolTable rootSymbolTable = populateSymbolTable(stCreator.create(), functionPrototypes);
+        FormulaBuildingVisitor formulaBuildingVisitor = makeFormulaBuildingVisitor(rootSymbolTable, stCreator);
+
         try {
-            return makeFormulaBuildingVisitor().visit(formulaCtx);
+            return formulaBuildingVisitor.visit(formulaCtx);
         } catch (WrappingRuntimeException e) {
             throw new FormulaParsingException(e.getWrappedException());
         }
     }
 
-    private FormulaBuildingVisitor makeFormulaBuildingVisitor() {
-        SymbolTableCreator stCreator = new SymbolTableCreator();
-        TermBuildingVisitor termBuildingVisitor = new TermBuildingVisitor(stCreator.create(), stCreator);
+    private FormulaBuildingVisitor makeFormulaBuildingVisitor(SymbolTable rootSymbolTable,
+                                                              SymbolTableCreator symbolTableCreator) {
+
+        TermBuildingVisitor termBuildingVisitor = new TermBuildingVisitor(rootSymbolTable, symbolTableCreator);
         return new FormulaBuildingVisitor(termBuildingVisitor);
+    }
+
+    private SymbolTable populateSymbolTable(SymbolTable symbolTable, List<FunctionPrototype> functionPrototypes) {
+        for (FunctionPrototype prototype : functionPrototypes) {
+            symbolTable.addMapping(prototype.getName(), prototype);
+        }
+        return symbolTable;
     }
 
 }
