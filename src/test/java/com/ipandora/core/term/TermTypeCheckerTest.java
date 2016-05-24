@@ -204,4 +204,14 @@ public class TermTypeCheckerTest {
         termTypeChecker.analyse(addition, Collections.singletonList(FOO_PROTOTYPE));
     }
 
+    @Test(expected = TypeMismatchException.class)
+    public void visitWithPrototypesShouldThrowIfMultiplePrototypesGivenForSameFunctionName()
+            throws TypeMismatchException {
+
+        FunctionPrototype foo1 = new FunctionPrototype("Foo", Collections.singletonList(Type.NAT), Type.NAT);
+        FunctionPrototype foo2 = new FunctionPrototype("Foo", Collections.singletonList(Type.UNKNOWN), Type.NAT);
+
+        termTypeChecker.analyse(new Number(1), Arrays.asList(foo1, foo2));
+    }
+
 }

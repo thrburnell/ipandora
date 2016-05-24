@@ -15,7 +15,13 @@ public class TermTypeChecker {
 
         Map<String, FunctionPrototype> functionPrototypeMap = new HashMap<>();
         for (FunctionPrototype prototype : functionPrototypes) {
-            functionPrototypeMap.put(prototype.getName(), prototype);
+            String name = prototype.getName();
+            FunctionPrototype existingProto = functionPrototypeMap.get(name);
+            if (existingProto != null && !existingProto.equals(prototype)) {
+                throw new TypeMismatchException("Multiple mismatching prototypes given for function " + name);
+            }
+
+            functionPrototypeMap.put(name, prototype);
         }
 
         try {
