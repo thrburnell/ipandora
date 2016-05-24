@@ -59,7 +59,7 @@ public class ANTLRTermParser implements TermParser {
 
         try {
             Term t = fromString(term, functionPrototypes);
-            termTypeChecker.analyse(t);
+            termTypeChecker.analyse(t, functionPrototypes);
             return t;
         } catch (TypeMismatchException e) {
             throw new TermParsingException(e);

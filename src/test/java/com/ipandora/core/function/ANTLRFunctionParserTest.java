@@ -2,7 +2,6 @@ package com.ipandora.core.function;
 
 import com.ipandora.api.predicate.formula.EqualToFormula;
 import com.ipandora.api.predicate.function.*;
-import com.ipandora.api.predicate.function.FunctionDefinition;
 import com.ipandora.api.predicate.term.*;
 import com.ipandora.api.predicate.term.Number;
 import org.junit.Before;
@@ -19,6 +18,7 @@ import java.util.List;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.fail;
 import static org.mockito.Matchers.any;
+import static org.mockito.Matchers.anyList;
 import static org.mockito.Mockito.doThrow;
 
 @RunWith(MockitoJUnitRunner.class)
@@ -88,7 +88,7 @@ public class ANTLRFunctionParserTest {
     public void fromStringWithTypeCheckingShouldThrowWithCauseIfTypeCheckerThrows() throws Throwable {
 
         doThrow(new TypeMismatchException("test")).
-                when(mockTypeChecker).analyse(any(FunctionDefinition.class));
+                when(mockTypeChecker).analyse(any(FunctionDefinition.class), anyList());
 
         try {
             parser.fromStringWithTypeChecking("Foo(x) = \n" +

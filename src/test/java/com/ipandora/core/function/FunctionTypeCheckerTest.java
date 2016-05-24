@@ -20,7 +20,9 @@ import static com.ipandora.testutils.FormulaCreators.eq;
 import static com.ipandora.testutils.FormulaCreators.truth;
 import static com.ipandora.testutils.FunctionCreators.*;
 import static com.ipandora.testutils.TermCreators.*;
+import static java.util.Collections.EMPTY_LIST;
 import static org.mockito.Matchers.any;
+import static org.mockito.Matchers.anyList;
 import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.verify;
 
@@ -47,28 +49,28 @@ public class FunctionTypeCheckerTest {
 
     @Test
     public void analyseShouldAskTermTypeCheckerForExpressionInEachCase() throws TypeMismatchException {
-        typeChecker.analyse(SUM_FN);
-        verify(mockTermTypeChecker).analyse(num(0));
-        verify(mockTermTypeChecker).analyse(add(N, fun("Sum", sub(N, num(1)))));
+        typeChecker.analyse(SUM_FN, EMPTY_LIST);
+        verify(mockTermTypeChecker).analyse(num(0), EMPTY_LIST);
+        verify(mockTermTypeChecker).analyse(add(N, fun("Sum", sub(N, num(1)))), EMPTY_LIST);
     }
 
     @Test
     public void analyseShouldAskFormulaTypeCheckerForConditionFormulaInEachCase() throws TypeMismatchException {
-        typeChecker.analyse(SUM_FN);
-        verify(mockFormulaTypeChecker).analyse(eq(N, num(0)));
-        verify(mockFormulaTypeChecker).analyse(truth());
+        typeChecker.analyse(SUM_FN, EMPTY_LIST);
+        verify(mockFormulaTypeChecker).analyse(eq(N, num(0)), EMPTY_LIST);
+        verify(mockFormulaTypeChecker).analyse(truth(), EMPTY_LIST);
     }
 
     @Test(expected = TypeMismatchException.class)
     public void analyseShouldPropagateTermTypeCheckerException() throws TypeMismatchException {
-        doThrow(new TypeMismatchException("test")).when(mockTermTypeChecker).analyse(any(Term.class));
-        typeChecker.analyse(SUM_FN);
+        doThrow(new TypeMismatchException("test")).when(mockTermTypeChecker).analyse(any(Term.class), anyList());
+        typeChecker.analyse(SUM_FN, EMPTY_LIST);
     }
 
     @Test(expected = TypeMismatchException.class)
     public void analyseShouldPropagateFormulaTypeCheckerException() throws TypeMismatchException {
-        doThrow(new TypeMismatchException("test")).when(mockFormulaTypeChecker).analyse(any(Formula.class));
-        typeChecker.analyse(SUM_FN);
+        doThrow(new TypeMismatchException("test")).when(mockFormulaTypeChecker).analyse(any(Formula.class), anyList());
+        typeChecker.analyse(SUM_FN, EMPTY_LIST);
     }
 
     @Test(expected = TypeMismatchException.class)
@@ -77,7 +79,7 @@ public class FunctionTypeCheckerTest {
                 funCase(con("c"), ifCond(eq(N, num(0)))),
                 funCase(add(N, fun("Sum", sub(N, num(1)))), otherCond())));
 
-        typeChecker.analyse(fn);
+        typeChecker.analyse(fn, EMPTY_LIST);
     }
 
 }

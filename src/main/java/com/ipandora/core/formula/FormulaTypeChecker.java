@@ -1,6 +1,7 @@
 package com.ipandora.core.formula;
 
 import com.ipandora.api.predicate.formula.*;
+import com.ipandora.api.predicate.function.FunctionPrototype;
 import com.ipandora.api.predicate.term.Term;
 import com.ipandora.api.predicate.term.Type;
 import com.ipandora.api.predicate.term.TypeMismatchException;
@@ -17,9 +18,9 @@ public class FormulaTypeChecker {
         this.termTypeChecker = termTypeChecker;
     }
 
-    public void analyse(Formula formula) throws TypeMismatchException {
+    public void analyse(Formula formula, List<FunctionPrototype> functionPrototypes) throws TypeMismatchException {
         try {
-            formula.accept(new FormulaTypeCheckingVisitor());
+            formula.accept(new FormulaTypeCheckingVisitor(functionPrototypes));
         } catch (WrappingRuntimeException wre) {
             Exception wrapped = wre.getWrappedException();
             if (wrapped instanceof TypeMismatchException) {
@@ -30,6 +31,12 @@ public class FormulaTypeChecker {
     }
 
     private class FormulaTypeCheckingVisitor implements FormulaVisitor<Void> {
+
+        private final List<FunctionPrototype> functionPrototypes;
+
+        private FormulaTypeCheckingVisitor(List<FunctionPrototype> functionPrototypes) {
+            this.functionPrototypes = functionPrototypes;
+        }
 
         @Override
         public Void visit(Formula formula) {
@@ -104,7 +111,7 @@ public class FormulaTypeChecker {
 
             for (Term param : params) {
                 try {
-                    termTypeChecker.analyse(param);
+                    termTypeChecker.analyse(param, functionPrototypes);
                 } catch (TypeMismatchException e) {
                     throw new WrappingRuntimeException(e);
                 }
@@ -155,8 +162,8 @@ public class FormulaTypeChecker {
             }
 
             try {
-                termTypeChecker.analyse(left);
-                termTypeChecker.analyse(right);
+                termTypeChecker.analyse(left, functionPrototypes);
+                termTypeChecker.analyse(right, functionPrototypes);
             } catch (TypeMismatchException e) {
                 throw new WrappingRuntimeException(e);
             }

@@ -1,14 +1,25 @@
 package com.ipandora.core.term;
 
+import com.ipandora.api.predicate.function.FunctionPrototype;
 import com.ipandora.api.predicate.term.*;
 import com.ipandora.api.predicate.term.Number;
 import com.ipandora.core.util.WrappingRuntimeException;
 
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
 public class TermTypeChecker {
 
-    public void analyse(Term term) throws TypeMismatchException {
+    public void analyse(Term term, List<FunctionPrototype> functionPrototypes) throws TypeMismatchException {
+
+        Map<String, FunctionPrototype> functionPrototypeMap = new HashMap<>();
+        for (FunctionPrototype prototype : functionPrototypes) {
+            functionPrototypeMap.put(prototype.getName(), prototype);
+        }
+
         try {
-            term.accept(new TermTypeCheckingVisitor());
+            term.accept(new TermTypeCheckingVisitor(functionPrototypeMap));
         } catch (WrappingRuntimeException wre) {
             Exception wrapped = wre.getWrappedException();
             if (wrapped instanceof TypeMismatchException) {
@@ -19,6 +30,13 @@ public class TermTypeChecker {
     }
 
     private class TermTypeCheckingVisitor implements TermVisitor<Void> {
+
+        // Don't need a full blown SymbolTable for this
+        private final Map<String, FunctionPrototype> functionPrototypes;
+
+        private TermTypeCheckingVisitor(Map<String, FunctionPrototype> functionPrototypes) {
+            this.functionPrototypes = functionPrototypes;
+        }
 
         @Override
         public Void visit(Term term) {
@@ -84,8 +102,38 @@ public class TermTypeChecker {
 
         @Override
         public Void visitFunction(Function function) {
-            for (Term arg : function.getArgs()) {
-                visit(arg);
+
+            String name = function.getName();
+            FunctionPrototype prototype = functionPrototypes.get(name);
+            if (prototype == null) {
+                throw new WrappingRuntimeException(new TypeMismatchException("Unknown function: " + name));
+            }
+
+            Type actualType = function.getType();
+            Type expectedType = prototype.getReturnType();
+            if (actualType != expectedType) {
+                String errorMsg = String.format("Function %s has return type %s, but expected %s",
+                        name, actualType, expectedType);
+                throw new WrappingRuntimeException(new TypeMismatchException(errorMsg));
+            }
+
+            List<Term> args = function.getArgs();
+            List<Type> expectedArgTypes = prototype.getArgTypes();
+            if (args.size() != expectedArgTypes.size()) {
+                String errorMsg = String.format("Function %s has %d arguments, but expected %s",
+                        name, args.size(), expectedArgTypes.size());
+                throw new WrappingRuntimeException(new TypeMismatchException(errorMsg));
+            }
+
+            for (int i = 0; i < args.size(); i++) {
+                Type actual = args.get(i).getType();
+                Type expected = expectedArgTypes.get(i);
+                if (actual != expected) {
+                    String errorMsg = String.format("Function %s has type %s for argument %d, but expected %s",
+                            name, actual, i, expected);
+                    throw new WrappingRuntimeException(new TypeMismatchException(errorMsg));
+                }
+                visit(args.get(i));
             }
             return null;
         }

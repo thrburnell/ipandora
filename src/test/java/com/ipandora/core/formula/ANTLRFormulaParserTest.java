@@ -19,6 +19,7 @@ import static org.mockito.Mockito.verify;
 
 public class ANTLRFormulaParserTest {
 
+    private static final List<FunctionPrototype> EMPTY_LIST = Collections.emptyList();
     private ANTLRFormulaParser parser;
 
     @Before
@@ -273,7 +274,7 @@ public class ANTLRFormulaParserTest {
 
         Formula formula = parser.fromStringWithTypeChecking("\\FORALL x in Nat. x > 2");
 
-        verify(mockFormulaTypeChecker).analyse(formula);
+        verify(mockFormulaTypeChecker).analyse(formula, EMPTY_LIST);
     }
 
     @Test(expected = FormulaParsingException.class)

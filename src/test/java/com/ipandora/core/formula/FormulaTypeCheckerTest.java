@@ -13,6 +13,7 @@ import org.mockito.runners.MockitoJUnitRunner;
 
 import java.util.Arrays;
 
+import static java.util.Collections.EMPTY_LIST;
 import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.verify;
 
@@ -37,11 +38,11 @@ public class FormulaTypeCheckerTest {
         Variable variable = new Variable("?x");
         PredicateFormula predicate = new PredicateFormula("Foo", Arrays.<Term>asList(number, constant, variable));
 
-        typeChecker.analyse(predicate);
+        typeChecker.analyse(predicate, EMPTY_LIST);
 
-        verify(mockTermTypeChecker).analyse(number);
-        verify(mockTermTypeChecker).analyse(constant);
-        verify(mockTermTypeChecker).analyse(variable);
+        verify(mockTermTypeChecker).analyse(number, EMPTY_LIST);
+        verify(mockTermTypeChecker).analyse(constant, EMPTY_LIST);
+        verify(mockTermTypeChecker).analyse(variable, EMPTY_LIST);
     }
 
     @Test
@@ -50,10 +51,10 @@ public class FormulaTypeCheckerTest {
         Variable variable = Variable.withTypeNat("?x");
         EqualToFormula equalToFormula = new EqualToFormula(number, variable);
 
-        typeChecker.analyse(equalToFormula);
+        typeChecker.analyse(equalToFormula, EMPTY_LIST);
 
-        verify(mockTermTypeChecker).analyse(number);
-        verify(mockTermTypeChecker).analyse(variable);
+        verify(mockTermTypeChecker).analyse(number, EMPTY_LIST);
+        verify(mockTermTypeChecker).analyse(variable, EMPTY_LIST);
     }
 
     @Test
@@ -62,10 +63,10 @@ public class FormulaTypeCheckerTest {
         Variable variable = Variable.withTypeNat("?x");
         GreaterThanFormula greaterThanFormula = new GreaterThanFormula(number, variable);
 
-        typeChecker.analyse(greaterThanFormula);
+        typeChecker.analyse(greaterThanFormula, EMPTY_LIST);
 
-        verify(mockTermTypeChecker).analyse(number);
-        verify(mockTermTypeChecker).analyse(variable);
+        verify(mockTermTypeChecker).analyse(number, EMPTY_LIST);
+        verify(mockTermTypeChecker).analyse(variable, EMPTY_LIST);
     }
 
     @Test
@@ -74,10 +75,10 @@ public class FormulaTypeCheckerTest {
         Variable variable = Variable.withTypeNat("?x");
         GreaterThanEqualFormula greaterThanEqualFormula = new GreaterThanEqualFormula(number, variable);
 
-        typeChecker.analyse(greaterThanEqualFormula);
+        typeChecker.analyse(greaterThanEqualFormula, EMPTY_LIST);
 
-        verify(mockTermTypeChecker).analyse(number);
-        verify(mockTermTypeChecker).analyse(variable);
+        verify(mockTermTypeChecker).analyse(number, EMPTY_LIST);
+        verify(mockTermTypeChecker).analyse(variable, EMPTY_LIST);
     }
 
     @Test
@@ -86,10 +87,10 @@ public class FormulaTypeCheckerTest {
         Variable variable = Variable.withTypeNat("?x");
         LessThanFormula lessThanFormula = new LessThanFormula(number, variable);
 
-        typeChecker.analyse(lessThanFormula);
+        typeChecker.analyse(lessThanFormula, EMPTY_LIST);
 
-        verify(mockTermTypeChecker).analyse(number);
-        verify(mockTermTypeChecker).analyse(variable);
+        verify(mockTermTypeChecker).analyse(number, EMPTY_LIST);
+        verify(mockTermTypeChecker).analyse(variable, EMPTY_LIST);
     }
 
     @Test
@@ -98,10 +99,10 @@ public class FormulaTypeCheckerTest {
         Variable variable = Variable.withTypeNat("?x");
         LessThanEqualFormula lessThanEqualFormula = new LessThanEqualFormula(number, variable);
 
-        typeChecker.analyse(lessThanEqualFormula);
+        typeChecker.analyse(lessThanEqualFormula, EMPTY_LIST);
 
-        verify(mockTermTypeChecker).analyse(number);
-        verify(mockTermTypeChecker).analyse(variable);
+        verify(mockTermTypeChecker).analyse(number, EMPTY_LIST);
+        verify(mockTermTypeChecker).analyse(variable, EMPTY_LIST);
     }
 
     @Test(expected = TypeMismatchException.class)
@@ -110,9 +111,9 @@ public class FormulaTypeCheckerTest {
         EqualToFormula equalToFormula = new EqualToFormula(addition, new Number(2));
 
         doThrow(new WrappingRuntimeException(new TypeMismatchException("Test")))
-                .when(mockTermTypeChecker).analyse(addition);
+                .when(mockTermTypeChecker).analyse(addition, EMPTY_LIST);
 
-        typeChecker.analyse(equalToFormula);
+        typeChecker.analyse(equalToFormula, EMPTY_LIST);
     }
 
     @Test(expected = TypeMismatchException.class)
@@ -121,7 +122,7 @@ public class FormulaTypeCheckerTest {
         Variable variable = new Variable("?x");
         EqualToFormula equalToFormula = new EqualToFormula(number, variable);
 
-        typeChecker.analyse(equalToFormula);
+        typeChecker.analyse(equalToFormula, EMPTY_LIST);
     }
 
     @Test(expected = TypeMismatchException.class)
@@ -130,7 +131,7 @@ public class FormulaTypeCheckerTest {
         Variable variable = new Variable("?x");
         GreaterThanFormula greaterThanFormula = new GreaterThanFormula(number, variable);
 
-        typeChecker.analyse(greaterThanFormula);
+        typeChecker.analyse(greaterThanFormula, EMPTY_LIST);
     }
 
     @Test(expected = TypeMismatchException.class)
@@ -139,7 +140,7 @@ public class FormulaTypeCheckerTest {
         Variable variable = new Variable("?x");
         GreaterThanEqualFormula greaterThanEqualFormula = new GreaterThanEqualFormula(number, variable);
 
-        typeChecker.analyse(greaterThanEqualFormula);
+        typeChecker.analyse(greaterThanEqualFormula, EMPTY_LIST);
     }
 
     @Test(expected = TypeMismatchException.class)
@@ -148,7 +149,7 @@ public class FormulaTypeCheckerTest {
         Variable variable = new Variable("?x");
         LessThanFormula lessThanFormula = new LessThanFormula(number, variable);
 
-        typeChecker.analyse(lessThanFormula);
+        typeChecker.analyse(lessThanFormula, EMPTY_LIST);
     }
 
     @Test(expected = TypeMismatchException.class)
@@ -157,7 +158,7 @@ public class FormulaTypeCheckerTest {
         Variable variable = new Variable("?x");
         LessThanEqualFormula lessThanEqualFormula = new LessThanEqualFormula(number, variable);
 
-        typeChecker.analyse(lessThanEqualFormula);
+        typeChecker.analyse(lessThanEqualFormula, EMPTY_LIST);
     }
 
 }

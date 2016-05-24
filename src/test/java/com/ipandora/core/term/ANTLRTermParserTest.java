@@ -74,7 +74,7 @@ public class ANTLRTermParserTest {
 
     @Test
     public void fromStringFunction() throws TermParsingException {
-        Term term = parser.fromStringWithTypeChecking("Foo(x, 1)");
+        Term term = parser.fromString("Foo(x, 1)");
         Function expected = new Function("Foo", Arrays.<Term>asList(new Constant("x"), new Number(1)));
         assertThat(term).isEqualTo(expected);
     }

@@ -19,6 +19,7 @@ import java.util.List;
 
 public class ANTLRFormulaParser implements FormulaParser {
 
+    private static final List<FunctionPrototype> EMPTY_LIST = Collections.emptyList();
     private final FormulaTypeChecker formulaTypeChecker;
 
     public ANTLRFormulaParser(FormulaTypeChecker formulaTypeChecker) {
@@ -36,7 +37,7 @@ public class ANTLRFormulaParser implements FormulaParser {
 
         Formula form = fromString(formula, functionPrototypes);
         try {
-            formulaTypeChecker.analyse(form);
+            formulaTypeChecker.analyse(form, functionPrototypes);
         } catch (TypeMismatchException e) {
             throw new FormulaParsingException(e);
         }

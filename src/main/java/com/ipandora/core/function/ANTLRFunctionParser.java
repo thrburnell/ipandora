@@ -74,7 +74,7 @@ public class ANTLRFunctionParser implements FunctionParser {
         FunctionDefinition f = fromString(function, functionPrototypes);
 
         try {
-            functionTypeChecker.analyse(f);
+            functionTypeChecker.analyse(f, functionPrototypes);
         } catch (TypeMismatchException e) {
             throw new FunctionParsingException(e);
         }
