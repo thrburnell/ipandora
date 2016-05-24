@@ -1,4 +1,6 @@
-package com.ipandora.api.predicate.term;
+package com.ipandora.api.predicate.function;
+
+import com.ipandora.api.predicate.term.*;
 
 import java.util.ArrayList;
 import java.util.List;

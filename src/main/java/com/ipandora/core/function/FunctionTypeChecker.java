@@ -1,8 +1,8 @@
 package com.ipandora.core.function;
 
-import com.ipandora.api.predicate.function.Function;
+import com.ipandora.api.predicate.function.FunctionDefinition;
 import com.ipandora.api.predicate.function.FunctionCase;
-import com.ipandora.api.predicate.function.MathematicalFunction;
+import com.ipandora.api.predicate.function.MathematicalFunctionDefinition;
 import com.ipandora.api.predicate.term.Term;
 import com.ipandora.api.predicate.term.Type;
 import com.ipandora.api.predicate.term.TypeMismatchException;
@@ -20,7 +20,7 @@ public class FunctionTypeChecker {
         this.formulaTypeChecker = formulaTypeChecker;
     }
 
-    public void analyse(Function function) throws TypeMismatchException {
+    public void analyse(FunctionDefinition function) throws TypeMismatchException {
         try {
             function.accept(new FunctionTypeCheckingVisitor());
         } catch (WrappingRuntimeException wre) {
@@ -32,15 +32,15 @@ public class FunctionTypeChecker {
         }
     }
 
-    private class FunctionTypeCheckingVisitor implements FunctionVisitor<Void> {
+    private class FunctionTypeCheckingVisitor implements FunctionDefinitionVisitor<Void> {
 
         @Override
-        public Void visit(Function function) {
+        public Void visit(FunctionDefinition function) {
             return function.accept(this);
         }
 
         @Override
-        public Void visitMathematicalFunction(MathematicalFunction mathematicalFunction) {
+        public Void visitMathematicalFunctionDefinition(MathematicalFunctionDefinition mathematicalFunction) {
 
             for (FunctionCase functionCase : mathematicalFunction.getCases()) {
                 try {

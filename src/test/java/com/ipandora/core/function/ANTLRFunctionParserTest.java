@@ -2,7 +2,7 @@ package com.ipandora.core.function;
 
 import com.ipandora.api.predicate.formula.EqualToFormula;
 import com.ipandora.api.predicate.function.*;
-import com.ipandora.api.predicate.function.Function;
+import com.ipandora.api.predicate.function.FunctionDefinition;
 import com.ipandora.api.predicate.term.*;
 import com.ipandora.api.predicate.term.Number;
 import org.junit.Before;
@@ -34,13 +34,13 @@ public class ANTLRFunctionParserTest {
 
     @Test
     public void fromStringSingleCase() throws FunctionParsingException {
-        Function function = parser.fromString("Foo(x) = 1/x");
+        FunctionDefinition function = parser.fromString("Foo(x) = 1/x");
 
         FunctionCase functionCase = new FunctionCase(
                 new Division(new Number(1), Variable.withTypeNat("x")),
                 new OtherwiseCondition());
 
-        MathematicalFunction expected = new MathematicalFunction(
+        MathematicalFunctionDefinition expected = new MathematicalFunctionDefinition(
                 "Foo", Collections.singletonList(Variable.withTypeNat("x")), Collections.singletonList(functionCase));
 
         assertThat(function).isEqualTo(expected);
@@ -48,7 +48,7 @@ public class ANTLRFunctionParserTest {
 
     @Test
     public void fromStringManyCases() throws FunctionParsingException {
-        Function function = parser.fromString("Foo(x) = \n" +
+        FunctionDefinition function = parser.fromString("Foo(x) = \n" +
                 "1/2 if x = 1\n" +
                 "1/3 otherwise");
 
@@ -56,7 +56,7 @@ public class ANTLRFunctionParserTest {
         FunctionCase ifCase = new FunctionCase(new Division(new Number(1), new Number(2)), ifCondition);
         FunctionCase otherCase = new FunctionCase(new Division(new Number(1), new Number(3)), new OtherwiseCondition());
 
-        MathematicalFunction expected = new MathematicalFunction(
+        MathematicalFunctionDefinition expected = new MathematicalFunctionDefinition(
                 "Foo", Collections.singletonList(Variable.withTypeNat("x")), Arrays.asList(ifCase, otherCase));
 
         assertThat(function).isEqualTo(expected);
@@ -64,13 +64,13 @@ public class ANTLRFunctionParserTest {
 
     @Test
     public void fromStringManyArguments() throws FunctionParsingException {
-        Function function = parser.fromString("Foo(x, y) = x + y");
+        FunctionDefinition function = parser.fromString("Foo(x, y) = x + y");
 
         FunctionCase functionCase = new FunctionCase(
                 new Addition(Variable.withTypeNat("x"), Variable.withTypeNat("y")),
                 new OtherwiseCondition());
 
-        MathematicalFunction expected = new MathematicalFunction("Foo",
+        MathematicalFunctionDefinition expected = new MathematicalFunctionDefinition("Foo",
                 Arrays.asList(Variable.withTypeNat("x"), Variable.withTypeNat("y")),
                 Collections.singletonList(functionCase));
 
@@ -86,7 +86,7 @@ public class ANTLRFunctionParserTest {
     public void fromStringWithTypeCheckingShouldThrowWithCauseIfTypeCheckerThrows() throws Throwable {
 
         doThrow(new TypeMismatchException("test")).
-                when(mockTypeChecker).analyse(any(Function.class));
+                when(mockTypeChecker).analyse(any(FunctionDefinition.class));
 
         try {
             parser.fromStringWithTypeChecking("Foo(x) = \n" +

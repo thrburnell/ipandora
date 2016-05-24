@@ -1,7 +1,7 @@
 package com.ipandora.core.function;
 
 import com.ipandora.api.predicate.function.*;
-import com.ipandora.api.predicate.term.FunctionPrototype;
+import com.ipandora.api.predicate.function.FunctionPrototype;
 import com.ipandora.api.predicate.term.Term;
 import com.ipandora.api.predicate.term.Type;
 import com.ipandora.api.predicate.term.Variable;
@@ -14,7 +14,7 @@ import org.antlr.v4.runtime.Token;
 import java.util.ArrayList;
 import java.util.List;
 
-public class FunctionBuildingVisitor extends PredicateLogicBaseVisitor<Function> {
+public class FunctionBuildingVisitor extends PredicateLogicBaseVisitor<FunctionDefinition> {
 
     private final FormulaBuildingVisitor formulaBuildingVisitor;
     private final TermBuildingVisitor termBuildingVisitor;
@@ -26,7 +26,7 @@ public class FunctionBuildingVisitor extends PredicateLogicBaseVisitor<Function>
     }
 
     @Override
-    public Function visitFunctionDefinition(PredicateLogicParser.FunctionDefinitionContext ctx) {
+    public FunctionDefinition visitFunctionDefinition(PredicateLogicParser.FunctionDefinitionContext ctx) {
         String name = ctx.name.getText();
         List<Variable> variables = createVariables(ctx.args.args);
 
@@ -43,7 +43,7 @@ public class FunctionBuildingVisitor extends PredicateLogicBaseVisitor<Function>
         termBuildingVisitor.addFunctionPrototypeMapping(name, prototype);
 
         List<FunctionCase> cases = createCases(ctx.cases);
-        return new MathematicalFunction(name, variables, cases);
+        return new MathematicalFunctionDefinition(name, variables, cases);
     }
 
     private List<Variable> createVariables(List<Token> argTokens) {

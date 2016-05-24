@@ -9,8 +9,8 @@ import java.util.List;
 
 public class FunctionCreators {
 
-    public static MathematicalFunction mathFun(String name, List<Variable> args, List<FunctionCase> cases) {
-        return new MathematicalFunction(name, args, cases);
+    public static MathematicalFunctionDefinition mathFun(String name, List<Variable> args, List<FunctionCase> cases) {
+        return new MathematicalFunctionDefinition(name, args, cases);
     }
 
     public static FunctionCase funCase(Term expr, FunctionCaseCondition cond) {

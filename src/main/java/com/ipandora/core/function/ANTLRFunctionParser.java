@@ -1,6 +1,6 @@
 package com.ipandora.core.function;
 
-import com.ipandora.api.predicate.function.Function;
+import com.ipandora.api.predicate.function.FunctionDefinition;
 import com.ipandora.api.predicate.term.TypeMismatchException;
 import com.ipandora.core.formula.FormulaBuildingVisitor;
 import com.ipandora.core.term.SymbolTableCreator;
@@ -22,7 +22,7 @@ public class ANTLRFunctionParser implements FunctionParser {
     }
 
     @Override
-    public Function fromString(String function) throws FunctionParsingException {
+    public FunctionDefinition fromString(String function) throws FunctionParsingException {
         ANTLRInputStream stream = new ANTLRInputStream(function);
         PredicateLogicLexer lexer = new PredicateLogicLexer(stream);
         CommonTokenStream tokens = new CommonTokenStream(lexer);
@@ -47,8 +47,8 @@ public class ANTLRFunctionParser implements FunctionParser {
     }
 
     @Override
-    public Function fromStringWithTypeChecking(String function) throws FunctionParsingException {
-        Function f = fromString(function);
+    public FunctionDefinition fromStringWithTypeChecking(String function) throws FunctionParsingException {
+        FunctionDefinition f = fromString(function);
 
         try {
             functionTypeChecker.analyse(f);

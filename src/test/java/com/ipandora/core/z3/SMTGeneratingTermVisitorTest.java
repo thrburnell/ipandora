@@ -1,6 +1,6 @@
 package com.ipandora.core.z3;
 
-import com.ipandora.api.predicate.term.FunctionPrototype;
+import com.ipandora.api.predicate.function.FunctionPrototype;
 import com.ipandora.api.predicate.term.*;
 import com.ipandora.api.predicate.term.Number;
 import com.ipandora.core.util.WrappingRuntimeException;

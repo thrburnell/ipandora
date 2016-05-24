@@ -1,6 +1,6 @@
 package com.ipandora.core.term;
 
-import com.ipandora.api.predicate.term.FunctionPrototype;
+import com.ipandora.api.predicate.function.FunctionPrototype;
 import com.ipandora.api.predicate.term.Type;
 import org.junit.Test;
 import org.mockito.Mockito;

@@ -1,17 +1,17 @@
 package com.ipandora.api.predicate.function;
 
 import com.ipandora.api.predicate.term.Variable;
-import com.ipandora.core.function.FunctionVisitor;
+import com.ipandora.core.function.FunctionDefinitionVisitor;
 
 import java.util.List;
 
-public class MathematicalFunction implements Function {
+public class MathematicalFunctionDefinition implements FunctionDefinition {
 
     private final String name;
     private final List<Variable> arguments;
     private final List<FunctionCase> cases;
 
-    public MathematicalFunction(String name, List<Variable> arguments, List<FunctionCase> cases) {
+    public MathematicalFunctionDefinition(String name, List<Variable> arguments, List<FunctionCase> cases) {
         this.name = name;
         this.arguments = arguments;
         this.cases = cases;
@@ -30,8 +30,8 @@ public class MathematicalFunction implements Function {
     }
 
     @Override
-    public <T> T accept(FunctionVisitor<T> visitor) {
-        return visitor.visitMathematicalFunction(this);
+    public <T> T accept(FunctionDefinitionVisitor<T> visitor) {
+        return visitor.visitMathematicalFunctionDefinition(this);
     }
 
     @Override
@@ -39,7 +39,7 @@ public class MathematicalFunction implements Function {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
 
-        MathematicalFunction that = (MathematicalFunction) o;
+        MathematicalFunctionDefinition that = (MathematicalFunctionDefinition) o;
 
         if (!name.equals(that.name)) return false;
         if (!arguments.equals(that.arguments)) return false;

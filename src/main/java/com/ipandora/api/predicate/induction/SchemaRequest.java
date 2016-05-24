@@ -8,7 +8,7 @@ public class SchemaRequest {
 
     private String goal;
     private String variable;
-    private List<FunctionPrototype> functions;
+    private List<FunctionPrototypeRequest> functions;
 
     @JsonProperty
     public String getGoal() {
@@ -31,16 +31,16 @@ public class SchemaRequest {
     }
 
     @JsonProperty
-    public List<FunctionPrototype> getFunctions() {
+    public List<FunctionPrototypeRequest> getFunctions() {
         return functions;
     }
 
     @JsonProperty
-    public void setFunctions(List<FunctionPrototype> functions) {
+    public void setFunctions(List<FunctionPrototypeRequest> functions) {
         this.functions = functions;
     }
 
-    public static class FunctionPrototype {
+    public static class FunctionPrototypeRequest {
 
         private String name;
         private List<String> argTypes;

@@ -1,7 +1,7 @@
 package com.ipandora.core.function;
 
 import com.ipandora.api.predicate.formula.Formula;
-import com.ipandora.api.predicate.function.MathematicalFunction;
+import com.ipandora.api.predicate.function.MathematicalFunctionDefinition;
 import com.ipandora.api.predicate.term.Term;
 import com.ipandora.api.predicate.term.TypeMismatchException;
 import com.ipandora.api.predicate.term.Variable;
@@ -28,7 +28,7 @@ import static org.mockito.Mockito.verify;
 public class FunctionTypeCheckerTest {
 
     private static final Variable N = Variable.withTypeNat("n");
-    private static final MathematicalFunction SUM_FN = mathFun("Sum", Collections.singletonList(N), Arrays.asList(
+    private static final MathematicalFunctionDefinition SUM_FN = mathFun("Sum", Collections.singletonList(N), Arrays.asList(
             funCase(num(0), ifCond(eq(N, num(0)))),
             funCase(add(N, fun("Sum", sub(N, num(1)))), otherCond())));
 
@@ -73,7 +73,7 @@ public class FunctionTypeCheckerTest {
 
     @Test(expected = TypeMismatchException.class)
     public void analyseShouldThrowIfExpressionReturnTypeIsNotNat() throws TypeMismatchException {
-        MathematicalFunction fn = mathFun("Sum", Collections.singletonList(N), Arrays.asList(
+        MathematicalFunctionDefinition fn = mathFun("Sum", Collections.singletonList(N), Arrays.asList(
                 funCase(con("c"), ifCond(eq(N, num(0)))),
                 funCase(add(N, fun("Sum", sub(N, num(1)))), otherCond())));
 

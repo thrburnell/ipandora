@@ -1,7 +1,7 @@
 package com.ipandora.core.z3;
 
 import com.ipandora.api.predicate.formula.Formula;
-import com.ipandora.api.predicate.term.FunctionPrototype;
+import com.ipandora.api.predicate.function.FunctionPrototype;
 import com.ipandora.api.predicate.formula.PredicatePrototype;
 import com.ipandora.api.predicate.term.Type;
 import com.ipandora.api.predicate.term.TypeMismatchException;
