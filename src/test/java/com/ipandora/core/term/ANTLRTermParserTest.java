@@ -1,11 +1,15 @@
 package com.ipandora.core.term;
 
+import com.ipandora.api.predicate.function.FunctionPrototype;
 import com.ipandora.api.predicate.term.*;
 import com.ipandora.api.predicate.term.Number;
 import org.junit.Before;
 import org.junit.Test;
 
+import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
+import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
@@ -89,6 +93,18 @@ public class ANTLRTermParserTest {
     @Test(expected = TermParsingException.class)
     public void fromStringShouldThrowIfInvalidTermGiven() throws TermParsingException {
         parser.fromStringWithTypeChecking("1 + 2 = 3");
+    }
+
+    @Test
+    public void fromStringWithFunctionPrototypesShouldTypeFunctionTerm() throws TermParsingException {
+        List<FunctionPrototype> prototypes = new ArrayList<>();
+        prototypes.add(new FunctionPrototype("f", Collections.singletonList(Type.UNKNOWN), Type.NAT));
+
+        Term term = parser.fromString("1 + f(x)", prototypes);
+        Addition expected = new Addition(new Number(1),
+                new Function("f", Collections.<Term>singletonList(new Constant("x")), Type.NAT));
+
+        assertThat(term).isEqualTo(expected);
     }
 
 }
