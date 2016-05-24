@@ -53,11 +53,21 @@ public class Z3ClientImplTest {
     }
 
     @Test(expected = Z3UnrecognisableOutputException.class)
-    public void isSatThrowsUnrecognisableOutputExceptionWhenOutputDoesntBeginWithSatOrUnsat() throws Exception {
+    public void isSatThrowsUnrecognisableOutputExceptionWhenOutputDoesntBeginWithSatUnsatOrUnknown() throws Exception {
         Z3Client z3Client = new Z3ClientImpl(mockProcessExecutor, mockEnvironmentVariableProvider);
 
         when(mockProcessExecutor.execute(anyString(), anyInt(), Matchers.<String>anyVararg()))
                 .thenReturn("output that doesn't begin with sat or unsat");
+
+        z3Client.isSat("Demo program");
+    }
+
+    @Test(expected = Z3UnknownException.class)
+    public void isSatThrowsUnknownExceptionWhenOutputBeginsWithUnknown() throws Exception {
+        Z3ClientImpl z3Client = new Z3ClientImpl(mockProcessExecutor, mockEnvironmentVariableProvider);
+
+        when(mockProcessExecutor.execute(anyString(), anyInt(), Matchers.<String>anyVararg()))
+                .thenReturn("unknown");
 
         z3Client.isSat("Demo program");
     }

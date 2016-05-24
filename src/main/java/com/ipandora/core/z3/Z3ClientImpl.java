@@ -8,7 +8,10 @@ import java.io.IOException;
 
 public class Z3ClientImpl implements Z3Client {
 
-    public static final String Z3_BIN_PATH_VARNAME = "Z3_BINARY_PATH";
+    private static final String Z3_BIN_PATH_VARNAME = "Z3_BINARY_PATH";
+    private static final String SAT = "sat";
+    private static final String UNSAT = "unsat";
+    private static final String UNKNOWN = "unknown";
     private static int Z3_TIMEOUT_SECONDS = 5;
 
     private final ProcessExecutor processExecutor;
@@ -20,7 +23,8 @@ public class Z3ClientImpl implements Z3Client {
     }
 
     @Override
-    public boolean isSat(String program) throws IOException, Z3UnrecognisableOutputException, ProcessTimeoutException {
+    public boolean isSat(String program)
+            throws IOException, Z3UnrecognisableOutputException, ProcessTimeoutException, Z3UnknownException {
 
         try {
             String z3BinaryPath = environmentVariableProvider.getValue(Z3_BIN_PATH_VARNAME);
@@ -32,10 +36,12 @@ public class Z3ClientImpl implements Z3Client {
 
             String output = processExecutor.execute(program, Z3_TIMEOUT_SECONDS, z3BinaryPath, "-smt2", "-in");;
 
-            if (output.startsWith("sat")) {
+            if (output.startsWith(SAT)) {
                 return true;
-            } else if (output.startsWith("unsat")) {
+            } else if (output.startsWith(UNSAT)) {
                 return false;
+            } else if (output.startsWith(UNKNOWN)) {
+                throw new Z3UnknownException();
             } else {
                 throw new Z3UnrecognisableOutputException("Z3 output didn't begin with sat or unsat. " +
                         "Did the given program ask for (check-sat)?");

@@ -50,6 +50,8 @@ public class Z3ImpliesChecker implements ImpliesChecker {
         } catch (IOException | Z3UnrecognisableOutputException | ProcessTimeoutException e) {
             e.printStackTrace();
             throw new ProofStepCheckException(e);
+        } catch (Z3UnknownException e) {
+            throw new ProofStepCheckException("Unable to determine validity of proof step");
         }
     }
 

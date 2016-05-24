@@ -6,6 +6,6 @@ import java.io.IOException;
 
 public interface Z3Client {
 
-    boolean isSat(String program) throws IOException, Z3UnrecognisableOutputException, ProcessTimeoutException;
+    boolean isSat(String program) throws IOException, Z3UnrecognisableOutputException, ProcessTimeoutException, Z3UnknownException;
 
 }

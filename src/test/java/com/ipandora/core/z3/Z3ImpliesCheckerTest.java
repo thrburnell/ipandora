@@ -98,4 +98,17 @@ public class Z3ImpliesCheckerTest {
         }
     }
 
+    @Test
+    public void checkThrowsProofStepExceptionWithMessageIfZ3ClientThrowsUnknownException() throws Exception {
+
+        when(mockZ3Client.isSat(anyString())).thenThrow(new Z3UnknownException());
+
+        try {
+            checker.check(Collections.<Formula>singletonList(new FalsityFormula()), new TruthFormula());
+            fail("ProofStepCheckException should have been thrown!");
+        } catch (ProofStepCheckException e) {
+            assertThat(e.getMessage()).isEqualTo("Unable to determine validity of proof step");
+        }
+    }
+
 }

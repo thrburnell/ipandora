@@ -82,7 +82,7 @@ public class PredicateResource {
 
     @POST
     @Path("/step")
-    public Response checkProofStep(StepRequest stepRequest) throws ProofStepCheckException {
+    public Response checkProofStep(StepRequest stepRequest) {
 
         String method = stepRequest.getMethod();
 
@@ -122,8 +122,7 @@ public class PredicateResource {
 
     @POST
     @Path("/induction")
-    public Response generateInductionSchema(SchemaRequest schemaRequest)
-    { //throws SchemaGeneratorException {
+    public Response generateInductionSchema(SchemaRequest schemaRequest) {
 
         String goal = schemaRequest.getGoal();
         String varName = schemaRequest.getVariable();
@@ -222,7 +221,7 @@ public class PredicateResource {
         throw new FormulaParsingException("Unknown type: " + type);
     }
 
-    private Response checkProofStepLogicalImplication(StepRequest stepRequest) throws ProofStepCheckException {
+    private Response checkProofStepLogicalImplication(StepRequest stepRequest) {
         assert stepRequest.getMethod().equals(ProofStepMethods.LOGICAL_IMPLICATION);
 
         StepResponse stepResponse = new StepResponse();
@@ -258,7 +257,13 @@ public class PredicateResource {
             return invalidRequestResponse(stepResponse);
         }
 
-        boolean result = impliesChecker.check(assumptionFormulas, goalFormula);
+        boolean result;
+        try {
+            result = impliesChecker.check(assumptionFormulas, goalFormula);
+        } catch (ProofStepCheckException e) {
+            stepResponse.setErrorMsg(e.getMessage());
+            return invalidRequestResponse(stepResponse);
+        }
 
         stepResponse.setGoal(goal);
         stepResponse.setAssumptions(assumptions);
@@ -271,7 +276,7 @@ public class PredicateResource {
         return Response.ok(stepResponse).build();
     }
 
-    private Response checkProofStepArithmetic(StepRequest stepRequest) throws ProofStepCheckException {
+    private Response checkProofStepArithmetic(StepRequest stepRequest) {
         assert stepRequest.getMethod().equals(ProofStepMethods.ARITHMETIC);
 
         StepResponse stepResponse = new StepResponse();
@@ -307,7 +312,13 @@ public class PredicateResource {
             return invalidRequestResponse(stepResponse);
         }
 
-        boolean result = equalityChecker.check(fromTerm, goalTerm);
+        boolean result;
+        try {
+            result = equalityChecker.check(fromTerm, goalTerm);
+        } catch (ProofStepCheckException e) {
+            stepResponse.setErrorMsg(e.getMessage());
+            return invalidRequestResponse(stepResponse);
+        }
 
         stepResponse.setGoal(goal);
         stepResponse.setFrom(from);

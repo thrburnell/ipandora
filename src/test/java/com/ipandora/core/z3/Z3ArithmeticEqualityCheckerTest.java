@@ -114,4 +114,17 @@ public class Z3ArithmeticEqualityCheckerTest {
         }
     }
 
+    @Test
+    public void checkThrowsProofStepExceptionWithMessageIfZ3ClientThrowsUnknownException() throws Exception {
+
+        when(mockZ3Client.isSat(anyString())).thenThrow(new Z3UnknownException());
+
+        try {
+            checker.check(new Number(1), new Number(2));
+            fail("ProofStepCheckException should have been thrown!");
+        } catch (ProofStepCheckException e) {
+            assertThat(e.getMessage()).isEqualTo("Unable to determine validity of proof step");
+        }
+    }
+
 }
