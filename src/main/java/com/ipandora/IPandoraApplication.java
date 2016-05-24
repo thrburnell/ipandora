@@ -34,7 +34,7 @@ public class IPandoraApplication extends Application<IPandoraConfiguration> {
     @Override
     public void run(IPandoraConfiguration IPandoraConfiguration,
                     Environment environment) throws Exception {
-        
+
         FormulaTypeChecker formulaTypeChecker = new FormulaTypeChecker(new TermTypeChecker());
         ANTLRFormulaParser formulaParser = new ANTLRFormulaParser(formulaTypeChecker);
 

@@ -11,8 +11,10 @@ import org.junit.runner.RunWith;
 import org.mockito.Mock;
 import org.mockito.runners.MockitoJUnitRunner;
 
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
+import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.fail;
@@ -97,6 +99,26 @@ public class ANTLRFunctionParserTest {
         } catch (FunctionParsingException e) {
             throw e.getCause();
         }
+    }
+
+    @Test
+    public void fromStringWithFunctionPrototypesShouldReturnTypedExpression() throws FunctionParsingException {
+        List<FunctionPrototype> functionPrototypes = new ArrayList<>();
+        functionPrototypes.add(new FunctionPrototype("Bar", Collections.singletonList(Type.NAT), Type.NAT));
+
+        FunctionDefinition function = parser.fromString("Foo(x) = \n" +
+                "1/2 if Bar(x) = 1\n" +
+                "1/3 otherwise", functionPrototypes);
+
+        IfCondition ifCondition = new IfCondition(new EqualToFormula(new Function("Bar",
+                Collections.<Term>singletonList(Variable.withTypeNat("x")), Type.NAT), new Number(1)));
+        FunctionCase ifCase = new FunctionCase(new Division(new Number(1), new Number(2)), ifCondition);
+        FunctionCase otherCase = new FunctionCase(new Division(new Number(1), new Number(3)), new OtherwiseCondition());
+
+        MathematicalFunctionDefinition expected = new MathematicalFunctionDefinition(
+                "Foo", Collections.singletonList(Variable.withTypeNat("x")), Arrays.asList(ifCase, otherCase));
+
+        assertThat(function).isEqualTo(expected);
     }
 
 }
