@@ -33,6 +33,7 @@ import javax.ws.rs.core.Response;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 @Path("/predicate")
@@ -128,6 +129,9 @@ public class PredicateResource {
         String goal = schemaRequest.getGoal();
         String varName = schemaRequest.getVariable();
         List<SchemaRequest.FunctionPrototypeRequest> functions = schemaRequest.getFunctions();
+        if (functions == null) {
+            functions = Collections.emptyList();
+        }
 
         SchemaResponse response = new SchemaResponse();
         response.setGoal(goal);
@@ -146,7 +150,7 @@ public class PredicateResource {
         try {
             formula = formulaParser.fromStringWithTypeChecking(goal, functionPrototypes);
         } catch (FormulaParsingException e) {
-            response.setErrorMsg("Invalid goal formula: " + goal);
+            response.setErrorMsg("Invalid goal formula. Did you provide all correct function prototypes?");
             return invalidRequestResponse(response);
         }
         if (!(formula instanceof ForallFormula)) {
