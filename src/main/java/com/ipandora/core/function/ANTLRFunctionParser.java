@@ -1,6 +1,7 @@
 package com.ipandora.core.function;
 
 import com.ipandora.api.predicate.function.Function;
+import com.ipandora.api.predicate.term.TypeMismatchException;
 import com.ipandora.core.formula.FormulaBuildingVisitor;
 import com.ipandora.core.term.SymbolTableCreator;
 import com.ipandora.core.term.TermBuildingVisitor;
@@ -14,6 +15,12 @@ import org.antlr.v4.runtime.misc.ParseCancellationException;
 
 public class ANTLRFunctionParser implements FunctionParser {
 
+    private final FunctionTypeChecker functionTypeChecker;
+
+    public ANTLRFunctionParser(FunctionTypeChecker functionTypeChecker) {
+        this.functionTypeChecker = functionTypeChecker;
+    }
+
     @Override
     public Function fromString(String function) throws FunctionParsingException {
         ANTLRInputStream stream = new ANTLRInputStream(function);
@@ -21,7 +28,6 @@ public class ANTLRFunctionParser implements FunctionParser {
         CommonTokenStream tokens = new CommonTokenStream(lexer);
         PredicateLogicParser parser = new PredicateLogicParser(tokens);
         parser.setErrorHandler(new BailErrorStrategy());
-
 
         PredicateLogicParser.FunctionDefinitionContext fnCtx;
 
@@ -38,6 +44,19 @@ public class ANTLRFunctionParser implements FunctionParser {
         } catch (WrappingRuntimeException e) {
             throw new FunctionParsingException(e.getWrappedException());
         }
+    }
+
+    @Override
+    public Function fromStringWithTypeChecking(String function) throws FunctionParsingException {
+        Function f = fromString(function);
+
+        try {
+            functionTypeChecker.analyse(f);
+        } catch (TypeMismatchException e) {
+            throw new FunctionParsingException(e);
+        }
+
+        return f;
     }
 
     private FunctionBuildingVisitor makeFunctionBuildingVisitor() {
