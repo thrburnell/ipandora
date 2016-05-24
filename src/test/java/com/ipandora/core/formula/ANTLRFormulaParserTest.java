@@ -1,6 +1,7 @@
 package com.ipandora.core.formula;
 
 import com.ipandora.api.predicate.formula.*;
+import com.ipandora.api.predicate.function.FunctionPrototype;
 import com.ipandora.api.predicate.term.*;
 import com.ipandora.api.predicate.term.Number;
 import com.ipandora.core.term.TermTypeChecker;
@@ -8,8 +9,10 @@ import org.junit.Before;
 import org.junit.Test;
 import org.mockito.Mockito;
 
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
+import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.verify;
@@ -276,6 +279,19 @@ public class ANTLRFormulaParserTest {
     @Test(expected = FormulaParsingException.class)
     public void fromStringShouldThrowIfInvalidFormulaGiven() throws FormulaParsingException {
         parser.fromStringWithTypeChecking("\\FORALL x. (Foo x & Bar(y)");
+    }
+
+    @Test
+    public void fromStringWithPrototypesShouldTypeFunctionTerm() throws FormulaParsingException {
+        List<FunctionPrototype> functionPrototypes = new ArrayList<>();
+        functionPrototypes.add(new FunctionPrototype("Foo", Collections.singletonList(Type.UNKNOWN), Type.NAT));
+        Formula formula = parser.fromString("\\FORALL x. Foo(x) > 0", functionPrototypes);
+
+        ForallFormula expected = new ForallFormula(new Variable("x"), new GreaterThanFormula(
+                new Function("Foo", Collections.<Term>singletonList(new Variable("x")), Type.NAT), new Number(0)));
+
+
+        assertThat(formula).isEqualTo(expected);
     }
 
 }
