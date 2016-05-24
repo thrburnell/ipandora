@@ -1,7 +1,9 @@
 package com.ipandora.core.function;
 
 import com.ipandora.api.predicate.function.*;
+import com.ipandora.api.predicate.term.FunctionPrototype;
 import com.ipandora.api.predicate.term.Term;
+import com.ipandora.api.predicate.term.Type;
 import com.ipandora.api.predicate.term.Variable;
 import com.ipandora.core.formula.FormulaBuildingVisitor;
 import com.ipandora.core.term.TermBuildingVisitor;
@@ -29,9 +31,16 @@ public class FunctionBuildingVisitor extends PredicateLogicBaseVisitor<Function>
         List<Variable> variables = createVariables(ctx.args.args);
 
         // Add typing for all arguments before building the cases:
+        List<Type> argTypes = new ArrayList<>();
         for (Variable variable : variables) {
-            termBuildingVisitor.addTypeMapping(variable.getName(), variable.getType());
+            Type type = variable.getType();
+            termBuildingVisitor.addTypeMapping(variable.getName(), type);
+            argTypes.add(type);
         }
+
+        // Assume functions always return Nat
+        FunctionPrototype prototype = new FunctionPrototype(name, argTypes, Type.NAT);
+        termBuildingVisitor.addFunctionPrototypeMapping(name, prototype);
 
         List<FunctionCase> cases = createCases(ctx.cases);
         return new MathematicalFunction(name, variables, cases);

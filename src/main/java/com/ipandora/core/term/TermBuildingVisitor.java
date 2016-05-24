@@ -147,4 +147,8 @@ public class TermBuildingVisitor extends PredicateLogicBaseVisitor<Term> {
     public void addTypeMapping(String variableName, Type type) {
         symbolTable.addMapping(variableName, type);
     }
+
+    public void addFunctionPrototypeMapping(String functionName, FunctionPrototype prototype) {
+        symbolTable.addMapping(functionName, prototype);
+    }
 }
