@@ -2,16 +2,10 @@ package com.ipandora.api.predicate.function;
 
 import com.ipandora.api.predicate.formula.TruthFormula;
 
-public class OtherwiseCondition implements FunctionCaseCondition {
+public class OtherwiseCondition extends FunctionCaseCondition {
 
-    @Override
-    public boolean equals(Object o) {
-        return o != null && o instanceof OtherwiseCondition;
-    }
-
-    @Override
-    public int hashCode() {
-        return "otherwise".hashCode();
+    public OtherwiseCondition() {
+        super(new TruthFormula());
     }
 
 }

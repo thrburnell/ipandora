@@ -12,6 +12,14 @@ public class FunctionCase {
         this.condition = condition;
     }
 
+    public Term getExpression() {
+        return expression;
+    }
+
+    public FunctionCaseCondition getCondition() {
+        return condition;
+    }
+
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
