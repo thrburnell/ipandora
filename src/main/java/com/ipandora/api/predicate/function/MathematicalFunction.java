@@ -1,6 +1,7 @@
 package com.ipandora.api.predicate.function;
 
 import com.ipandora.api.predicate.term.Variable;
+import com.ipandora.core.function.FunctionVisitor;
 
 import java.util.List;
 
@@ -14,6 +15,23 @@ public class MathematicalFunction implements Function {
         this.name = name;
         this.arguments = arguments;
         this.cases = cases;
+    }
+
+    public String getName() {
+        return name;
+    }
+
+    public List<Variable> getArguments() {
+        return arguments;
+    }
+
+    public List<FunctionCase> getCases() {
+        return cases;
+    }
+
+    @Override
+    public <T> T accept(FunctionVisitor<T> visitor) {
+        return visitor.visitMathematicalFunction(this);
     }
 
     @Override
@@ -35,5 +53,4 @@ public class MathematicalFunction implements Function {
         result = 31 * result + cases.hashCode();
         return result;
     }
-
 }
