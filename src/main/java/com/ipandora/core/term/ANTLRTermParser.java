@@ -1,6 +1,7 @@
 package com.ipandora.core.term;
 
 import com.ipandora.api.predicate.term.Term;
+import com.ipandora.api.predicate.term.TypeMismatchException;
 import com.ipandora.core.util.WrappingRuntimeException;
 import com.ipandora.parser.PredicateLogicLexer;
 import com.ipandora.parser.PredicateLogicParser;
@@ -40,10 +41,10 @@ public class ANTLRTermParser implements TermParser {
     public Term fromStringWithTypeChecking(String term) throws TermParsingException {
         try {
             Term t = fromString(term);
-            termTypeChecker.visit(t);
+            termTypeChecker.analyse(t);
             return t;
-        } catch (WrappingRuntimeException e) {
-            throw new TermParsingException(e.getWrappedException());
+        } catch (TypeMismatchException e) {
+            throw new TermParsingException(e);
         }
     }
 

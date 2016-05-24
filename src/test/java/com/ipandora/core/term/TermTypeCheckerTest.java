@@ -2,13 +2,10 @@ package com.ipandora.core.term;
 
 import com.ipandora.api.predicate.term.*;
 import com.ipandora.api.predicate.term.Number;
-import com.ipandora.core.util.WrappingRuntimeException;
 import org.junit.Test;
 
 import java.util.Arrays;
 import java.util.Collections;
-
-import static org.assertj.core.api.Assertions.fail;
 
 public class TermTypeCheckerTest {
 
@@ -19,13 +16,13 @@ public class TermTypeCheckerTest {
     @Test(expected = TypeMismatchException.class)
     public void visitShouldThrowForAdditionWithConstant() throws Exception {
         Addition addition = new Addition(Variable.withTypeNat("?x"), new Constant("y"));
-        visitAndExpectWrappedRuntimeException(addition);
+        termTypeChecker.analyse(addition);
     }
 
     @Test(expected = TypeMismatchException.class)
     public void visitShouldThrowForAdditionWithUntypedVariable() throws Exception {
         Addition addition = new Addition(new Variable("?x"), Variable.withTypeNat("?y"));
-        visitAndExpectWrappedRuntimeException(addition);
+        termTypeChecker.analyse(addition);
     }
 
     @Test(expected = TypeMismatchException.class)
@@ -34,13 +31,13 @@ public class TermTypeCheckerTest {
                 new Function("Foo", Collections.<Term>singletonList(new Number(1))),
                 Variable.withTypeNat("?x"));
 
-        visitAndExpectWrappedRuntimeException(addition);
+        termTypeChecker.analyse(addition);
     }
 
     @Test
-    public void visitShouldNotThrowForAdditionWithNatVariables() {
+    public void visitShouldNotThrowForAdditionWithNatVariables() throws TypeMismatchException {
         Addition addition = new Addition(Variable.withTypeNat("?x"), Variable.withTypeNat("?y"));
-        termTypeChecker.visit(addition);
+        termTypeChecker.analyse(addition);
     }
 
     // Subtraction
@@ -48,13 +45,13 @@ public class TermTypeCheckerTest {
     @Test(expected = TypeMismatchException.class)
     public void visitShouldThrowForSubtractionWithConstant() throws Exception {
         Subtraction subtraction = new Subtraction(Variable.withTypeNat("?x"), new Constant("y"));
-        visitAndExpectWrappedRuntimeException(subtraction);
+        termTypeChecker.analyse(subtraction);
     }
 
     @Test(expected = TypeMismatchException.class)
     public void visitShouldThrowForSubtractionWithUntypedVariable() throws Exception {
         Subtraction subtraction = new Subtraction(new Variable("?x"), Variable.withTypeNat("?y"));
-        visitAndExpectWrappedRuntimeException(subtraction);
+        termTypeChecker.analyse(subtraction);
     }
 
     @Test(expected = TypeMismatchException.class)
@@ -63,13 +60,13 @@ public class TermTypeCheckerTest {
                 new Function("Foo", Collections.<Term>singletonList(new Number(1))),
                 Variable.withTypeNat("?x"));
 
-        visitAndExpectWrappedRuntimeException(subtraction);
+        termTypeChecker.analyse(subtraction);
     }
 
     @Test
-    public void visitShouldNotThrowForSubtractionWithNatVariables() {
+    public void visitShouldNotThrowForSubtractionWithNatVariables() throws TypeMismatchException {
         Subtraction subtraction = new Subtraction(Variable.withTypeNat("?x"), Variable.withTypeNat("?y"));
-        termTypeChecker.visit(subtraction);
+        termTypeChecker.analyse(subtraction);
     }
 
     // Multiplication
@@ -77,13 +74,13 @@ public class TermTypeCheckerTest {
     @Test(expected = TypeMismatchException.class)
     public void visitShouldThrowForMultiplicationWithConstant() throws Exception {
         Multiplication multiplication = new Multiplication(Variable.withTypeNat("?x"), new Constant("y"));
-        visitAndExpectWrappedRuntimeException(multiplication);
+        termTypeChecker.analyse(multiplication);
     }
 
     @Test(expected = TypeMismatchException.class)
     public void visitShouldThrowForMultiplicationWithUntypedVariable() throws Exception {
         Multiplication multiplication = new Multiplication(new Variable("?x"), Variable.withTypeNat("?y"));
-        visitAndExpectWrappedRuntimeException(multiplication);
+        termTypeChecker.analyse(multiplication);
     }
 
     @Test(expected = TypeMismatchException.class)
@@ -92,13 +89,13 @@ public class TermTypeCheckerTest {
                 new Function("Foo", Collections.<Term>singletonList(new Number(1))),
                 Variable.withTypeNat("?x"));
 
-        visitAndExpectWrappedRuntimeException(multiplication);
+        termTypeChecker.analyse(multiplication);
     }
 
     @Test
-    public void visitShouldNotThrowForMultiplicationWithNatVariables() {
+    public void visitShouldNotThrowForMultiplicationWithNatVariables() throws TypeMismatchException {
         Multiplication multiplication = new Multiplication(Variable.withTypeNat("?x"), Variable.withTypeNat("?y"));
-        termTypeChecker.visit(multiplication);
+        termTypeChecker.analyse(multiplication);
     }
 
     // Division
@@ -106,13 +103,13 @@ public class TermTypeCheckerTest {
     @Test(expected = TypeMismatchException.class)
     public void visitShouldThrowForDivisionWithConstant() throws Exception {
         Division division = new Division(Variable.withTypeNat("?x"), new Constant("y"));
-        visitAndExpectWrappedRuntimeException(division);
+        termTypeChecker.analyse(division);
     }
 
     @Test(expected = TypeMismatchException.class)
     public void visitShouldThrowForDivisionWithUntypedVariable() throws Exception {
         Division division = new Division(new Variable("?x"), Variable.withTypeNat("?y"));
-        visitAndExpectWrappedRuntimeException(division);
+        termTypeChecker.analyse(division);
     }
 
     @Test(expected = TypeMismatchException.class)
@@ -121,13 +118,13 @@ public class TermTypeCheckerTest {
                 new Function("Foo", Collections.<Term>singletonList(new Number(1))),
                 Variable.withTypeNat("?x"));
 
-        visitAndExpectWrappedRuntimeException(division);
+        termTypeChecker.analyse(division);
     }
 
     @Test
-    public void visitShouldNotThrowForDivisionWithNatVariables() {
+    public void visitShouldNotThrowForDivisionWithNatVariables() throws TypeMismatchException {
         Division division = new Division(Variable.withTypeNat("?x"), Variable.withTypeNat("?y"));
-        termTypeChecker.visit(division);
+        termTypeChecker.analyse(division);
     }
 
 
@@ -135,13 +132,13 @@ public class TermTypeCheckerTest {
     @Test(expected = TypeMismatchException.class)
     public void visitShouldThrowForPowerWithConstant() throws Exception {
         Power power = new Power(new Constant("x"), 2);
-        visitAndExpectWrappedRuntimeException(power);
+        termTypeChecker.analyse(power);
     }
 
     @Test(expected = TypeMismatchException.class)
     public void visitShouldThrowForPowerWithUntypedVariable() throws Exception {
         Power power = new Power(new Variable("?x"), 3);
-        visitAndExpectWrappedRuntimeException(power);
+        termTypeChecker.analyse(power);
     }
 
     @Test(expected = TypeMismatchException.class)
@@ -150,13 +147,13 @@ public class TermTypeCheckerTest {
                 new Function("Foo", Collections.<Term>singletonList(new Number(1))),
                 2);
 
-        visitAndExpectWrappedRuntimeException(power);
+        termTypeChecker.analyse(power);
     }
 
     @Test
-    public void visitShouldNotThrowForPowerWithNatVariables() {
+    public void visitShouldNotThrowForPowerWithNatVariables() throws TypeMismatchException {
         Power power = new Power(Variable.withTypeNat("?x"), 3);
-        termTypeChecker.visit(power);
+        termTypeChecker.analyse(power);
     }
 
     // Function
@@ -165,26 +162,15 @@ public class TermTypeCheckerTest {
         Function function = new Function("Foo",
                 Arrays.asList(new Number(2), new Addition(new Number(1), new Variable("?x"))));
 
-        visitAndExpectWrappedRuntimeException(function);
+        termTypeChecker.analyse(function);
     }
 
     @Test
-    public void visitShouldNotThrowForFunctionWithWellTypedParams() {
+    public void visitShouldNotThrowForFunctionWithWellTypedParams() throws TypeMismatchException {
         Function function = new Function("Foo",
                 Arrays.asList(new Number(2), new Multiplication(Variable.withTypeNat("?x"), new Number(3))));
 
-        termTypeChecker.visit(function);
-    }
-
-
-    private void visitAndExpectWrappedRuntimeException(Term term) throws Exception {
-        try {
-            termTypeChecker.visit(term);
-        } catch (WrappingRuntimeException e) {
-            throw e.getWrappedException();
-        }
-
-        fail("WrappingRuntimeException should have been thrown!");
+        termTypeChecker.analyse(function);
     }
 
 }

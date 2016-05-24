@@ -13,8 +13,8 @@ import org.mockito.runners.MockitoJUnitRunner;
 
 import java.util.Arrays;
 
+import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
 
 @RunWith(MockitoJUnitRunner.class)
 public class FormulaTypeCheckerTest {
@@ -39,9 +39,9 @@ public class FormulaTypeCheckerTest {
 
         typeChecker.analyse(predicate);
 
-        verify(mockTermTypeChecker).visit(number);
-        verify(mockTermTypeChecker).visit(constant);
-        verify(mockTermTypeChecker).visit(variable);
+        verify(mockTermTypeChecker).analyse(number);
+        verify(mockTermTypeChecker).analyse(constant);
+        verify(mockTermTypeChecker).analyse(variable);
     }
 
     @Test
@@ -52,8 +52,8 @@ public class FormulaTypeCheckerTest {
 
         typeChecker.analyse(equalToFormula);
 
-        verify(mockTermTypeChecker).visit(number);
-        verify(mockTermTypeChecker).visit(variable);
+        verify(mockTermTypeChecker).analyse(number);
+        verify(mockTermTypeChecker).analyse(variable);
     }
 
     @Test
@@ -64,8 +64,8 @@ public class FormulaTypeCheckerTest {
 
         typeChecker.analyse(greaterThanFormula);
 
-        verify(mockTermTypeChecker).visit(number);
-        verify(mockTermTypeChecker).visit(variable);
+        verify(mockTermTypeChecker).analyse(number);
+        verify(mockTermTypeChecker).analyse(variable);
     }
 
     @Test
@@ -76,8 +76,8 @@ public class FormulaTypeCheckerTest {
 
         typeChecker.analyse(greaterThanEqualFormula);
 
-        verify(mockTermTypeChecker).visit(number);
-        verify(mockTermTypeChecker).visit(variable);
+        verify(mockTermTypeChecker).analyse(number);
+        verify(mockTermTypeChecker).analyse(variable);
     }
 
     @Test
@@ -88,8 +88,8 @@ public class FormulaTypeCheckerTest {
 
         typeChecker.analyse(lessThanFormula);
 
-        verify(mockTermTypeChecker).visit(number);
-        verify(mockTermTypeChecker).visit(variable);
+        verify(mockTermTypeChecker).analyse(number);
+        verify(mockTermTypeChecker).analyse(variable);
     }
 
     @Test
@@ -100,8 +100,8 @@ public class FormulaTypeCheckerTest {
 
         typeChecker.analyse(lessThanEqualFormula);
 
-        verify(mockTermTypeChecker).visit(number);
-        verify(mockTermTypeChecker).visit(variable);
+        verify(mockTermTypeChecker).analyse(number);
+        verify(mockTermTypeChecker).analyse(variable);
     }
 
     @Test(expected = TypeMismatchException.class)
@@ -109,8 +109,8 @@ public class FormulaTypeCheckerTest {
         Addition addition = new Addition(new Variable("?x"), Variable.withTypeNat("?y"));
         EqualToFormula equalToFormula = new EqualToFormula(addition, new Number(2));
 
-        when(mockTermTypeChecker.visit(addition))
-                .thenThrow(new WrappingRuntimeException(new TypeMismatchException("Test")));
+        doThrow(new WrappingRuntimeException(new TypeMismatchException("Test")))
+                .when(mockTermTypeChecker).analyse(addition);
 
         typeChecker.analyse(equalToFormula);
     }

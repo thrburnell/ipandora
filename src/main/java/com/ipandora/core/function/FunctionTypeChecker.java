@@ -8,7 +8,7 @@ import com.ipandora.core.formula.FormulaTypeChecker;
 import com.ipandora.core.term.TermTypeChecker;
 import com.ipandora.core.util.WrappingRuntimeException;
 
-public class FunctionTypeChecker implements FunctionVisitor<Void> {
+public class FunctionTypeChecker {
 
     private final TermTypeChecker termTypeChecker;
     private final FormulaTypeChecker formulaTypeChecker;
@@ -20,7 +20,7 @@ public class FunctionTypeChecker implements FunctionVisitor<Void> {
 
     public void analyse(Function function) throws TypeMismatchException {
         try {
-            function.accept(this);
+            function.accept(new FunctionTypeCheckingVisitor());
         } catch (WrappingRuntimeException wre) {
             Exception wrapped = wre.getWrappedException();
             if (wrapped instanceof TypeMismatchException) {
@@ -30,24 +30,27 @@ public class FunctionTypeChecker implements FunctionVisitor<Void> {
         }
     }
 
-    @Override
-    public Void visit(Function function) {
-        return function.accept(this);
-    }
+    private class FunctionTypeCheckingVisitor implements FunctionVisitor<Void> {
 
-    @Override
-    public Void visitMathematicalFunction(MathematicalFunction mathematicalFunction) {
-
-        for (FunctionCase functionCase : mathematicalFunction.getCases()) {
-            try {
-                termTypeChecker.analyse(functionCase.getExpression());
-                formulaTypeChecker.analyse(functionCase.getCondition().getFormula());
-            } catch (TypeMismatchException e) {
-                throw new WrappingRuntimeException(e);
-            }
+        @Override
+        public Void visit(Function function) {
+            return function.accept(this);
         }
 
-        return null;
+        @Override
+        public Void visitMathematicalFunction(MathematicalFunction mathematicalFunction) {
+
+            for (FunctionCase functionCase : mathematicalFunction.getCases()) {
+                try {
+                    termTypeChecker.analyse(functionCase.getExpression());
+                    formulaTypeChecker.analyse(functionCase.getCondition().getFormula());
+                } catch (TypeMismatchException e) {
+                    throw new WrappingRuntimeException(e);
+                }
+            }
+
+            return null;
+        }
     }
 
 }

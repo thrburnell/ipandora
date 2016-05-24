@@ -9,7 +9,7 @@ import com.ipandora.core.util.WrappingRuntimeException;
 
 import java.util.List;
 
-public class FormulaTypeChecker implements FormulaVisitor<Void> {
+public class FormulaTypeChecker {
 
     private final TermTypeChecker termTypeChecker;
 
@@ -19,7 +19,7 @@ public class FormulaTypeChecker implements FormulaVisitor<Void> {
 
     public void analyse(Formula formula) throws TypeMismatchException {
         try {
-            formula.accept(this);
+            formula.accept(new FormulaTypeCheckingVisitor());
         } catch (WrappingRuntimeException wre) {
             Exception wrapped = wre.getWrappedException();
             if (wrapped instanceof TypeMismatchException) {
@@ -29,127 +29,138 @@ public class FormulaTypeChecker implements FormulaVisitor<Void> {
         }
     }
 
-    @Override
-    public Void visit(Formula formula) {
-        formula.accept(this);
-        return null;
-    }
+    private class FormulaTypeCheckingVisitor implements FormulaVisitor<Void> {
 
-    @Override
-    public Void visitAndFormula(AndFormula andFormula) {
-        visit(andFormula.getLeft());
-        visit(andFormula.getRight());
-        return null;
-    }
-
-    @Override
-    public Void visitOrFormula(OrFormula orFormula) {
-        visit(orFormula.getLeft());
-        visit(orFormula.getRight());
-        return null;
-    }
-
-    @Override
-    public Void visitForallFormula(ForallFormula forallFormula) {
-        visit(forallFormula.getFormula());
-        return null;
-    }
-
-    @Override
-    public Void visitExistsFormula(ExistsFormula existsFormula) {
-        visit(existsFormula.getFormula());
-        return null;
-    }
-
-    @Override
-    public Void visitTruthFormula(TruthFormula truthFormula) {
-        return null;
-    }
-
-    @Override
-    public Void visitFalsityFormula(FalsityFormula falsityFormula) {
-        return null;
-    }
-
-    @Override
-    public Void visitImpliesFormula(ImpliesFormula impliesFormula) {
-        visit(impliesFormula.getLeft());
-        visit(impliesFormula.getRight());
-        return null;
-    }
-
-    @Override
-    public Void visitIffFormula(IffFormula iffFormula) {
-        visit(iffFormula.getLeft());
-        visit(iffFormula.getRight());
-        return null;
-    }
-
-    @Override
-    public Void visitNotFormula(NotFormula notFormula) {
-        visit(notFormula.getFormula());
-        return null;
-    }
-
-    @Override
-    public Void visitPropositionFormula(PropositionFormula propositionFormula) {
-        return null;
-    }
-
-    @Override
-    public Void visitPredicateFormula(PredicateFormula predicateFormula) {
-        List<Term> params = predicateFormula.getParams();
-
-        for (Term param : params) {
-            termTypeChecker.visit(param);
+        @Override
+        public Void visit(Formula formula) {
+            formula.accept(this);
+            return null;
         }
 
-        return null;
-    }
-
-    @Override
-    public Void visitEqualToFormula(EqualToFormula equalToFormula) {
-        visitMathematicalComparisonFormula(equalToFormula);
-        return null;
-    }
-
-    @Override
-    public Void visitGreaterThanFormula(GreaterThanFormula greaterThanFormula) {
-        visitMathematicalComparisonFormula(greaterThanFormula);
-        return null;
-    }
-
-    @Override
-    public Void visitLessThanFormula(LessThanFormula lessThanFormula) {
-        visitMathematicalComparisonFormula(lessThanFormula);
-        return null;
-    }
-
-    @Override
-    public Void visitGreaterThanEqualFormula(GreaterThanEqualFormula greaterThanEqualFormula) {
-        visitMathematicalComparisonFormula(greaterThanEqualFormula);
-        return null;
-    }
-
-    @Override
-    public Void visitLessThanEqualFormula(LessThanEqualFormula lessThanEqualFormula) {
-        visitMathematicalComparisonFormula(lessThanEqualFormula);
-        return null;
-    }
-
-    private void visitMathematicalComparisonFormula(MathematicalComparisonFormula formula) {
-        Term left = formula.getLeft();
-        Term right = formula.getRight();
-
-        if (left.getType() != Type.NAT) {
-            throw new WrappingRuntimeException(new TypeMismatchException("Left term not of type Nat: " + left));
-        }
-        if (right.getType() != Type.NAT) {
-            throw new WrappingRuntimeException(new TypeMismatchException("Right term not of type Nat: " + right));
+        @Override
+        public Void visitAndFormula(AndFormula andFormula) {
+            visit(andFormula.getLeft());
+            visit(andFormula.getRight());
+            return null;
         }
 
-        termTypeChecker.visit(left);
-        termTypeChecker.visit(right);
+        @Override
+        public Void visitOrFormula(OrFormula orFormula) {
+            visit(orFormula.getLeft());
+            visit(orFormula.getRight());
+            return null;
+        }
+
+        @Override
+        public Void visitForallFormula(ForallFormula forallFormula) {
+            visit(forallFormula.getFormula());
+            return null;
+        }
+
+        @Override
+        public Void visitExistsFormula(ExistsFormula existsFormula) {
+            visit(existsFormula.getFormula());
+            return null;
+        }
+
+        @Override
+        public Void visitTruthFormula(TruthFormula truthFormula) {
+            return null;
+        }
+
+        @Override
+        public Void visitFalsityFormula(FalsityFormula falsityFormula) {
+            return null;
+        }
+
+        @Override
+        public Void visitImpliesFormula(ImpliesFormula impliesFormula) {
+            visit(impliesFormula.getLeft());
+            visit(impliesFormula.getRight());
+            return null;
+        }
+
+        @Override
+        public Void visitIffFormula(IffFormula iffFormula) {
+            visit(iffFormula.getLeft());
+            visit(iffFormula.getRight());
+            return null;
+        }
+
+        @Override
+        public Void visitNotFormula(NotFormula notFormula) {
+            visit(notFormula.getFormula());
+            return null;
+        }
+
+        @Override
+        public Void visitPropositionFormula(PropositionFormula propositionFormula) {
+            return null;
+        }
+
+        @Override
+        public Void visitPredicateFormula(PredicateFormula predicateFormula) {
+            List<Term> params = predicateFormula.getParams();
+
+            for (Term param : params) {
+                try {
+                    termTypeChecker.analyse(param);
+                } catch (TypeMismatchException e) {
+                    throw new WrappingRuntimeException(e);
+                }
+            }
+
+            return null;
+        }
+
+        @Override
+        public Void visitEqualToFormula(EqualToFormula equalToFormula) {
+            visitMathematicalComparisonFormula(equalToFormula);
+            return null;
+        }
+
+        @Override
+        public Void visitGreaterThanFormula(GreaterThanFormula greaterThanFormula) {
+            visitMathematicalComparisonFormula(greaterThanFormula);
+            return null;
+        }
+
+        @Override
+        public Void visitLessThanFormula(LessThanFormula lessThanFormula) {
+            visitMathematicalComparisonFormula(lessThanFormula);
+            return null;
+        }
+
+        @Override
+        public Void visitGreaterThanEqualFormula(GreaterThanEqualFormula greaterThanEqualFormula) {
+            visitMathematicalComparisonFormula(greaterThanEqualFormula);
+            return null;
+        }
+
+        @Override
+        public Void visitLessThanEqualFormula(LessThanEqualFormula lessThanEqualFormula) {
+            visitMathematicalComparisonFormula(lessThanEqualFormula);
+            return null;
+        }
+
+        private void visitMathematicalComparisonFormula(MathematicalComparisonFormula formula) {
+            Term left = formula.getLeft();
+            Term right = formula.getRight();
+
+            if (left.getType() != Type.NAT) {
+                throw new WrappingRuntimeException(new TypeMismatchException("Left term not of type Nat: " + left));
+            }
+            if (right.getType() != Type.NAT) {
+                throw new WrappingRuntimeException(new TypeMismatchException("Right term not of type Nat: " + right));
+            }
+
+            try {
+                termTypeChecker.analyse(left);
+                termTypeChecker.analyse(right);
+            } catch (TypeMismatchException e) {
+                throw new WrappingRuntimeException(e);
+            }
+        }
     }
 
 }
