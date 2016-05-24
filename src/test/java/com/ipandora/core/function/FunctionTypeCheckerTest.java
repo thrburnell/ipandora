@@ -71,4 +71,13 @@ public class FunctionTypeCheckerTest {
         typeChecker.analyse(SUM_FN);
     }
 
+    @Test(expected = TypeMismatchException.class)
+    public void analyseShouldThrowIfExpressionReturnTypeIsNotNat() throws TypeMismatchException {
+        MathematicalFunction fn = mathFun("Sum", Collections.singletonList(N), Arrays.asList(
+                funCase(con("c"), ifCond(eq(N, num(0)))),
+                funCase(add(N, fun("Sum", sub(N, num(1)))), otherCond())));
+
+        typeChecker.analyse(fn);
+    }
+
 }

@@ -3,6 +3,8 @@ package com.ipandora.core.function;
 import com.ipandora.api.predicate.function.Function;
 import com.ipandora.api.predicate.function.FunctionCase;
 import com.ipandora.api.predicate.function.MathematicalFunction;
+import com.ipandora.api.predicate.term.Term;
+import com.ipandora.api.predicate.term.Type;
 import com.ipandora.api.predicate.term.TypeMismatchException;
 import com.ipandora.core.formula.FormulaTypeChecker;
 import com.ipandora.core.term.TermTypeChecker;
@@ -42,7 +44,12 @@ public class FunctionTypeChecker {
 
             for (FunctionCase functionCase : mathematicalFunction.getCases()) {
                 try {
-                    termTypeChecker.analyse(functionCase.getExpression());
+                    Term expression = functionCase.getExpression();
+                    if (expression.getType() != Type.NAT) {
+                        throw new TypeMismatchException("Return expression not of type Nat: " + expression);
+                    }
+
+                    termTypeChecker.analyse(expression);
                     formulaTypeChecker.analyse(functionCase.getCondition().getFormula());
                 } catch (TypeMismatchException e) {
                     throw new WrappingRuntimeException(e);
