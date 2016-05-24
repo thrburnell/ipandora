@@ -16,11 +16,9 @@ import java.util.List;
 
 public class ANTLRTermParser implements TermParser {
 
-    private final TermBuildingVisitor termBuildingVisitor;
     private final TermTypeChecker termTypeChecker;
 
-    public ANTLRTermParser(TermBuildingVisitor termBuildingVisitor, TermTypeChecker termTypeChecker) {
-        this.termBuildingVisitor = termBuildingVisitor;
+    public ANTLRTermParser(TermTypeChecker termTypeChecker) {
         this.termTypeChecker = termTypeChecker;
     }
 

@@ -34,9 +34,7 @@ public class IPandoraApplication extends Application<IPandoraConfiguration> {
     @Override
     public void run(IPandoraConfiguration IPandoraConfiguration,
                     Environment environment) throws Exception {
-
-        SymbolTableCreator symbolTableCreator = new SymbolTableCreator();
-
+        
         FormulaTypeChecker formulaTypeChecker = new FormulaTypeChecker(new TermTypeChecker());
         ANTLRFormulaParser formulaParser = new ANTLRFormulaParser(formulaTypeChecker);
 
@@ -57,8 +55,7 @@ public class IPandoraApplication extends Application<IPandoraConfiguration> {
         FormulaStringBuilder formulaStringBuilder = new FormulaStringBuilder(new TermStringBuilder());
         TermStringBuilder termStringBuilder = new TermStringBuilder();
 
-        ANTLRTermParser termParser = new ANTLRTermParser(
-                new TermBuildingVisitor(symbolTableCreator.create(), symbolTableCreator), new TermTypeChecker());
+        ANTLRTermParser termParser = new ANTLRTermParser(new TermTypeChecker());
 
         TermTypeInferrer termTypeInferrer = new TermTypeInferrer();
 

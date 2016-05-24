@@ -19,12 +19,8 @@ public class ANTLRTermParserTest {
 
     @Before
     public void before() {
-        SymbolTableCreator symbolTableCreator = new SymbolTableCreator();
-        TermBuildingVisitor termBuildingVisitor = new TermBuildingVisitor(
-                symbolTableCreator.create(), symbolTableCreator);
-
         TermTypeChecker termTypeChecker = new TermTypeChecker();
-        parser = new ANTLRTermParser(termBuildingVisitor, termTypeChecker);
+        parser = new ANTLRTermParser(termTypeChecker);
     }
 
     @Test
