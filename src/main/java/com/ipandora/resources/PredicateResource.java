@@ -384,16 +384,18 @@ public class PredicateResource {
 
         Term fromTerm;
         try {
-            fromTerm = termParser.fromStringWithTypeChecking(from, functionPrototypes);
-        } catch (TermParsingException e) {
+            fromTerm = termParser.fromString(from, functionPrototypes);
+            termTypeInferrer.infer(fromTerm);
+        } catch (TermParsingException | TypeMismatchException e) {
             stepResponse.setErrorMsg("Invalid from term: " + from);
             return invalidRequestResponse(stepResponse);
         }
 
         Term goalTerm;
         try {
-            goalTerm = termParser.fromStringWithTypeChecking(goal, functionPrototypes);
-        } catch (TermParsingException e) {
+            goalTerm = termParser.fromString(goal, functionPrototypes);
+            termTypeInferrer.infer(goalTerm);
+        } catch (TermParsingException | TypeMismatchException e) {
             stepResponse.setErrorMsg("Invalid goal term: " + goal);
             return invalidRequestResponse(stepResponse);
         }
