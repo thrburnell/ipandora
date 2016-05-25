@@ -18,8 +18,8 @@ import java.util.Collections;
 
 import static com.ipandora.testutils.FormulaCreators.eq;
 import static com.ipandora.testutils.FormulaCreators.not;
-import static com.ipandora.testutils.FormulaCreators.truth;
-import static com.ipandora.testutils.FunctionCreators.*;
+import static com.ipandora.testutils.FunctionCreators.funCase;
+import static com.ipandora.testutils.FunctionCreators.mathFun;
 import static com.ipandora.testutils.TermCreators.*;
 import static java.util.Collections.EMPTY_LIST;
 import static org.mockito.Matchers.any;
@@ -59,7 +59,7 @@ public class FunctionTypeCheckerTest {
     public void analyseShouldAskFormulaTypeCheckerForConditionFormulaInEachCase() throws TypeMismatchException {
         typeChecker.analyse(SUM_FN, EMPTY_LIST);
         verify(mockFormulaTypeChecker).analyse(eq(N, num(0)), EMPTY_LIST);
-        verify(mockFormulaTypeChecker).analyse(truth(), EMPTY_LIST);
+        verify(mockFormulaTypeChecker).analyse(not(eq(N, num(0))), EMPTY_LIST);
     }
 
     @Test(expected = TypeMismatchException.class)
