@@ -2,6 +2,7 @@ package com.ipandora.api.predicate.induction;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonProperty;
+import com.ipandora.api.predicate.function.FunctionPrototypeRequest;
 
 import java.util.List;
 
@@ -10,7 +11,7 @@ public class SchemaResponse {
 
     private String goal;
     private String variable;
-    private List<SchemaRequest.FunctionPrototypeRequest> functions;
+    private List<FunctionPrototypeRequest> functions;
     private BaseCase baseCase;
     private InductiveCase inductiveCase;
     private String errorMsg;
@@ -36,12 +37,12 @@ public class SchemaResponse {
     }
 
     @JsonProperty
-    public List<SchemaRequest.FunctionPrototypeRequest> getFunctions() {
+    public List<FunctionPrototypeRequest> getFunctions() {
         return functions;
     }
 
     @JsonProperty
-    public void setFunctions(List<SchemaRequest.FunctionPrototypeRequest> functions) {
+    public void setFunctions(List<FunctionPrototypeRequest> functions) {
         this.functions = functions;
     }
 

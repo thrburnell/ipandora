@@ -3,6 +3,7 @@ package com.ipandora.resources;
 import com.ipandora.api.predicate.formula.ForallFormula;
 import com.ipandora.api.predicate.formula.Formula;
 import com.ipandora.api.predicate.function.FunctionPrototype;
+import com.ipandora.api.predicate.function.FunctionPrototypeRequest;
 import com.ipandora.api.predicate.induction.SchemaRequest;
 import com.ipandora.api.predicate.induction.SchemaResponse;
 import com.ipandora.api.predicate.proofstep.StepRequest;
@@ -128,7 +129,7 @@ public class PredicateResource {
 
         String goal = schemaRequest.getGoal();
         String varName = schemaRequest.getVariable();
-        List<SchemaRequest.FunctionPrototypeRequest> functions = schemaRequest.getFunctions();
+        List<FunctionPrototypeRequest> functions = schemaRequest.getFunctions();
         if (functions == null) {
             functions = Collections.emptyList();
         }
@@ -195,12 +196,12 @@ public class PredicateResource {
         return Response.ok(response).build();
     }
 
-    private List<FunctionPrototype> getFunctionPrototypes(List<SchemaRequest.FunctionPrototypeRequest> prototypes)
+    private List<FunctionPrototype> getFunctionPrototypes(List<FunctionPrototypeRequest> prototypes)
             throws FormulaParsingException {
 
         List<FunctionPrototype> functionPrototypes = new ArrayList<>();
 
-        for (SchemaRequest.FunctionPrototypeRequest prototype : prototypes) {
+        for (FunctionPrototypeRequest prototype : prototypes) {
 
             String name = prototype.getName();
             ArrayList<Type> types = new ArrayList<>();
