@@ -257,10 +257,23 @@ public class PredicateResource {
             return invalidRequestResponse(stepResponse);
         }
 
+        List<FunctionPrototypeRequest> prototypes = stepRequest.getFunctions();
+        if (prototypes == null) {
+            prototypes = new ArrayList<>();
+        }
+
+        List<FunctionPrototype> functionPrototypes;
+        try {
+            functionPrototypes = getFunctionPrototypes(prototypes);
+        } catch (FormulaParsingException e) {
+            stepResponse.setErrorMsg("Invalid function prototype: " + e.getMessage());
+            return invalidRequestResponse(stepResponse);
+        }
+
         List<Formula> assumptionFormulas = new ArrayList<>();
         for (String assumption : assumptions) {
             try {
-                assumptionFormulas.add(formulaParser.fromStringWithTypeChecking(assumption));
+                assumptionFormulas.add(formulaParser.fromStringWithTypeChecking(assumption, functionPrototypes));
             } catch (FormulaParsingException e) {
                 stepResponse.setErrorMsg("Invalid assumption formula: " + assumption);
                 return invalidRequestResponse(stepResponse);
@@ -269,7 +282,7 @@ public class PredicateResource {
 
         Formula goalFormula;
         try {
-            goalFormula = formulaParser.fromStringWithTypeChecking(goal);
+            goalFormula = formulaParser.fromStringWithTypeChecking(goal, functionPrototypes);
         } catch (FormulaParsingException e) {
             stepResponse.setErrorMsg("Invalid goal formula: " + goal);
             return invalidRequestResponse(stepResponse);
