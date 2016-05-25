@@ -1,0 +1,4 @@
+// Sum the square of all natural numbers from 0 through to n inclusive
+SumSq(n) = 
+  0                 if n = 0
+  n*n + SumSq(n-1)  otherwise

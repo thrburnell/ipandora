@@ -1,0 +1,4 @@
+// Taken from week 3 TUT question 2, 2016
+powerTwo(n) = 
+  1                  if n = 0
+  2 * powerTwo(n-1)  otherwise

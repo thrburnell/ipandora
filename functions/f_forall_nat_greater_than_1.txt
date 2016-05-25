@@ -1,0 +1,4 @@
+// Taken from slide 59/77 of Mathematical Induction slides, 2016
+f(n) = 
+  1/2                     if n = 1
+  1 / (n*(n+1)) + f(n-1)  otherwise

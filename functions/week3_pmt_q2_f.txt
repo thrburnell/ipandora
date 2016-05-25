@@ -1,0 +1,2 @@
+// Taken from week 3 PMT question 2, 2016
+f(n) = n*n*n - 25*n

@@ -1,0 +1,5 @@
+// Taken from slide 68/77 of Mathematical Induction slides, 2016
+g(n) = 
+  0                            if n = 0
+  1                            if n = 1
+  (5 * g(n-1)) - (6 * g(n-2))  otherwise

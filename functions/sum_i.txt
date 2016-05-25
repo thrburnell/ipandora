@@ -1,0 +1,4 @@
+// Sum all natural numbers from 0 through to n inclusive
+Sum(n) = 
+  0             if n = 0
+  n + Sum(n-1)  otherwise
