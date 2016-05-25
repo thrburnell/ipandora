@@ -2,6 +2,7 @@ package com.ipandora.resources;
 
 import com.ipandora.api.predicate.formula.ForallFormula;
 import com.ipandora.api.predicate.formula.Formula;
+import com.ipandora.api.predicate.function.FunctionDefinition;
 import com.ipandora.api.predicate.function.FunctionPrototype;
 import com.ipandora.api.predicate.function.FunctionPrototypeRequest;
 import com.ipandora.api.predicate.induction.SchemaRequest;
@@ -14,6 +15,8 @@ import com.ipandora.api.predicate.validate.ValidateRequest;
 import com.ipandora.api.predicate.validate.ValidateResponse;
 import com.ipandora.core.formula.FormulaParser;
 import com.ipandora.core.formula.FormulaParsingException;
+import com.ipandora.core.function.FunctionParser;
+import com.ipandora.core.function.FunctionParsingException;
 import com.ipandora.core.induction.InductionSchema;
 import com.ipandora.core.induction.InductionSchemaGenerator;
 import com.ipandora.core.induction.SchemaGeneratorException;
@@ -46,16 +49,20 @@ public class PredicateResource {
 
     private final FormulaParser formulaParser;
     private final TermParser termParser;
+    private final FunctionParser functionParser;
     private final ImpliesChecker impliesChecker;
     private final ArithmeticEqualityChecker equalityChecker;
+    private final FunctionEqualityChecker functionEqualityChecker;
     private final ProofStreamReaderCreator proofStreamReaderCreator;
     private final InductionSchemaGenerator inductionSchemaGenerator;
     private final PrettyStringBuilder<Formula> formulaStringBuilder;
     private final PrettyStringBuilder<Term> termStringBuilder;
     private final TermTypeInferrer termTypeInferrer;
 
-    public PredicateResource(FormulaParser formulaParser, TermParser termParser, ImpliesChecker impliesChecker,
+    public PredicateResource(FormulaParser formulaParser, TermParser termParser, FunctionParser functionParser,
+                             ImpliesChecker impliesChecker,
                              ArithmeticEqualityChecker equalityChecker,
+                             FunctionEqualityChecker functionEqualityChecker,
                              ProofStreamReaderCreator proofStreamReaderCreator,
                              InductionSchemaGenerator inductionSchemaGenerator,
                              PrettyStringBuilder<Formula> formulaStringBuilder,
@@ -63,8 +70,10 @@ public class PredicateResource {
                              TermTypeInferrer termTypeInferrer) {
         this.formulaParser = formulaParser;
         this.termParser = termParser;
+        this.functionParser = functionParser;
         this.impliesChecker = impliesChecker;
         this.equalityChecker = equalityChecker;
+        this.functionEqualityChecker = functionEqualityChecker;
         this.proofStreamReaderCreator = proofStreamReaderCreator;
         this.inductionSchemaGenerator = inductionSchemaGenerator;
         this.formulaStringBuilder = formulaStringBuilder;
@@ -337,7 +346,81 @@ public class PredicateResource {
     }
 
     private Response checkProofStepFunctionDefinition(StepRequest stepRequest) {
-        return Response.ok("Function definition not yet implemented").build();
+        assert stepRequest.getMethod().equals(ProofStepMethods.FUNCTION_DEFINITION);
+
+        StepResponse stepResponse = new StepResponse();
+        stepResponse.setMethod(ProofStepMethods.FUNCTION_DEFINITION);
+
+        String goal = stepRequest.getGoal();
+        if (goal == null) {
+            stepResponse.setErrorMsg("Required goal missing");
+            return invalidRequestResponse(stepResponse);
+        }
+
+        String from = stepRequest.getFrom();
+        if (from == null) {
+            stepResponse.setErrorMsg("Required from missing");
+            return invalidRequestResponse(stepResponse);
+        }
+
+        String function = stepRequest.getFunction();
+        if (function == null) {
+            stepResponse.setErrorMsg("Required function missing");
+            return invalidRequestResponse(stepResponse);
+        }
+
+        List<FunctionPrototypeRequest> prototypes = stepRequest.getFunctions();
+        if (prototypes == null) {
+            prototypes = new ArrayList<>();
+        }
+
+        List<FunctionPrototype> functionPrototypes;
+        try {
+            functionPrototypes = getFunctionPrototypes(prototypes);
+        } catch (FormulaParsingException e) {
+            stepResponse.setErrorMsg("Invalid function prototype: " + e.getMessage());
+            return invalidRequestResponse(stepResponse);
+        }
+
+        Term fromTerm;
+        try {
+            fromTerm = termParser.fromStringWithTypeChecking(from, functionPrototypes);
+        } catch (TermParsingException e) {
+            stepResponse.setErrorMsg("Invalid from term: " + from);
+            return invalidRequestResponse(stepResponse);
+        }
+
+        Term goalTerm;
+        try {
+            goalTerm = termParser.fromStringWithTypeChecking(goal, functionPrototypes);
+        } catch (TermParsingException e) {
+            stepResponse.setErrorMsg("Invalid goal term: " + goal);
+            return invalidRequestResponse(stepResponse);
+        }
+
+        FunctionDefinition functionDefinition;
+        try {
+            functionDefinition = functionParser.fromStringWithTypeChecking(function, functionPrototypes);
+        } catch (FunctionParsingException e) {
+            stepResponse.setErrorMsg("Invalid function.");
+            return invalidRequestResponse(function);
+        }
+
+        boolean result;
+        try {
+            result = functionEqualityChecker.check(fromTerm, goalTerm, functionDefinition);
+        } catch (ProofStepCheckException e) {
+            stepResponse.setErrorMsg(e.getMessage());
+            return invalidRequestResponse(stepResponse);
+        }
+
+        stepResponse.setFrom(from);
+        stepResponse.setGoal(goal);
+        stepResponse.setFunction(function);
+        stepResponse.setFunctions(prototypes);
+        stepResponse.setValid(result);
+
+        return Response.ok(stepResponse).build();
     }
 
     private Response invalidRequestResponse(Object entity) {

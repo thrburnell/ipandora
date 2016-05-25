@@ -1,6 +1,9 @@
 package com.ipandora;
 
 import com.ipandora.core.formula.*;
+import com.ipandora.core.function.ANTLRFunctionParser;
+import com.ipandora.core.function.FunctionDefinitionEncoderImpl;
+import com.ipandora.core.function.FunctionTypeChecker;
 import com.ipandora.core.induction.MathematicalInductionSchemaGenerator;
 import com.ipandora.core.proof.ProofStreamReaderCreator;
 import com.ipandora.core.term.*;
@@ -35,9 +38,18 @@ public class IPandoraApplication extends Application<IPandoraConfiguration> {
     public void run(IPandoraConfiguration IPandoraConfiguration,
                     Environment environment) throws Exception {
 
-        FormulaTypeChecker formulaTypeChecker = new FormulaTypeChecker(new TermTypeChecker());
-        ANTLRFormulaParser formulaParser = new ANTLRFormulaParser(formulaTypeChecker);
+        // Type checkers
+        TermTypeChecker termTypeChecker = new TermTypeChecker();
+        FormulaTypeChecker formulaTypeChecker = new FormulaTypeChecker(termTypeChecker);
+        FunctionTypeChecker functionTypeChecker = new FunctionTypeChecker(termTypeChecker, formulaTypeChecker);
+        TermTypeInferrer termTypeInferrer = new TermTypeInferrer();
 
+        // Parsers
+        ANTLRFormulaParser formulaParser = new ANTLRFormulaParser(formulaTypeChecker);
+        ANTLRTermParser termParser = new ANTLRTermParser(termTypeChecker);
+        ANTLRFunctionParser functionParser = new ANTLRFunctionParser(functionTypeChecker);
+
+        // Z3 checkers
         Z3ImpliesChecker impliesChecker = new Z3ImpliesChecker(
                 new SMTCodeGeneratorImpl(new SMTGeneratingFormulaVisitorCreator()),
                 new Z3ClientImpl(new ProcessExecutorImpl(), new EnvironmentVariableProviderImpl()),
@@ -47,23 +59,29 @@ public class IPandoraApplication extends Application<IPandoraConfiguration> {
                 new SMTCodeGeneratorImpl(new SMTGeneratingFormulaVisitorCreator()),
                 new Z3ClientImpl(new ProcessExecutorImpl(), new EnvironmentVariableProviderImpl()));
 
-        ProofStreamReaderCreator proofStreamReaderCreator = new ProofStreamReaderCreator();
+        Z3FunctionEqualityChecker functionEqualityChecker = new Z3FunctionEqualityChecker(
+                new SMTCodeGeneratorImpl(new SMTGeneratingFormulaVisitorCreator()),
+                new Z3ClientImpl(new ProcessExecutorImpl(), new EnvironmentVariableProviderImpl()),
+                new FunctionDefinitionEncoderImpl(new FormulaConjunctionReducer()));
 
+        // Schema generator
         MathematicalInductionSchemaGenerator inductionSchemaGenerator = new MathematicalInductionSchemaGenerator(
                 new TermStringBuilder(), new TermSubstitutor());
 
+        // String builders
         FormulaStringBuilder formulaStringBuilder = new FormulaStringBuilder(new TermStringBuilder());
         TermStringBuilder termStringBuilder = new TermStringBuilder();
 
-        ANTLRTermParser termParser = new ANTLRTermParser(new TermTypeChecker());
+        // Utils
+        ProofStreamReaderCreator proofStreamReaderCreator = new ProofStreamReaderCreator();
 
-        TermTypeInferrer termTypeInferrer = new TermTypeInferrer();
 
-        PredicateResource resource = new PredicateResource(formulaParser, termParser, impliesChecker, equalityChecker,
-                proofStreamReaderCreator, inductionSchemaGenerator, formulaStringBuilder, termStringBuilder,
-                termTypeInferrer);
+        // Resources
+        PredicateResource resource = new PredicateResource(formulaParser, termParser, functionParser, impliesChecker,
+                equalityChecker, functionEqualityChecker, proofStreamReaderCreator, inductionSchemaGenerator,
+                formulaStringBuilder, termStringBuilder, termTypeInferrer);
+
         environment.jersey().register(resource);
-
         environment.jersey().register(MultiPartFeature.class);
     }
 }

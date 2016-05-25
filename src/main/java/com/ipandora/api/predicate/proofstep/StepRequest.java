@@ -1,6 +1,7 @@
 package com.ipandora.api.predicate.proofstep;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
+import com.ipandora.api.predicate.function.FunctionPrototypeRequest;
 
 import java.util.List;
 
@@ -9,8 +10,10 @@ public class StepRequest {
     private String method;
     private String goal;
     private String from;
-
     private List<String> assumptions;
+    private String function;
+    private List<FunctionPrototypeRequest> functions;
+
 
     @JsonProperty
     public String getMethod() {
@@ -52,4 +55,23 @@ public class StepRequest {
         this.assumptions = assumptions;
     }
 
+    @JsonProperty
+    public String getFunction() {
+        return function;
+    }
+
+    @JsonProperty
+    public void setFunction(String function) {
+        this.function = function;
+    }
+
+    @JsonProperty
+    public List<FunctionPrototypeRequest> getFunctions() {
+        return functions;
+    }
+
+    @JsonProperty
+    public void setFunctions(List<FunctionPrototypeRequest> functions) {
+        this.functions = functions;
+    }
 }
