@@ -101,41 +101,53 @@ public class TermTypeInferrer {
 
             String name = function.getName();
             FunctionPrototype oldProto = functionPrototypesByName.get(name);
+            boolean changedProto;
 
             // Infer return type
-            inferTypeFromStack(function);
+            changedProto = inferTypeFromStack(function);
 
             // Infer arg types
             List<Type> newArgTypes = new ArrayList<>();
-            boolean changedArgs = false;
             for (Term arg : function.getArgs()) {
                 Stack<Type> oldTypeStack = typeStack;
                 typeStack = new Stack<>();
-                changedArgs |= visit(arg);
+                changedProto |= visit(arg);
                 typeStack = oldTypeStack;
                 newArgTypes.add(arg.getType());
             }
 
             if (oldProto != null) {
+                Type oldReturnType = oldProto.getReturnType();
+                if (oldReturnType != Type.UNKNOWN) {
+                    changedProto |= attemptToSetType(function, oldReturnType);
+                }
+
                 List<Term> args = function.getArgs();
                 List<Type> argTypes = oldProto.getArgTypes();
                 for (int i = 0; i < argTypes.size(); i++) {
                     Type argType = argTypes.get(i);
                     if (argType != Type.UNKNOWN) {
+                        Term arg = args.get(i);
                         typeStack.push(argType);
-                        changedArgs |= visit(args.get(i));
+                        boolean changedArg = visit(arg);
                         typeStack.pop();
+
+                        changedProto |= changedArg;
+
+                        if (changedArg) {
+                            newArgTypes.remove(i);
+                            newArgTypes.add(i, arg.getType());
+                        }
                     }
                 }
             }
 
-            FunctionPrototype newProto = new FunctionPrototype(name, newArgTypes, function.getType());
-            boolean changedProto = isNewProtoStronger(oldProto, newProto);
             if (changedProto) {
+                FunctionPrototype newProto = new FunctionPrototype(name, newArgTypes, function.getType());
                 functionPrototypesByName.put(name, newProto);
             }
 
-            return changedArgs || changedProto;
+            return changedProto;
         }
 
         @Override
@@ -181,38 +193,6 @@ public class TermTypeInferrer {
 
             return changedLeft || changedRight;
         }
-
-        private boolean isNewProtoStronger(FunctionPrototype oldProto, FunctionPrototype newProto) {
-
-            if (newProto == null) {
-                return false;
-            }
-
-            if (oldProto == null) {
-                return true;
-            }
-
-            Type oldReturnType = oldProto.getReturnType();
-            Type newReturnType = newProto.getReturnType();
-            if (isNewTypeStronger(oldReturnType, newReturnType)) {
-                return true;
-            }
-
-            List<Type> oldArgTypes = oldProto.getArgTypes();
-            List<Type> newArgTypes = newProto.getArgTypes();
-            for (int i = 0; i < oldArgTypes.size(); i++) {
-                if (isNewTypeStronger(oldArgTypes.get(i), newArgTypes.get(i))) {
-                    return true;
-                }
-            }
-
-            return false;
-        }
-
-        private boolean isNewTypeStronger(Type oldType, Type newType) {
-            return oldType == Type.UNKNOWN && newType != Type.UNKNOWN;
-        }
-
 
     }
 
