@@ -51,8 +51,10 @@ public class Z3ArithmeticEqualityChecker implements ArithmeticEqualityChecker {
 
         try {
             return !z3Client.isSat(program);
-        } catch (IOException | Z3UnrecognisableOutputException | ProcessTimeoutException e) {
-            e.printStackTrace();
+        } catch (ProcessTimeoutException e) {
+            throw new ProofStepCheckException("Unable to determine validity of proof step before timeout. " +
+                    "Try providing more assertions.");
+        } catch (IOException | Z3UnrecognisableOutputException e) {
             throw new ProofStepCheckException(e);
         } catch (Z3UnknownException e) {
             throw new ProofStepCheckException("Unable to determine validity of proof step");

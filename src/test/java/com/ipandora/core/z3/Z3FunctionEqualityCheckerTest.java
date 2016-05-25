@@ -7,6 +7,7 @@ import com.ipandora.api.predicate.function.FunctionDefinition;
 import com.ipandora.api.predicate.function.MathematicalFunctionDefinition;
 import com.ipandora.core.function.FunctionDefinitionEncoder;
 import com.ipandora.core.proof.ProofStepCheckException;
+import com.ipandora.core.util.ProcessTimeoutException;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -130,6 +131,23 @@ public class Z3FunctionEqualityCheckerTest {
             fail("ProofStepException should have been thrown!");
         } catch (ProofStepCheckException e) {
             assertThat(e.getMessage()).isEqualTo("Unable to determine validity of proof step");
+        }
+    }
+
+    @Test
+    public void checkThrowsProofStepExceptionWithMessageIfZ3ClientTimesOut() throws Exception {
+        MathematicalFunctionDefinition f = mathFun("f", Collections.singletonList(natVar("x")),
+                Collections.singletonList(funCase(add(natVar("x"), num(1)), truth())));
+
+        when(mockZ3Client.isSat(anyString()))
+                .thenThrow(new ProcessTimeoutException("test", null));
+
+        try {
+            checker.check(num(0), num(1), f);
+            fail("ProofStepException should have been thrown!");
+        } catch (ProofStepCheckException e) {
+            assertThat(e.getMessage()).isEqualTo("Unable to determine validity of proof step before timeout. " +
+                    "Try providing more assertions.");
         }
     }
 

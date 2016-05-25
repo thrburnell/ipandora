@@ -6,6 +6,7 @@ import com.ipandora.api.predicate.term.Addition;
 import com.ipandora.api.predicate.term.Multiplication;
 import com.ipandora.api.predicate.term.Number;
 import com.ipandora.core.proof.ProofStepCheckException;
+import com.ipandora.core.util.ProcessTimeoutException;
 import com.ipandora.testutils.ContainedInCondition;
 import org.junit.Before;
 import org.junit.Test;
@@ -124,6 +125,19 @@ public class Z3ArithmeticEqualityCheckerTest {
             fail("ProofStepCheckException should have been thrown!");
         } catch (ProofStepCheckException e) {
             assertThat(e.getMessage()).isEqualTo("Unable to determine validity of proof step");
+        }
+    }
+
+    @Test
+    public void checkThrowsProofStepExceptionWithMessageIfZ3ClientTimesOut() throws Exception {
+        when(mockZ3Client.isSat(anyString())).thenThrow(new ProcessTimeoutException("test", null));
+
+        try {
+            checker.check(new Number(1), new Number(2));
+            fail("ProofStepCheckException should have been thrown!");
+        } catch (ProofStepCheckException e) {
+            assertThat(e.getMessage()).isEqualTo("Unable to determine validity of proof step before timeout. " +
+                    "Try providing more assertions.");
         }
     }
 
