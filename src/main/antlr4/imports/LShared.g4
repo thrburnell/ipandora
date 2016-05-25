@@ -12,3 +12,4 @@ fragment LETTER: ('a'..'z' | 'A'..'Z');
 fragment DIGIT: ('0'..'9');
 
 WS: (' ' | '\t' | '\r' | '\n')+ -> skip;
+LINE_COMMENT: '//' ~[\r\n]* -> skip;
