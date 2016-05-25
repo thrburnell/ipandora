@@ -13,16 +13,8 @@ public class FunctionCreators {
         return new MathematicalFunctionDefinition(name, args, cases);
     }
 
-    public static FunctionCase funCase(Term expr, FunctionCaseCondition cond) {
+    public static FunctionCase funCase(Term expr, Formula cond) {
         return new FunctionCase(expr, cond);
-    }
-
-    public static IfCondition ifCond(Formula form) {
-        return new IfCondition(form);
-    }
-
-    public static OtherwiseCondition otherCond() {
-        return new OtherwiseCondition();
     }
 
 }

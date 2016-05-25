@@ -17,6 +17,7 @@ import java.util.Arrays;
 import java.util.Collections;
 
 import static com.ipandora.testutils.FormulaCreators.eq;
+import static com.ipandora.testutils.FormulaCreators.not;
 import static com.ipandora.testutils.FormulaCreators.truth;
 import static com.ipandora.testutils.FunctionCreators.*;
 import static com.ipandora.testutils.TermCreators.*;
@@ -31,8 +32,8 @@ public class FunctionTypeCheckerTest {
 
     private static final Variable N = Variable.withTypeNat("n");
     private static final MathematicalFunctionDefinition SUM_FN = mathFun("Sum", Collections.singletonList(N), Arrays.asList(
-            funCase(num(0), ifCond(eq(N, num(0)))),
-            funCase(add(N, fun("Sum", sub(N, num(1)))), otherCond())));
+            funCase(num(0), eq(N, num(0))),
+            funCase(add(N, fun("Sum", sub(N, num(1)))), not(eq(N, num(0))))));
 
     @Mock
     private TermTypeChecker mockTermTypeChecker;
@@ -76,8 +77,8 @@ public class FunctionTypeCheckerTest {
     @Test(expected = TypeMismatchException.class)
     public void analyseShouldThrowIfExpressionReturnTypeIsNotNat() throws TypeMismatchException {
         MathematicalFunctionDefinition fn = mathFun("Sum", Collections.singletonList(N), Arrays.asList(
-                funCase(con("c"), ifCond(eq(N, num(0)))),
-                funCase(add(N, fun("Sum", sub(N, num(1)))), otherCond())));
+                funCase(con("c"), eq(N, num(0))),
+                funCase(add(N, fun("Sum", sub(N, num(1)))), eq(N, num(0)))));
 
         typeChecker.analyse(fn, EMPTY_LIST);
     }

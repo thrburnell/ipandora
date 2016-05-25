@@ -1,11 +1,17 @@
 package com.ipandora.core.function;
 
-import com.ipandora.api.predicate.function.*;
+import com.ipandora.api.predicate.formula.Formula;
+import com.ipandora.api.predicate.formula.NotFormula;
+import com.ipandora.api.predicate.formula.TruthFormula;
+import com.ipandora.api.predicate.function.FunctionCase;
+import com.ipandora.api.predicate.function.FunctionDefinition;
 import com.ipandora.api.predicate.function.FunctionPrototype;
+import com.ipandora.api.predicate.function.MathematicalFunctionDefinition;
 import com.ipandora.api.predicate.term.Term;
 import com.ipandora.api.predicate.term.Type;
 import com.ipandora.api.predicate.term.Variable;
 import com.ipandora.core.formula.FormulaBuildingVisitor;
+import com.ipandora.core.formula.FormulaConjunctionReducer;
 import com.ipandora.core.term.TermBuildingVisitor;
 import com.ipandora.parser.PredicateLogicBaseVisitor;
 import com.ipandora.parser.PredicateLogicParser;
@@ -18,11 +24,14 @@ public class FunctionBuildingVisitor extends PredicateLogicBaseVisitor<FunctionD
 
     private final FormulaBuildingVisitor formulaBuildingVisitor;
     private final TermBuildingVisitor termBuildingVisitor;
+    private final FormulaConjunctionReducer conjunctionReducer;
 
     public FunctionBuildingVisitor(FormulaBuildingVisitor formulaBuildingVisitor,
-                                   TermBuildingVisitor termBuildingVisitor) {
+                                   TermBuildingVisitor termBuildingVisitor,
+                                   FormulaConjunctionReducer conjunctionReducer) {
         this.formulaBuildingVisitor = formulaBuildingVisitor;
         this.termBuildingVisitor = termBuildingVisitor;
+        this.conjunctionReducer = conjunctionReducer;
     }
 
     @Override
@@ -69,16 +78,19 @@ public class FunctionBuildingVisitor extends PredicateLogicBaseVisitor<FunctionD
 
         ArrayList<FunctionCase> functionCases = new ArrayList<>();
 
+        List<Formula> negatedPreviousConditions = new ArrayList<>();
         for (PredicateLogicParser.FnCaseContext fnCaseContext : fnCaseContexts) {
 
             Term expression = termBuildingVisitor.visit(fnCaseContext.expr);
-            FunctionCaseCondition condition;
+            Formula condition;
 
             PredicateLogicParser.FormulaContext condCtx = fnCaseContext.cond;
             if (condCtx == null) {
-                condition = new OtherwiseCondition();
+                condition = negatedPreviousConditions.isEmpty() ?
+                        new TruthFormula() : conjunctionReducer.reduce(negatedPreviousConditions);
             } else {
-                condition = new IfCondition(formulaBuildingVisitor.visit(condCtx));
+                condition = formulaBuildingVisitor.visit(condCtx);
+                negatedPreviousConditions.add(new NotFormula(condition));
             }
 
             functionCases.add(new FunctionCase(expression, condition));

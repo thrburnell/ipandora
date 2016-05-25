@@ -1,13 +1,14 @@
 package com.ipandora.api.predicate.function;
 
+import com.ipandora.api.predicate.formula.Formula;
 import com.ipandora.api.predicate.term.Term;
 
 public class FunctionCase {
 
     private final Term expression;
-    private final FunctionCaseCondition condition;
+    private final Formula condition;
 
-    public FunctionCase(Term expression, FunctionCaseCondition condition) {
+    public FunctionCase(Term expression, Formula condition) {
         this.expression = expression;
         this.condition = condition;
     }
@@ -16,7 +17,7 @@ public class FunctionCase {
         return expression;
     }
 
-    public FunctionCaseCondition getCondition() {
+    public Formula getCondition() {
         return condition;
     }
 

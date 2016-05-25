@@ -61,7 +61,7 @@ public class FunctionTypeChecker {
                     }
 
                     termTypeChecker.analyse(expression, functionPrototypes);
-                    formulaTypeChecker.analyse(functionCase.getCondition().getFormula(), functionPrototypes);
+                    formulaTypeChecker.analyse(functionCase.getCondition(), functionPrototypes);
                 } catch (TypeMismatchException e) {
                     throw new WrappingRuntimeException(e);
                 }

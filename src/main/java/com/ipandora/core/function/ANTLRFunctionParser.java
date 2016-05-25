@@ -4,6 +4,7 @@ import com.ipandora.api.predicate.function.FunctionDefinition;
 import com.ipandora.api.predicate.function.FunctionPrototype;
 import com.ipandora.api.predicate.term.TypeMismatchException;
 import com.ipandora.core.formula.FormulaBuildingVisitor;
+import com.ipandora.core.formula.FormulaConjunctionReducer;
 import com.ipandora.core.term.SymbolTable;
 import com.ipandora.core.term.SymbolTableCreator;
 import com.ipandora.core.term.TermBuildingVisitor;
@@ -87,7 +88,8 @@ public class ANTLRFunctionParser implements FunctionParser {
 
         TermBuildingVisitor termVisitor = new TermBuildingVisitor(rootSymbolTable, symbolTableCreator);
         FormulaBuildingVisitor formulaVisitor = new FormulaBuildingVisitor(termVisitor);
-        return new FunctionBuildingVisitor(formulaVisitor, termVisitor);
+        FormulaConjunctionReducer conjunctionReducer = new FormulaConjunctionReducer();
+        return new FunctionBuildingVisitor(formulaVisitor, termVisitor, conjunctionReducer);
     }
 
     private SymbolTable populateSymbolTable(SymbolTable symbolTable, List<FunctionPrototype> functionPrototypes) {

@@ -1,7 +1,10 @@
 package com.ipandora.core.function;
 
-import com.ipandora.api.predicate.formula.EqualToFormula;
-import com.ipandora.api.predicate.function.*;
+import com.ipandora.api.predicate.formula.*;
+import com.ipandora.api.predicate.function.FunctionCase;
+import com.ipandora.api.predicate.function.FunctionDefinition;
+import com.ipandora.api.predicate.function.FunctionPrototype;
+import com.ipandora.api.predicate.function.MathematicalFunctionDefinition;
 import com.ipandora.api.predicate.term.*;
 import com.ipandora.api.predicate.term.Number;
 import org.junit.Before;
@@ -40,7 +43,7 @@ public class ANTLRFunctionParserTest {
 
         FunctionCase functionCase = new FunctionCase(
                 new Division(new Number(1), Variable.withTypeNat("x")),
-                new OtherwiseCondition());
+                new TruthFormula());
 
         MathematicalFunctionDefinition expected = new MathematicalFunctionDefinition(
                 "Foo", Collections.singletonList(Variable.withTypeNat("x")), Collections.singletonList(functionCase));
@@ -49,17 +52,40 @@ public class ANTLRFunctionParserTest {
     }
 
     @Test
-    public void fromStringManyCases() throws FunctionParsingException {
+    public void fromStringTwoCases() throws FunctionParsingException {
         FunctionDefinition function = parser.fromString("Foo(x) = \n" +
                 "1/2 if x = 1\n" +
                 "1/3 otherwise");
 
-        IfCondition ifCondition = new IfCondition(new EqualToFormula(Variable.withTypeNat("x"), new Number(1)));
+        Formula ifCondition = new EqualToFormula(Variable.withTypeNat("x"), new Number(1));
         FunctionCase ifCase = new FunctionCase(new Division(new Number(1), new Number(2)), ifCondition);
-        FunctionCase otherCase = new FunctionCase(new Division(new Number(1), new Number(3)), new OtherwiseCondition());
+        NotFormula otherCondition = new NotFormula(ifCondition);
+        FunctionCase otherCase = new FunctionCase(new Division(new Number(1), new Number(3)), otherCondition);
 
         MathematicalFunctionDefinition expected = new MathematicalFunctionDefinition(
                 "Foo", Collections.singletonList(Variable.withTypeNat("x")), Arrays.asList(ifCase, otherCase));
+
+        assertThat(function).isEqualTo(expected);
+    }
+
+    @Test
+    public void fromStringManyCases() throws FunctionParsingException {
+        FunctionDefinition function = parser.fromString("Foo(x) = \n" +
+                "1/2 if x = 1\n" +
+                "1/3 if x = 2\n" +
+                "1/8 otherwise");
+
+        Formula ifCondition1 = new EqualToFormula(Variable.withTypeNat("x"), new Number(1));
+        FunctionCase ifCase1 = new FunctionCase(new Division(new Number(1), new Number(2)), ifCondition1);
+
+        Formula ifCondition2 = new EqualToFormula(Variable.withTypeNat("x"), new Number(2));
+        FunctionCase ifCase2 = new FunctionCase(new Division(new Number(1), new Number(3)), ifCondition2);
+
+        AndFormula otherCondition = new AndFormula(new NotFormula(ifCondition1), new NotFormula(ifCondition2));
+        FunctionCase otherCase = new FunctionCase(new Division(new Number(1), new Number(8)), otherCondition);
+
+        MathematicalFunctionDefinition expected = new MathematicalFunctionDefinition("Foo",
+                Collections.singletonList(Variable.withTypeNat("x")), Arrays.asList(ifCase1, ifCase2, otherCase));
 
         assertThat(function).isEqualTo(expected);
     }
@@ -70,7 +96,7 @@ public class ANTLRFunctionParserTest {
 
         FunctionCase functionCase = new FunctionCase(
                 new Addition(Variable.withTypeNat("x"), Variable.withTypeNat("y")),
-                new OtherwiseCondition());
+                new TruthFormula());
 
         MathematicalFunctionDefinition expected = new MathematicalFunctionDefinition("Foo",
                 Arrays.asList(Variable.withTypeNat("x"), Variable.withTypeNat("y")),
@@ -110,10 +136,11 @@ public class ANTLRFunctionParserTest {
                 "1/2 if Bar(x) = 1\n" +
                 "1/3 otherwise", functionPrototypes);
 
-        IfCondition ifCondition = new IfCondition(new EqualToFormula(new Function("Bar",
-                Collections.<Term>singletonList(Variable.withTypeNat("x")), Type.NAT), new Number(1)));
+        Formula ifCondition = new EqualToFormula(new Function("Bar",
+                Collections.<Term>singletonList(Variable.withTypeNat("x")), Type.NAT), new Number(1));
         FunctionCase ifCase = new FunctionCase(new Division(new Number(1), new Number(2)), ifCondition);
-        FunctionCase otherCase = new FunctionCase(new Division(new Number(1), new Number(3)), new OtherwiseCondition());
+        NotFormula otherCondition = new NotFormula(ifCondition);
+        FunctionCase otherCase = new FunctionCase(new Division(new Number(1), new Number(3)), otherCondition);
 
         MathematicalFunctionDefinition expected = new MathematicalFunctionDefinition(
                 "Foo", Collections.singletonList(Variable.withTypeNat("x")), Arrays.asList(ifCase, otherCase));
