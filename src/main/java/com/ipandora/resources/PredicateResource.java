@@ -95,6 +95,9 @@ public class PredicateResource {
 
             case ProofStepMethods.ARITHMETIC:
                 return checkProofStepArithmetic(stepRequest);
+
+            case ProofStepMethods.FUNCTION_DEFINITION:
+                return checkProofStepFunctionDefinition(stepRequest);
         }
 
         StepResponse unknownMethodResponse = new StepResponse();
@@ -331,6 +334,10 @@ public class PredicateResource {
         stepResponse.setValid(result);
 
         return Response.ok(stepResponse).build();
+    }
+
+    private Response checkProofStepFunctionDefinition(StepRequest stepRequest) {
+        return Response.ok("Function definition not yet implemented").build();
     }
 
     private Response invalidRequestResponse(Object entity) {
