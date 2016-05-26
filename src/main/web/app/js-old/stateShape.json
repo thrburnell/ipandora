@@ -1,0 +1,48 @@
+{
+
+  // Keys of formulas which justify the new proof step
+  proofStepJustification: [0, 1],
+
+  // Formula for the next proof step
+  proofStepFormula: "D(x)",
+
+  // All known formulas, including givens and derived
+  knownFormulas: {
+    0: {
+      id: 0,
+      uiId: 1,
+      formula: "A(x)"
+    },
+    1: {
+      id: 1,
+      uiId: 2,
+      formula: "B(x)"
+    },
+    2: {
+      id: 2,
+      uiId: 3,
+      formula: "C(x)"
+    }
+  },
+
+  // Keys of formulas which were given
+  givens: [0, 1],   // formulas[0, 1], i.e. A(x) and B(x)
+
+  // All formulas to be shown
+  toShows: [
+    {
+      id: 0,
+      uiId: 'alpha',
+      formula: "E(x)"
+    }
+  ]
+
+  // Keys of derived formulas, along with keys of the formulas which imply
+  proofSteps: [
+    {
+      derived: 2,             // formulas[2],   i.e. C(x)
+      justification: [0, 1]   // formulas[0,1], i.e. A(x) and B(x)
+    }
+  ]
+
+}

@@ -1,4 +1,16 @@
 body {
-  background: cornsilk;
+  background: white;
+}
+
+.top-buffer {
+  margin-top: 20px;
+}
+
+.bottom-no-margin {
+  margin-bottom: 0px !important;
+}
+
+.function-input {
+  font-family: monospace;
 }
 

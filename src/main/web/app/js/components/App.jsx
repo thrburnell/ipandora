@@ -1,19 +1,16 @@
 import React from 'react'
-import RProofStructUpload from '../containers/RProofStructUpload'
-import RClearButton from '../containers/RClearButton'
-import GivenBlock from './GivenBlock'
-import ToShowBlock from './ToShowBlock'
-import ProofBlock from './ProofBlock'
-import Separator from './Separator'
+import AppRow from './AppRow'
+import RFunctionInput from '../containers/RFunctionInput'
+import RToShow from '../containers/RToShow' 
+import RBaseCase from '../containers/RBaseCase'
+import RInductiveCase from '../containers/RInductiveCase'
 
 const App = () => (
-  <div>
-    <RProofStructUpload />
-    <RClearButton />
-    <GivenBlock />
-    <ToShowBlock />
-    <Separator />
-    <ProofBlock />
+  <div className="container">
+    <AppRow rowClass="top-buffer"><RFunctionInput /></AppRow>
+    <AppRow><RToShow /></AppRow>
+    <AppRow><RBaseCase /></AppRow>
+    <AppRow><RInductiveCase /></AppRow>
   </div>
 )
 
