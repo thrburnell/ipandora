@@ -15,4 +15,5 @@ public class ValidateRequest {
     public void setFormula(String formula) {
         this.formula = formula;
     }
+
 }

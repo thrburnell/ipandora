@@ -83,13 +83,26 @@ public class PredicateResource {
 
     @POST
     @Path("/formula")
-    public ValidateResponse validateFormula(ValidateRequest validateRequest) {
+    public Response validateFormula(ValidateRequest validateRequest) {
 
         ValidateResponse validateResponse = new ValidateResponse();
-        validateResponse.setFormula(validateRequest.getFormula());
-        validateResponse.setSyntaxValid(false);
-        validateResponse.setErrorMsg("Validation not yet implemented");
-        return validateResponse;
+        String formula = validateRequest.getFormula();
+        if (formula == null) {
+            validateResponse.setErrorMsg("Required formula missing");
+            return invalidRequestResponse(validateResponse);
+        }
+
+        try {
+            formulaParser.fromString(formula);
+        } catch (FormulaParsingException e) {
+            validateResponse.setValid(false);
+            validateResponse.setErrorMsg("Invalid formula");
+            return invalidRequestResponse(validateResponse);
+        }
+
+        validateResponse.setFormula(formula);
+        validateResponse.setValid(true);
+        return Response.ok(validateResponse).build();
     }
 
     @POST
@@ -172,7 +185,7 @@ public class PredicateResource {
         }
 
         Variable variable = Variable.withTypeNat(varName);
-        InductionSchema schema = null;
+        InductionSchema schema;
         try {
             schema = inductionSchemaGenerator.generateSchema((ForallFormula) formula, variable);
         } catch (SchemaGeneratorException e) {
