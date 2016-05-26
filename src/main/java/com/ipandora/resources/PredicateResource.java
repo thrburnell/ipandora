@@ -98,13 +98,12 @@ public class PredicateResource {
 
         try {
             formulaParser.fromString(formula);
+            validateResponse.setValid(true);
         } catch (FormulaParsingException e) {
             validateResponse.setValid(false);
             validateResponse.setErrorMsg("Invalid formula");
-            return invalidRequestResponse(validateResponse);
         }
 
-        validateResponse.setValid(true);
         return Response.ok(validateResponse).build();
     }
 
@@ -123,13 +122,12 @@ public class PredicateResource {
 
         try {
             functionParser.fromString(function);
+            validateResponse.setValid(true);
         } catch (FunctionParsingException e) {
             validateResponse.setValid(false);
             validateResponse.setErrorMsg("Invalid function");
-            return invalidRequestResponse(validateResponse);
         }
 
-        validateResponse.setValid(true);
         return Response.ok(validateResponse).build();
     }
 
