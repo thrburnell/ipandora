@@ -2,7 +2,7 @@ package com.ipandora.api.predicate.validate;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 
-public class ValidateRequest {
+public class ValidateFormulaRequest {
 
     private String formula;
 

@@ -11,8 +11,10 @@ import com.ipandora.api.predicate.proofstep.StepRequest;
 import com.ipandora.api.predicate.proofstep.StepResponse;
 import com.ipandora.api.predicate.read.ReadResponse;
 import com.ipandora.api.predicate.term.*;
-import com.ipandora.api.predicate.validate.ValidateRequest;
-import com.ipandora.api.predicate.validate.ValidateResponse;
+import com.ipandora.api.predicate.validate.ValidateFormulaRequest;
+import com.ipandora.api.predicate.validate.ValidateFormulaResponse;
+import com.ipandora.api.predicate.validate.ValidateFunctionRequest;
+import com.ipandora.api.predicate.validate.ValidateFunctionResponse;
 import com.ipandora.core.formula.FormulaParser;
 import com.ipandora.core.formula.FormulaParsingException;
 import com.ipandora.core.function.FunctionParser;
@@ -83,14 +85,16 @@ public class PredicateResource {
 
     @POST
     @Path("/formula")
-    public Response validateFormula(ValidateRequest validateRequest) {
+    public Response validateFormula(ValidateFormulaRequest validateRequest) {
 
-        ValidateResponse validateResponse = new ValidateResponse();
+        ValidateFormulaResponse validateResponse = new ValidateFormulaResponse();
         String formula = validateRequest.getFormula();
         if (formula == null) {
             validateResponse.setErrorMsg("Required formula missing");
             return invalidRequestResponse(validateResponse);
         }
+
+        validateResponse.setFormula(formula);
 
         try {
             formulaParser.fromString(formula);
@@ -100,7 +104,31 @@ public class PredicateResource {
             return invalidRequestResponse(validateResponse);
         }
 
-        validateResponse.setFormula(formula);
+        validateResponse.setValid(true);
+        return Response.ok(validateResponse).build();
+    }
+
+    @POST
+    @Path("/function")
+    public Response validateFunction(ValidateFunctionRequest validateRequest) {
+
+        ValidateFunctionResponse validateResponse = new ValidateFunctionResponse();
+
+        String function = validateRequest.getFunction();
+        if (function == null) {
+            validateResponse.setErrorMsg("Required function missing");
+        }
+
+        validateResponse.setFunction(function);
+
+        try {
+            functionParser.fromString(function);
+        } catch (FunctionParsingException e) {
+            validateResponse.setValid(false);
+            validateResponse.setErrorMsg("Invalid function");
+            return invalidRequestResponse(validateResponse);
+        }
+
         validateResponse.setValid(true);
         return Response.ok(validateResponse).build();
     }
