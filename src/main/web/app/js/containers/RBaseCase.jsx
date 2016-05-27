@@ -2,7 +2,10 @@ import { connect } from 'react-redux'
 import BaseCase from '../components/BaseCase'
 
 const mapStateToProps = (state) => (
-  state.baseCase
+  {
+    ...state.baseCase,
+    active: state.toShow.valid
+  }
 )
 
 const mapDispatchToProps = () => ({})

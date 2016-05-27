@@ -5,7 +5,10 @@
     "valid": true
   },
 
-  "toShow": "\\FORALL n in Nat. SumSq(n) = (n/6) * (n+1) * (2*n+1)",
+  "toShow": {
+    "formula": "\\FORALL n in Nat. SumSq(n) = (n/6) * (n+1) * (2*n+1)",
+    "valid": true
+  },
 
   "baseCase": {
     "toShow": [

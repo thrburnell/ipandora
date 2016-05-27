@@ -1,15 +1,12 @@
+import { RECEIVE_FUNCTION_VALIDITY } from '../actions'
+
 const Fn = (state={}, action) => {
 
   switch (action.type) {
-    case 'RECEIVE_INVALID_FUNCTION':
+    case RECEIVE_FUNCTION_VALIDITY:
       return {
-        definition: action.definition,
-        valid: false
-      }
-    case 'RECEIVE_VALID_FUNCTION':
-      return {
-        definition: action.definition,
-        valid: true
+        definition: action.fn,
+        valid: action.valid
       }
     default:
       return state

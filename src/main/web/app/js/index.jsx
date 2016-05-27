@@ -9,19 +9,8 @@ import thunkMiddleware from 'redux-thunk'
 import ipandoraApp from './reducers'
 import App from './components/App'
 
-const initialState = {
-  toShow: "Default to show",
-  baseCase: {
-    active: false
-  },
-  inductiveCase: {
-    active: false
-  }
-}
-
 let store = createStore(
   ipandoraApp,
-  initialState,
   applyMiddleware(thunkMiddleware)
 )
 

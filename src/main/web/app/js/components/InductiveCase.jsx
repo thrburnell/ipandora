@@ -1,8 +1,8 @@
 import React from 'react'
 
-const InductiveCase = (props) => {
+const InductiveCase = ({ active=false, arbitrary, hypothesis, toShow }) => {
 
-  if (!props.active) {
+  if (!active) {
     return null
   }
 
@@ -13,15 +13,15 @@ const InductiveCase = (props) => {
       </div>
       <ul className="list-group">
         <li className="list-group-item">
-          Take an arbitrary <strong>{ props.arbitrary.name }</strong> in <strong>{ props.arbitrary.domain }</strong>
+          Take an arbitrary <strong>{ arbitrary.name }</strong> in <strong>{ arbitrary.domain }</strong>
         </li>
         <li className="list-group-item">
           <strong>Inductive Hypothesis: </strong>
-          { props.hypothesis }
+          { hypothesis }
         </li>
         <li className="list-group-item">
           <strong>To Show: </strong>
-          { props.toShow }
+          { toShow }
         </li>
       </ul>
       <div className="panel-body">

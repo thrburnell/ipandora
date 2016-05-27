@@ -1,6 +1,6 @@
 import React from 'react'
 
-const BaseCase = ({ active, toShow }) => {
+const BaseCase = ({ active=false, toShow }) => {
   if (!active) {
     return null
   }
