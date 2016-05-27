@@ -3,6 +3,7 @@ package com.ipandora;
 import com.ipandora.core.formula.*;
 import com.ipandora.core.function.ANTLRFunctionParser;
 import com.ipandora.core.function.FunctionDefinitionEncoderImpl;
+import com.ipandora.core.function.FunctionPrototypeBuildingVisitor;
 import com.ipandora.core.function.FunctionTypeChecker;
 import com.ipandora.core.induction.MathematicalInductionSchemaGenerator;
 import com.ipandora.core.proof.ProofStreamReaderCreator;
@@ -75,11 +76,12 @@ public class IPandoraApplication extends Application<IPandoraConfiguration> {
         // Utils
         ProofStreamReaderCreator proofStreamReaderCreator = new ProofStreamReaderCreator();
 
+        FunctionPrototypeBuildingVisitor prototypeBuildingVisitor = new FunctionPrototypeBuildingVisitor();
 
         // Resources
         PredicateResource resource = new PredicateResource(formulaParser, termParser, functionParser, impliesChecker,
                 equalityChecker, functionEqualityChecker, proofStreamReaderCreator, inductionSchemaGenerator,
-                formulaStringBuilder, termStringBuilder, termTypeInferrer);
+                formulaStringBuilder, termStringBuilder, termTypeInferrer, prototypeBuildingVisitor);
 
         environment.jersey().register(resource);
         environment.jersey().register(MultiPartFeature.class);

@@ -19,6 +19,7 @@ import com.ipandora.core.formula.FormulaParser;
 import com.ipandora.core.formula.FormulaParsingException;
 import com.ipandora.core.function.FunctionParser;
 import com.ipandora.core.function.FunctionParsingException;
+import com.ipandora.core.function.FunctionPrototypeBuildingVisitor;
 import com.ipandora.core.induction.InductionSchema;
 import com.ipandora.core.induction.InductionSchemaGenerator;
 import com.ipandora.core.induction.SchemaGeneratorException;
@@ -60,6 +61,7 @@ public class PredicateResource {
     private final PrettyStringBuilder<Formula> formulaStringBuilder;
     private final PrettyStringBuilder<Term> termStringBuilder;
     private final TermTypeInferrer termTypeInferrer;
+    private final FunctionPrototypeBuildingVisitor prototypeBuildingVisitor;
 
     public PredicateResource(FormulaParser formulaParser, TermParser termParser, FunctionParser functionParser,
                              ImpliesChecker impliesChecker,
@@ -69,7 +71,8 @@ public class PredicateResource {
                              InductionSchemaGenerator inductionSchemaGenerator,
                              PrettyStringBuilder<Formula> formulaStringBuilder,
                              PrettyStringBuilder<Term> termStringBuilder,
-                             TermTypeInferrer termTypeInferrer) {
+                             TermTypeInferrer termTypeInferrer,
+                             FunctionPrototypeBuildingVisitor prototypeBuildingVisitor) {
         this.formulaParser = formulaParser;
         this.termParser = termParser;
         this.functionParser = functionParser;
@@ -81,6 +84,7 @@ public class PredicateResource {
         this.formulaStringBuilder = formulaStringBuilder;
         this.termStringBuilder = termStringBuilder;
         this.termTypeInferrer = termTypeInferrer;
+        this.prototypeBuildingVisitor = prototypeBuildingVisitor;
     }
 
     @POST
@@ -121,8 +125,12 @@ public class PredicateResource {
         validateResponse.setFunction(function);
 
         try {
-            functionParser.fromString(function);
+            FunctionDefinition functionDefinition = functionParser.fromString(function);
             validateResponse.setValid(true);
+
+            FunctionPrototype prototype = prototypeBuildingVisitor.visit(functionDefinition);
+            FunctionPrototypeRequest prototypeRequest = getFunctionPrototypeRequest(prototype);
+            validateResponse.setPrototype(prototypeRequest);
         } catch (FunctionParsingException e) {
             validateResponse.setValid(false);
             validateResponse.setErrorMsg("Invalid function");
@@ -266,6 +274,22 @@ public class PredicateResource {
         }
 
         return functionPrototypes;
+    }
+
+    private FunctionPrototypeRequest getFunctionPrototypeRequest(FunctionPrototype prototype) {
+        FunctionPrototypeRequest functionPrototypeRequest = new FunctionPrototypeRequest();
+
+        functionPrototypeRequest.setName(prototype.getName());
+
+        List<String> argTypes = new ArrayList<>();
+        for (Type type : prototype.getArgTypes()) {
+            argTypes.add(type.getName());
+        }
+
+        functionPrototypeRequest.setArgTypes(argTypes);
+        functionPrototypeRequest.setReturnType(prototype.getReturnType().getName());
+
+        return functionPrototypeRequest;
     }
 
     private Type getTypeOrThrow(String type) throws FormulaParsingException {
