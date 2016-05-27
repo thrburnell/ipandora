@@ -23,10 +23,10 @@ const ToShow = ({ active=false, onValidateClick, valid }) => {
         <form className="form-horizontal">
           <div className="form-group bottom-no-margin">
             <div className="col-sm-9">
-              <input ref={node => { formula = node }} type="text" className="form-control" placeholder="\\FORALL n in Nat. ..." />
+              <input ref={node => { formula = node }} type="text" className="form-control monospace-font" placeholder="\FORALL n in Nat. ..." />
             </div>
             <div className="col-sm-3">
-              <input ref={node => { variable = node }} type="text" className="form-control" placeholder="by induction on" />
+              <input ref={node => { variable = node }} type="text" className="form-control monospace-font" placeholder="by induction on" />
             </div>
           </div>
         </form>

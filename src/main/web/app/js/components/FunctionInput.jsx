@@ -17,7 +17,7 @@ const FunctionInput = ({ title, onValidateClick, valid }) => {
       <div className="panel-body">
         <form>
           <div className="form-group bottom-no-margin">
-            <textarea ref={node => { input = node }} className="form-control function-input" rows="3" />
+            <textarea ref={node => { input = node }} className="form-control monospace-font" rows="3" />
           </div>
         </form>
       </div>
