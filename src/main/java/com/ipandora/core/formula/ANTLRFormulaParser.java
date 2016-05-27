@@ -59,9 +59,9 @@ public class ANTLRFormulaParser implements FormulaParser {
         PredicateLogicParser parser = new PredicateLogicParser(tokens);
         parser.setErrorHandler(new BailErrorStrategy());
 
-        PredicateLogicParser.FormulaContext formulaCtx;
+        PredicateLogicParser.EntireFormulaContext formulaCtx;
         try {
-            formulaCtx = parser.formula();
+            formulaCtx = parser.entireFormula();
         } catch (ParseCancellationException e) {
             throw new FormulaParsingException("Invalid formula: " + formula);
         }

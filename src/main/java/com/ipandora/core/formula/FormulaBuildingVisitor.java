@@ -25,6 +25,11 @@ public class FormulaBuildingVisitor extends PredicateLogicBaseVisitor<Formula> {
     }
 
     @Override
+    public Formula visitEntireFormula(PredicateLogicParser.EntireFormulaContext ctx) {
+        return visit(ctx.form);
+    }
+
+    @Override
     public Formula visitFormula(PredicateLogicParser.FormulaContext ctx) {
 
         PredicateLogicParser.IffElementContext lhs = ctx.lhs;

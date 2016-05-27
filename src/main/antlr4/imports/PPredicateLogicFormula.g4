@@ -19,8 +19,13 @@ fnCase
 
 // Formulas
 
+entireFormula
+    : form=formula EOF
+    ;
+
 formula
-    : lhs=iffElement (IFF rhs=formula)?;
+    : lhs=iffElement (IFF rhs=formula)?
+    ;
 
 iffElement
     : lhs=impliesElement (IMPLIES rhs=iffElement)?;
