@@ -200,7 +200,7 @@ public class PredicateResource {
 
         Formula formula;
         try {
-            formula = formulaParser.fromStringWithTypeChecking(goal, functionPrototypes);
+            formula = formulaParser.fromString(goal, functionPrototypes);
         } catch (FormulaParsingException e) {
             response.setErrorMsg("Invalid goal formula. Did you provide all correct function prototypes?");
             return invalidRequestResponse(response);
