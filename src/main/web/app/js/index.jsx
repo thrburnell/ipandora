@@ -1,4 +1,5 @@
-import 'bootstrap/dist/css/bootstrap.css'
+import expose from 'expose?$!expose?jQuery!jQuery'
+import bootstrap from 'bootstrap-webpack'
 import '../css/main.css'
 
 import React from 'react'
@@ -9,8 +10,13 @@ import thunkMiddleware from 'redux-thunk'
 import ipandoraApp from './reducers'
 import App from './components/App'
 
+const initialState = {
+  toShow: { valid: true }
+}
+
 let store = createStore(
   ipandoraApp,
+  initialState,
   applyMiddleware(thunkMiddleware)
 )
 

@@ -3,8 +3,8 @@ import InductiveCase from '../components/InductiveCase'
 
 const mapStateToProps = (state) => (
   {
-    ...state.inductiveCase,
-    active: state.toShow.valid
+    ...state.inductiveCase //,
+    // active: state.toShow.valid
   }
 )
 

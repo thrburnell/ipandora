@@ -1,28 +1,53 @@
 {
 
-  "fn": {
-    "definition": "SumSq(n) = ...",
-    "valid": true
+  fn: {
+    definition: "SumSq(n) = ...",
+    valid: true
   },
 
-  "toShow": {
-    "formula": "\\FORALL n in Nat. SumSq(n) = (n/6) * (n+1) * (2*n+1)",
-    "valid": true
+  prototypes: [
+    {
+      name: "SumSq",
+      argTypes: [ "Nat" ],
+      returnType: "Nat"
+    }
+  ],
+
+  toShow: {
+    formula: "\\FORALL n in Nat. SumSq(n) = (n/6) * (n+1) * (2*n+1)",
+    valid: true
   },
 
-  "baseCase": {
-    "toShow": [
+  baseCase: {
+    toShow: [
       "SumSq(0) = (0/6) * (0+1) * (2*0+1)"
+    ],
+
+    stateValid: false,
+
+    steps: [
+      {
+        term: "SumSq(0)",
+        justification: "INITIAL_STEP"
+      },
+      {
+        term: "0",
+        justification: "FUNCTION_DEFINITION"
+      },
+      {
+        term: "0*1*1",
+        justification: "ARITHMETIC"
+      }
     ]
   },
 
-  "inductiveCase": {
-    "arbitrary": {
-      "name": "k",
-      "domain": "Nat"
+  inductiveCase: {
+    arbitrary: {
+      name: "k",
+      domain: "Nat"
     },
-    "hypothesis": "SumSq(k) = (k/6) * (k+1) * (2*k+1)",
-    "toShow": [
+    hypothesis: "SumSq(k) = (k/6) * (k+1) * (2*k+1)",
+    toShow: [
       "SumSq(k+1) = ((k+1)/6) * ((k+1)+1) * (2*(k+1)+1)"
     ]
   }

@@ -1,5 +1,6 @@
 import { connect } from 'react-redux'
 import BaseCase from '../components/BaseCase'
+import { saveBaseInitialTerm, makeBaseProofStep } from '../actions'
 
 const mapStateToProps = (state) => (
   {
@@ -8,7 +9,12 @@ const mapStateToProps = (state) => (
   }
 )
 
-const mapDispatchToProps = () => ({})
+const mapDispatchToProps = (dispatch) => (
+  {
+    onInitialEntry: (input) => dispatch(saveBaseInitialTerm(input)),
+    onStepEntry: (input, justification) => dispatch(makeBaseProofStep(input, justification))
+  }
+)
 
 const RBaseCase = connect(
   mapStateToProps,
