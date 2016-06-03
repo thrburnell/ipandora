@@ -1,0 +1,282 @@
+FORMAT: 1A
+HOST: http://polls.apiblueprint.org/
+
+# iPandora
+
+iPandora is an API for use in constructing mathematical proofs in the language of first-order predicate logic, as well as proofs of Haskell program correctness.
+
+
+## Predicate Logic Formula [/predicate/formula]
+
+### Validate [POST]
+
+Validates a predicate logic formula according to the defined syntax.
+
++ Request (application/json)
+
+        {
+            "formula": "\\FORALL x in Nat. (f(x) > 0 -> \\EXISTS y in Nat. g(x, y) = 4)"
+        }
+
++ Response 200 (application/json)
+
+        {
+            "formula": "\\FORALL x in Nat. (f(x) > 0 -> \\EXISTS y in Nat. g(x, y) = 4)",
+            "valid": true
+        }
+
++ Response 422 (application/json)
+
+        {
+            "formula": "\\FORALL x in Nat. (f(x) > \\EXISTS y in Nat. g(x, y) = 4)",
+            "valid": false,
+            "errorMsg": "A potentially useful error message"
+        }
+        
+## Mathematical Function [/predicate/function]
+
+### Validate [POST]
+
+Validates a mathematical function according to the defined syntax.
+
+If the function is syntactically valid, its prototype is also returned.
+
++ Request (application/json)
+
+        {
+            "function": "Sum(n) = 0 if n = 0 n + Sum(n-1) otherwise"
+        }
+
++ Response 200 (application/json)
+
+        {
+            "function": "Sum(n) = 0 if n = 0 n + Sum(n-1) otherwise",
+            "valid": true,
+            "prototype": {
+                "name": "Sum",
+                "argTypes": [ "Nat" ],
+                "returnType": "Nat"
+            }
+        }
+
++ Response 422 (application/json)
+
+        {
+            "function": "Sum(n) = if n = 0 then 0 else Sum(n-1)",
+            "syntaxValid": false,
+            "errorMsg": "A potentially useful error message"
+        }
+
+## Predicate Logic Proof Step [/predicate/step]
+
+### Check Proof Step [POST]
+
+Determines whether validity in a proof is preserved.
+
+For `LOGICAL_IMPLICATION`, prototypes for each called function must be specified.
+
+For `ARITHMETIC`, types of `from` and `goal` are inferred.
+
+For `FUNCTION_DEFINITION`, prototypes for each called function must be specified. In addition, the function must also be given.
+
++ Request (application/json)
+
+        {
+            "method": "LOGICAL_IMPLICATION",
+            "goal": "\\FORALL x in Nat. f(x+1) > 0",
+            "assumptions": [
+                "\\FORALL x in Nat. f(x) > 0"
+            ],
+            "functions": [
+                {
+                    "name": "f",
+                    "argTypes": [ "Nat" ],
+                    "returnType": "Nat"
+                }
+            ]
+        }
+        
++ Response 200 (application/json)
+
+        {
+            "method": "LOGICAL_IMPLICATION",
+            "goal": "\\FORALL x in Nat. f(x+1) > 0",
+            "assumptions": [
+                "\\FORALL x in Nat. f(x) > 0"
+            ],
+            "functions": [
+                {
+                    "name": "f",
+                    "argTypes": [ "Nat" ],
+                    "returnType": "Nat"
+                }
+            ]
+        }
+        
++ Response 200 (application/json)
+
+        {
+            "method": "LOGICAL_IMPLICATION",
+            "goal": "\\FORALL x. Bar(x)",
+            "assumptions": [
+                "\\FORALL x. (Foo(x) | Bar(x))",
+                "\\EXISTS x. (!Foo(x))"
+            ],
+            "valid": false,
+            "errorMsg": "A potentially useful error message"
+        }
+        
++ Request (application/json)
+
+        {
+            "method": "ARITHMETIC",
+            "goal": "0 * 1 * 1",
+            "from": "0"
+        }
+        
++ Response 200 (application/json)
+
+        {
+            "method": "ARITHMETIC",
+            "goal": "0 * 1 * 1",
+            "from": "0",
+            "valid": true
+        }
+        
+
++ Request (application/json)
+
+        {
+            "method": "FUNCTION_DEFINITION",
+            "goal": "0 * 1 * 1",
+            "from": "SumSq(0)",
+            "function": "SumSq(n) = \\n0 if n = 0\\n n * n + SumSq(n-1) otherwise",
+            "functions": [
+                {
+                    "name": "SumSq",
+                    "argTypes": [ "Nat" ],
+                    "returnType": "Nat"
+                }
+            ]
+        }
+        
++ Response 200 (application/json)
+
+        {
+            "method": "FUNCTION_DEFINITION",
+            "goal": "0 * 1 * 1",
+            "from": "SumSq(0)",
+            "function": "SumSq(n) = \\n0 if n = 0\\n n * n + SumSq(n-1) otherwise",
+            "functions": [
+                {
+                    "name": "SumSq",
+                    "argTypes": [ "Nat" ],
+                    "returnType": "Nat"
+                }
+            ],
+            "valid": true
+        }
+        
++ Request (application/json)
+
+        {
+            "method": "UNKNOWN_PROOF_STEP_METHOD",
+            "goal": "0 * 1 * 1"
+        }
+        
++ Response 422 (application/json)
+
+        {
+            "method": "UNKNOWN_PROOF_STEP_METHOD",
+            "errorMsg": "Unknown proof step method"
+        }
+        
+## Proof Structure Parsing [/predicate/read]
+
+### File Parsing [POST]
+
+Reads the attached text file for given and to show formulas.
+
++ Request (multipart/form-data)
+
+        {
+            "file": text file
+        }
+        
++ Response 200 (application/json)
+
+        {
+            "given": [
+                "\\FORALL x. (Foo(x) | Bar(x))",
+                "\\FORALL x. (! Foo(x))"
+            ],
+            "toShow": "\\FORALL x Bar(x)"
+        }
+        
++ Response 200 (application/json)
+
+        {
+            "assumptions": [
+                "\\FORALL x. (Foo(x) | Bar(x))",
+                "\\EXISTS x. (! Foo(x))"
+            ],
+            "goal": "\\FORALL x. Bar(x)",
+            "validityPreserved": false,
+            "errorMsg": "A potentially useful error message"
+        }
+
+## Induction Schema Generation [/predicate/induction]
+
+### Generate Mathematical Induction Schema [POST]
+
+Generates an induction schema for a given formula quantified universally over the natural numbers.
+
++ Request (application/json)
+
+        {
+            "goal": "\\FORALL n in Nat. (sumSq(n) = (n/6) * (n+1) * (2*n+1))",
+            "variable": "n",
+            "functions": [
+                {
+                    "name": "sumSq":
+                    "argTypes": [ "Nat" ],
+                    "returnType": "Nat"
+                }
+            ]
+        }
+        
++ Response 200 (application/json)
+
+        {
+            "goal": "\\FORALL n in Nat. (sumSq(n) = (n/6) * (n+1) * (2*n+1))",
+            "variable": "n",
+            "functions": [
+                {
+                    "name": "sumSq":
+                    "args": [ "Nat" ],
+                    "type": "Nat"
+                }
+            ],
+            "baseCase": {
+                "toShow": [
+                    "sumSq(0) = (0/6) * (0+1) * (2*0+1)"
+                ]
+            },
+            "inductiveCase": {
+                "arbitrary": {
+                    "name": "k",
+                    "domain": "Nat"
+                },
+                "hypothesis": "sumSq(k) = (k/6) * (k+1) * (2*k+1)",
+                "toShow": [
+                    "sumSq(k+1) = ((k+1)/6) * ((k+1)+1) * (2*(k+1)+1)"
+                ]
+            }
+        }
+        
++ Response 422 (application/json)
+
+        {
+            "goal": "\\EXISTS x in Nat. (x > 0 -> x + 1 > 1)",
+            "errorMsg": "A potentially useful error message"
+        }
