@@ -23,7 +23,3 @@ LTE: '<=';
 // Types
 IN: 'in';
 NAT: 'Nat';
-
-// Function definitions
-IF: 'if';
-OTHERWISE: 'otherwise';
