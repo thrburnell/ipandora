@@ -12,7 +12,9 @@ import com.ipandora.api.predicate.term.Type;
 import com.ipandora.api.predicate.term.Variable;
 import com.ipandora.core.formula.FormulaBuildingVisitor;
 import com.ipandora.core.formula.FormulaConjunctionReducer;
+import com.ipandora.core.formula.InvalidSyntaxException;
 import com.ipandora.core.term.TermBuildingVisitor;
+import com.ipandora.core.util.WrappingRuntimeException;
 import com.ipandora.parser.PredicateLogicBaseVisitor;
 import com.ipandora.parser.PredicateLogicParser;
 import org.antlr.v4.runtime.Token;
@@ -70,30 +72,35 @@ public class FunctionBuildingVisitor extends PredicateLogicBaseVisitor<FunctionD
         return variables;
     }
 
-    private List<FunctionCase> createCases(List<PredicateLogicParser.FnCaseContext> fnCaseContexts) {
-
-        if (fnCaseContexts.isEmpty()) {
-            throw new IllegalFunctionException("No cases given with function definition.");
-        }
+    private List<FunctionCase> createCases(PredicateLogicParser.FnCasesContext fnCasesContext) {
 
         ArrayList<FunctionCase> functionCases = new ArrayList<>();
-
         List<Formula> negatedPreviousConditions = new ArrayList<>();
-        for (PredicateLogicParser.FnCaseContext fnCaseContext : fnCaseContexts) {
 
-            Term expression = termBuildingVisitor.visit(fnCaseContext.expr);
+        while (fnCasesContext != null) {
+            Term expression;
             Formula condition;
 
-            PredicateLogicParser.FormulaContext condCtx = fnCaseContext.cond;
-            if (condCtx == null) {
+            if (fnCasesContext.ifFnCase != null) {
+
+                PredicateLogicParser.IfCaseContext ifFnCase = fnCasesContext.ifFnCase;
+                expression = termBuildingVisitor.visit(ifFnCase.expr);
+                condition = formulaBuildingVisitor.visit(ifFnCase.cond);
+                negatedPreviousConditions.add(new NotFormula(condition));
+
+            } else if (fnCasesContext.otherwiseFnCase != null) {
+
+                expression = termBuildingVisitor.visit(fnCasesContext.otherwiseFnCase.expr);
                 condition = negatedPreviousConditions.isEmpty() ?
                         new TruthFormula() : conjunctionReducer.reduce(negatedPreviousConditions);
+
             } else {
-                condition = formulaBuildingVisitor.visit(condCtx);
-                negatedPreviousConditions.add(new NotFormula(condition));
+                throw new WrappingRuntimeException(
+                        new InvalidSyntaxException("Function case contained no if or otherwise case."));
             }
 
             functionCases.add(new FunctionCase(expression, condition));
+            fnCasesContext = fnCasesContext.rest;
         }
 
         return functionCases;
