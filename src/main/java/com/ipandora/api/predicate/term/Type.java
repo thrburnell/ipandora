@@ -20,4 +20,14 @@ public enum Type implements Comparable<Type> {
         return name;
     }
 
+    public static Type withIdentifier(String identifier) {
+        for (Type type : values()) {
+            if (type.getName().equals(identifier)) {
+                return type;
+            }
+        }
+
+        throw new IllegalArgumentException("No Type for given identifier: " + identifier);
+    }
+
 }

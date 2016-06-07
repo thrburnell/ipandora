@@ -56,8 +56,6 @@ public class ANTLRFunctionParser implements FunctionParser {
 
         try {
             return functionBuildingVisitor.visit(fnCtx);
-        } catch (IllegalFunctionException e) {
-            throw new FunctionParsingException(e);
         } catch (WrappingRuntimeException e) {
             throw new FunctionParsingException(e.getWrappedException());
         }

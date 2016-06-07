@@ -17,7 +17,8 @@ import java.util.Collections;
 import java.util.List;
 
 import static com.ipandora.testutils.FormulaCreators.*;
-import static com.ipandora.testutils.FunctionCreators.*;
+import static com.ipandora.testutils.FunctionCreators.funCase;
+import static com.ipandora.testutils.FunctionCreators.mathFun;
 import static com.ipandora.testutils.TermCreators.*;
 import static org.assertj.core.api.Assertions.assertThat;
 

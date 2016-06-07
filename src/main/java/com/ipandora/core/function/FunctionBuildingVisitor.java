@@ -38,41 +38,79 @@ public class FunctionBuildingVisitor extends PredicateLogicBaseVisitor<FunctionD
 
     @Override
     public FunctionDefinition visitFunctionDefinition(PredicateLogicParser.FunctionDefinitionContext ctx) {
-        String name = ctx.name.getText();
-        List<Variable> variables = createVariables(ctx.args.args);
 
-        // Add typing for all arguments before building the cases:
-        List<Type> argTypes = new ArrayList<>();
-        for (Variable variable : variables) {
-            Type type = variable.getType();
-            termBuildingVisitor.addTypeMapping(variable.getName(), type);
-            argTypes.add(type);
+        PredicateLogicParser.FunctionPrototypeContext proto = ctx.proto;
+        FunctionPrototype prototype = makePrototype(proto);
+        PredicateLogicParser.DefinitionContext def = ctx.def;
+
+        String name = def.name.getText();
+        if (!name.equals(proto.name.getText())) {
+            throw new WrappingRuntimeException(
+                    new IllegalFunctionException("Name of function in prototype doesn't match name in definition."));
         }
 
-        // Assume functions always return Nat
-        FunctionPrototype prototype = new FunctionPrototype(name, argTypes, Type.NAT);
-        termBuildingVisitor.addFunctionPrototypeMapping(name, prototype);
+        List<String> argNames = new ArrayList<>();
+        for (PredicateLogicParser.AnyNameContext arg : def.args.args) {
+            argNames.add(arg.getText());
+        }
 
-        List<FunctionCase> cases = createCases(ctx.cases);
-        return new MathematicalFunctionDefinition(name, variables, cases);
+        List<Variable> variables = makeVariables(argNames, prototype.getArgTypes());
+
+        // Add typing for all arguments before building the cases:
+        for (Variable variable : variables) {
+            termBuildingVisitor.addTypeMapping(variable.getName(), variable.getType());
+        }
+
+        termBuildingVisitor.addFunctionPrototypeMapping(name, prototype);
+        List<FunctionCase> functionCases = makeCases(def.cases);
+
+        return new MathematicalFunctionDefinition(name, variables, functionCases);
     }
 
-    private List<Variable> createVariables(List<Token> argTokens) {
+    private FunctionPrototype makePrototype(PredicateLogicParser.FunctionPrototypeContext ctx) {
 
-        if (argTokens.isEmpty()) {
-            throw new IllegalFunctionException("No arguments given with function definition.");
+        String name = ctx.name.getText();
+
+        List<Token> types = ctx.types.types;
+
+        if (types.isEmpty()) {
+            throw new WrappingRuntimeException(
+                    new IllegalFunctionException("No return type given for function definition"));
+        }
+
+        ArrayList<Type> argTypes = new ArrayList<>();
+        for (int i = 0; i < types.size() - 1; i++) {
+            Type argType = Type.withIdentifier(types.get(i).getText());
+            argTypes.add(argType);
+        }
+
+        Type returnType = Type.withIdentifier(types.get(types.size() - 1).getText());
+
+        return new FunctionPrototype(name, argTypes, returnType);
+    }
+
+    private List<Variable> makeVariables(List<String> argNames, List<Type> argTypes) {
+
+        if (argNames.isEmpty()) {
+            throw new WrappingRuntimeException(
+                    new IllegalFunctionException("No arguments given with function definition."));
+        }
+
+        if (argNames.size() != argTypes.size()) {
+            throw new WrappingRuntimeException(
+                    new IllegalFunctionException("Different number of args given in prototype and definition."));
         }
 
         ArrayList<Variable> variables = new ArrayList<>();
 
-        for (Token argToken : argTokens) {
-            variables.add(Variable.withTypeNat(argToken.getText()));
+        for (int i = 0; i < argNames.size(); i++) {
+            variables.add(new Variable(argNames.get(i), argTypes.get(i)));
         }
 
         return variables;
     }
 
-    private List<FunctionCase> createCases(PredicateLogicParser.FnCasesContext fnCasesContext) {
+    private List<FunctionCase> makeCases(PredicateLogicParser.FnCasesContext fnCasesContext) {
 
         ArrayList<FunctionCase> functionCases = new ArrayList<>();
         List<Formula> negatedPreviousConditions = new ArrayList<>();

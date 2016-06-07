@@ -1,12 +1,32 @@
 parser grammar PPredicateLogicFunction;
-import PPredicateLogicFormula, PPredicateLogicTerm;
+import PShared, PPredicateLogicFormula, PPredicateLogicTerm;
+
+// Sum :: Nat -> Nat
 
 functionDefinition
-    : name=(NAME | CAP_NAME_ONLY_LETTERS) args=fnArgList ET cases=fnCases
+    : proto=functionPrototype def=definition
+    ;
+
+// Prototype
+functionPrototype
+    : name=anyName DOUBLE_COLON types=protoTypeList
+    ;
+
+protoTypeList
+    : types+=CAP_NAME_ONLY_LETTERS (IMPLIES types+=CAP_NAME_ONLY_LETTERS)*
+    ;
+
+protoReturnType
+    : type=CAP_NAME_ONLY_LETTERS
+    ;
+
+// Definition
+definition
+    : name=anyName args=fnArgList ET cases=fnCases
     ;
 
 fnArgList
-    : LPAREN (args+=(NAME | CAP_NAME_ONLY_LETTERS) (COMMA args+=(NAME | CAP_NAME_ONLY_LETTERS))*)? RPAREN
+    : LPAREN (args+=anyName (COMMA args+=anyName)*)? RPAREN
     ;
 
 fnCases

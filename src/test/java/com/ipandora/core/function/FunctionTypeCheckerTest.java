@@ -31,9 +31,10 @@ import static org.mockito.Mockito.verify;
 public class FunctionTypeCheckerTest {
 
     private static final Variable N = Variable.withTypeNat("n");
-    private static final MathematicalFunctionDefinition SUM_FN = mathFun("Sum", Collections.singletonList(N), Arrays.asList(
-            funCase(num(0), eq(N, num(0))),
-            funCase(add(N, fun("Sum", sub(N, num(1)))), not(eq(N, num(0))))));
+    private static final MathematicalFunctionDefinition SUM_FN = mathFun("Sum", Collections.singletonList(N),
+            Arrays.asList(
+                    funCase(num(0), eq(N, num(0))),
+                    funCase(add(N, fun("Sum", sub(N, num(1)))), not(eq(N, num(0))))));
 
     @Mock
     private TermTypeChecker mockTermTypeChecker;
@@ -75,7 +76,9 @@ public class FunctionTypeCheckerTest {
     }
 
     @Test(expected = TypeMismatchException.class)
-    public void analyseShouldThrowIfExpressionReturnTypeIsNotNat() throws TypeMismatchException {
+    public void analyseShouldThrowIfExpressionReturnTypeIsDifferentToPrototypeReturnType()
+            throws TypeMismatchException {
+
         MathematicalFunctionDefinition fn = mathFun("Sum", Collections.singletonList(N), Arrays.asList(
                 funCase(con("c"), eq(N, num(0))),
                 funCase(add(N, fun("Sum", sub(N, num(1)))), eq(N, num(0)))));

@@ -1,7 +1,8 @@
 package com.ipandora.testutils;
 
 import com.ipandora.api.predicate.formula.Formula;
-import com.ipandora.api.predicate.function.*;
+import com.ipandora.api.predicate.function.FunctionCase;
+import com.ipandora.api.predicate.function.MathematicalFunctionDefinition;
 import com.ipandora.api.predicate.term.Term;
 import com.ipandora.api.predicate.term.Variable;
 

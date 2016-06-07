@@ -43,13 +43,16 @@ public class FunctionDefinitionEncoderImpl implements FunctionDefinitionEncoder 
 
             // Variable guards
             for (Variable argVar : argVars) {
-                formulas.add(new GreaterThanEqualFormula(argVar, new Number(0)));
+                // TODO: avoid this sort of type checking
+                if (argVar.getType() == Type.NAT) {
+                    formulas.add(new GreaterThanEqualFormula(argVar, new Number(0)));
+                }
             }
 
             // Function cases
             for (FunctionCase functionCase : mathematicalFunction.getCases()) {
                 Formula condition = functionCase.getCondition();
-                Term expression =  functionCase.getExpression();
+                Term expression = functionCase.getExpression();
                 ImpliesFormula formula = new ImpliesFormula(condition, new EqualToFormula(function, expression));
                 formulas.add(formula);
             }

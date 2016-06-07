@@ -39,7 +39,8 @@ public class ANTLRFunctionParserTest {
 
     @Test
     public void fromStringSingleCase() throws FunctionParsingException {
-        FunctionDefinition function = parser.fromString("Foo(x) = 1/x");
+        FunctionDefinition function = parser.fromString("Foo :: Nat -> Nat\n" +
+                "Foo(x) = 1/x");
 
         FunctionCase functionCase = new FunctionCase(
                 new Division(new Number(1), Variable.withTypeNat("x")),
@@ -53,7 +54,8 @@ public class ANTLRFunctionParserTest {
 
     @Test
     public void fromStringTwoCases() throws FunctionParsingException {
-        FunctionDefinition function = parser.fromString("Foo(x) = \n" +
+        FunctionDefinition function = parser.fromString("Foo :: Nat -> Nat\n" +
+                "Foo(x) = \n" +
                 "1/2 if x = 1\n" +
                 "1/3 otherwise");
 
@@ -70,7 +72,8 @@ public class ANTLRFunctionParserTest {
 
     @Test
     public void fromStringManyCases() throws FunctionParsingException {
-        FunctionDefinition function = parser.fromString("Foo(x) = \n" +
+        FunctionDefinition function = parser.fromString("Foo :: Nat -> Nat\n" +
+                "Foo(x) = \n" +
                 "1/2 if x = 1\n" +
                 "1/3 if x = 2\n" +
                 "1/8 otherwise");
@@ -92,7 +95,8 @@ public class ANTLRFunctionParserTest {
 
     @Test
     public void fromStringManyArguments() throws FunctionParsingException {
-        FunctionDefinition function = parser.fromString("Foo(x, y) = x + y");
+        FunctionDefinition function = parser.fromString("Foo :: Nat -> Nat -> Nat\n" +
+                "Foo(x, y) = x + y");
 
         FunctionCase functionCase = new FunctionCase(
                 new Addition(Variable.withTypeNat("x"), Variable.withTypeNat("y")),
@@ -107,7 +111,8 @@ public class ANTLRFunctionParserTest {
 
     @Test(expected = FunctionParsingException.class)
     public void fromStringShouldThrowIfNoArgumentsGiven() throws FunctionParsingException {
-        parser.fromString("Foo() = 1");
+        parser.fromString("Foo :: Nat\n" +
+                "Foo() = 1");
     }
 
     @Test(expected = TypeMismatchException.class)
@@ -117,7 +122,8 @@ public class ANTLRFunctionParserTest {
                 when(mockTypeChecker).analyse(any(FunctionDefinition.class), anyList());
 
         try {
-            parser.fromStringWithTypeChecking("Foo(x) = \n" +
+            parser.fromStringWithTypeChecking("Foo :: Nat -> Nat\n" +
+                    "Foo(x) = \n" +
                     "1/2 if c = 1\n" +
                     "1/3 otherwise");
 
@@ -132,7 +138,8 @@ public class ANTLRFunctionParserTest {
         List<FunctionPrototype> functionPrototypes = new ArrayList<>();
         functionPrototypes.add(new FunctionPrototype("Bar", Collections.singletonList(Type.NAT), Type.NAT));
 
-        FunctionDefinition function = parser.fromString("Foo(x) = \n" +
+        FunctionDefinition function = parser.fromString("Foo :: Nat -> Nat\n" +
+                "Foo(x) = \n" +
                 "1/2 if Bar(x) = 1\n" +
                 "1/3 otherwise", functionPrototypes);
 
@@ -146,6 +153,18 @@ public class ANTLRFunctionParserTest {
                 "Foo", Collections.singletonList(Variable.withTypeNat("x")), Arrays.asList(ifCase, otherCase));
 
         assertThat(function).isEqualTo(expected);
+    }
+
+    @Test(expected = FunctionParsingException.class)
+    public void fromStringShouldThrowIfNamesOfPrototypeAndDefinitionDiffer() throws FunctionParsingException {
+        parser.fromString("Foo :: Nat -> Nat\n" +
+                "foo(x) = x");
+    }
+
+    @Test(expected = FunctionParsingException.class)
+    public void fromStringShouldThrowIfArgCountOfPrototypeAndDefinitionDiffer() throws FunctionParsingException {
+        parser.fromString("Foo :: Nat -> Nat\n" +
+                "Foo(x, y) = x + y");
     }
 
 }
