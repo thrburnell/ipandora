@@ -5,6 +5,7 @@ lexer grammar LShared;
 
 DOT: '.';
 COMMA: ',';
+CAP_NAME_ONLY_LETTERS: ('A'..'Z') LETTER*;
 NAME: LETTER CHARACTER*;
 NUMBER: DIGIT+;
 fragment CHARACTER: LETTER | DIGIT | '_';

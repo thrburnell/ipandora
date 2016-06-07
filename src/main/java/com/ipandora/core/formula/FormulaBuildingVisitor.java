@@ -225,12 +225,15 @@ public class FormulaBuildingVisitor extends PredicateLogicBaseVisitor<Formula> {
             return Type.UNKNOWN;
         }
 
-        switch (ctx.type.getType()) {
-            case PredicateLogicLexer.NAT: return Type.NAT;
+        String type = ctx.type.getText();
+
+        for (Type t : Type.values()) {
+            if (t.getName().equals(type)) {
+                return t;
+            }
         }
 
-        throw new WrappingRuntimeException(
-                new InvalidSyntaxException("Unknown type " + ctx.type.getText()));
+        throw new WrappingRuntimeException(new InvalidSyntaxException("Unknown type " + type));
     }
 
 }

@@ -22,4 +22,3 @@ LTE: '<=';
 
 // Types
 IN: 'in';
-NAT: 'Nat';

@@ -30,11 +30,11 @@ powerTerm
 
 leafTerm
     : func=function
-    | term=NAME
+    | term=(NAME | CAP_NAME_ONLY_LETTERS)
     | number=NUMBER
     | LPAREN expr=mathExpr RPAREN
     ;
 
 function
-    : name=NAME args=argList
+    : name=(NAME | CAP_NAME_ONLY_LETTERS) args=argList
     ;

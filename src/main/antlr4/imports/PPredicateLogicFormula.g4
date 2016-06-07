@@ -36,16 +36,16 @@ quantified
     ;
 
 varSet
-    : vars+=NAME (COMMA vars+=NAME)* (dom=domain)?
+    : vars+=(NAME | CAP_NAME_ONLY_LETTERS) (COMMA vars+=(NAME | CAP_NAME_ONLY_LETTERS))* (dom=domain)?
     ;
 
 domain
-    : IN type=NAT
+    : IN type=CAP_NAME_ONLY_LETTERS
     ;
 
 // Optional argList; when missing, predicate is a propositional variable
 predicate
-    : name=NAME args=argList?
+    : name=(NAME | CAP_NAME_ONLY_LETTERS) args=argList?
     ;
 
 boolExpr

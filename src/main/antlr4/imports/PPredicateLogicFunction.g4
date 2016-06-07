@@ -2,11 +2,11 @@ parser grammar PPredicateLogicFunction;
 import PPredicateLogicFormula, PPredicateLogicTerm;
 
 functionDefinition
-    : name=NAME args=fnArgList ET cases=fnCases
+    : name=(NAME | CAP_NAME_ONLY_LETTERS) args=fnArgList ET cases=fnCases
     ;
 
 fnArgList
-    : LPAREN (args+=NAME (COMMA args+=NAME)*)? RPAREN
+    : LPAREN (args+=(NAME | CAP_NAME_ONLY_LETTERS) (COMMA args+=(NAME | CAP_NAME_ONLY_LETTERS))*)? RPAREN
     ;
 
 fnCases
