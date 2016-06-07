@@ -1,4 +1,5 @@
 parser grammar PPredicateLogicTerm;
+import PShared;
 
 argList
     : LPAREN args+=mathExpr (COMMA args+=mathExpr)* RPAREN
@@ -30,11 +31,11 @@ powerTerm
 
 leafTerm
     : func=function
-    | term=(NAME | CAP_NAME_ONLY_LETTERS)
+    | term=anyName
     | number=NUMBER
     | LPAREN expr=mathExpr RPAREN
     ;
 
 function
-    : name=(NAME | CAP_NAME_ONLY_LETTERS) args=argList
+    : name=anyName args=argList
     ;

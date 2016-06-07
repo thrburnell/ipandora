@@ -1,5 +1,5 @@
 parser grammar PPredicateLogicFormula;
-import PPredicateLogicTerm;
+import PShared, PPredicateLogicTerm;
 
 // Formulas
 
@@ -36,7 +36,7 @@ quantified
     ;
 
 varSet
-    : vars+=(NAME | CAP_NAME_ONLY_LETTERS) (COMMA vars+=(NAME | CAP_NAME_ONLY_LETTERS))* (dom=domain)?
+    : vars+=anyName (COMMA vars+=anyName)* (dom=domain)?
     ;
 
 domain
@@ -45,7 +45,7 @@ domain
 
 // Optional argList; when missing, predicate is a propositional variable
 predicate
-    : name=(NAME | CAP_NAME_ONLY_LETTERS) args=argList?
+    : name=anyName args=argList?
     ;
 
 boolExpr

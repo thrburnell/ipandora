@@ -9,7 +9,6 @@ import com.ipandora.core.util.WrappingRuntimeException;
 import com.ipandora.parser.PredicateLogicBaseVisitor;
 import com.ipandora.parser.PredicateLogicLexer;
 import com.ipandora.parser.PredicateLogicParser;
-import org.antlr.v4.runtime.Token;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -150,7 +149,7 @@ public class FormulaBuildingVisitor extends PredicateLogicBaseVisitor<Formula> {
         for (PredicateLogicParser.VarSetContext vsc : ctx.varSets) {
             List<Variable> variables = new ArrayList<>();
             Type type = getTypeFromDomain(vsc.dom);
-            for (Token var : vsc.vars) {
+            for (PredicateLogicParser.AnyNameContext var : vsc.vars) {
                 String variableName = var.getText();
                 variables.add(new Variable(variableName, type));
                 termBuildingVisitor.addTypeMapping(variableName, type);

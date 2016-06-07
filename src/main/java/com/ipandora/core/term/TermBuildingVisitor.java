@@ -89,7 +89,7 @@ public class TermBuildingVisitor extends PredicateLogicBaseVisitor<Term> {
     @Override
     public Term visitLeafTerm(PredicateLogicParser.LeafTermContext ctx) {
 
-        Token term = ctx.term;
+        PredicateLogicParser.AnyNameContext term = ctx.term;
         if (term != null) {
             String name = term.getText();
             Type type = symbolTable.getType(name);

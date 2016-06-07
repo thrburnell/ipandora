@@ -1,3 +1,3 @@
 grammar PredicateLogic;
 import LPredicateLogicTerm, LPredicateLogicFormula, LPredicateLogicFunction, LShared,
-        PPredicateLogicTerm, PPredicateLogicFormula, PPredicateLogicFunction;
+        PPredicateLogicTerm, PPredicateLogicFormula, PPredicateLogicFunction, PShared;
