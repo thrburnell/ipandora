@@ -5,7 +5,6 @@ import com.ipandora.api.predicate.function.FunctionDefinition;
 import com.ipandora.api.predicate.function.FunctionPrototype;
 import com.ipandora.api.predicate.function.MathematicalFunctionDefinition;
 import com.ipandora.api.predicate.term.Term;
-import com.ipandora.api.predicate.term.Type;
 import com.ipandora.api.predicate.term.TypeMismatchException;
 import com.ipandora.core.formula.FormulaTypeChecker;
 import com.ipandora.core.term.TermTypeChecker;
@@ -56,8 +55,8 @@ public class FunctionTypeChecker {
             for (FunctionCase functionCase : mathematicalFunction.getCases()) {
                 try {
                     Term expression = functionCase.getExpression();
-                    if (expression.getType() != Type.NAT) {
-                        throw new TypeMismatchException("Return expression not of type Nat: " + expression);
+                    if (expression.getType() != mathematicalFunction.getReturnType()) {
+                        throw new TypeMismatchException("Return expression not of correct type: " + expression);
                     }
 
                     termTypeChecker.analyse(expression, functionPrototypes);

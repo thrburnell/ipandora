@@ -3,6 +3,7 @@ package com.ipandora.core.function;
 import com.ipandora.api.predicate.formula.Formula;
 import com.ipandora.api.predicate.function.MathematicalFunctionDefinition;
 import com.ipandora.api.predicate.term.Term;
+import com.ipandora.api.predicate.term.Type;
 import com.ipandora.api.predicate.term.TypeMismatchException;
 import com.ipandora.api.predicate.term.Variable;
 import com.ipandora.core.formula.FormulaTypeChecker;
@@ -34,7 +35,7 @@ public class FunctionTypeCheckerTest {
     private static final MathematicalFunctionDefinition SUM_FN = mathFun("Sum", Collections.singletonList(N),
             Arrays.asList(
                     funCase(num(0), eq(N, num(0))),
-                    funCase(add(N, fun("Sum", sub(N, num(1)))), not(eq(N, num(0))))));
+                    funCase(add(N, fun("Sum", sub(N, num(1)))), not(eq(N, num(0))))), Type.NAT);
 
     @Mock
     private TermTypeChecker mockTermTypeChecker;
@@ -76,12 +77,12 @@ public class FunctionTypeCheckerTest {
     }
 
     @Test(expected = TypeMismatchException.class)
-    public void analyseShouldThrowIfExpressionReturnTypeIsDifferentToPrototypeReturnType()
+    public void analyseShouldThrowIfExpressionReturnTypeIsDifferentToFunctionReturnType()
             throws TypeMismatchException {
 
         MathematicalFunctionDefinition fn = mathFun("Sum", Collections.singletonList(N), Arrays.asList(
                 funCase(con("c"), eq(N, num(0))),
-                funCase(add(N, fun("Sum", sub(N, num(1)))), eq(N, num(0)))));
+                funCase(add(N, fun("Sum", sub(N, num(1)))), eq(N, num(0)))), Type.NAT);
 
         typeChecker.analyse(fn, EMPTY_LIST);
     }

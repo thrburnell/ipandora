@@ -64,7 +64,7 @@ public class FunctionBuildingVisitor extends PredicateLogicBaseVisitor<FunctionD
         termBuildingVisitor.addFunctionPrototypeMapping(name, prototype);
         List<FunctionCase> functionCases = makeCases(def.cases);
 
-        return new MathematicalFunctionDefinition(name, variables, functionCases);
+        return new MathematicalFunctionDefinition(name, variables, functionCases, prototype.getReturnType());
     }
 
     private FunctionPrototype makePrototype(PredicateLogicParser.FunctionPrototypeContext ctx) {

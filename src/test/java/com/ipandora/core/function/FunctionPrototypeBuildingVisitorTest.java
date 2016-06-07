@@ -17,7 +17,8 @@ public class FunctionPrototypeBuildingVisitorTest {
     @Test
     public void visitMathematicalFunctionDefinitionShouldReturnCorrectPrototype() {
         MathematicalFunctionDefinition fn = new MathematicalFunctionDefinition("Foo",
-                Arrays.asList(Variable.withTypeNat("x"), new Variable("y")), Collections.<FunctionCase>emptyList());
+                Arrays.asList(Variable.withTypeNat("x"), new Variable("y")), Collections.<FunctionCase>emptyList(),
+                Type.NAT);
 
         FunctionPrototype expected = new FunctionPrototype("Foo", Arrays.asList(Type.NAT, Type.UNKNOWN), Type.NAT);
         FunctionPrototypeBuildingVisitor visitor = new FunctionPrototypeBuildingVisitor();

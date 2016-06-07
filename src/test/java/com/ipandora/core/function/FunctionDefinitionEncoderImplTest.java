@@ -6,6 +6,7 @@ import com.ipandora.api.predicate.formula.Formula;
 import com.ipandora.api.predicate.formula.ImpliesFormula;
 import com.ipandora.api.predicate.function.FunctionCase;
 import com.ipandora.api.predicate.function.MathematicalFunctionDefinition;
+import com.ipandora.api.predicate.term.Type;
 import com.ipandora.api.predicate.term.Variable;
 import com.ipandora.core.formula.ConjunctionFormulaSplitter;
 import com.ipandora.core.formula.FormulaConjunctionReducer;
@@ -44,7 +45,8 @@ public class FunctionDefinitionEncoderImplTest {
         Variable z = natVar("z");
 
         FunctionCase fCase = funCase(add(x, y, z), truth());
-        MathematicalFunctionDefinition f = mathFun("f", Arrays.asList(x, y, z), Collections.singletonList(fCase));
+        MathematicalFunctionDefinition f = mathFun("f", Arrays.asList(x, y, z), Collections.singletonList(fCase),
+                Type.NAT);
 
         ForallFormula encoded = encoder.encode(f);
         List<Variable> variables = encoded.getVariables();
@@ -65,7 +67,8 @@ public class FunctionDefinitionEncoderImplTest {
 
         FunctionCase c1 = funCase(add(x, y, z), eq(add(x, y), num(2)));
         FunctionCase c2 = funCase(z, not(eq(add(x, y), num(2))));
-        MathematicalFunctionDefinition f = mathFun("f", Arrays.asList(x, y, z), Arrays.asList(c1, c2));
+        MathematicalFunctionDefinition f = mathFun("f", Arrays.asList(x, y, z), Arrays.asList(c1, c2),
+                Type.NAT);
 
         ForallFormula encoded = encoder.encode(f);
         Formula formula = encoded.getFormula();
@@ -86,7 +89,8 @@ public class FunctionDefinitionEncoderImplTest {
         Variable z = natVar("z");
 
         FunctionCase fCase = funCase(add(x, y, z), truth());
-        MathematicalFunctionDefinition f = mathFun("f", Arrays.asList(x, y, z), Collections.singletonList(fCase));
+        MathematicalFunctionDefinition f = mathFun("f", Arrays.asList(x, y, z), Collections.singletonList(fCase),
+                Type.NAT);
 
         ImpliesFormula expected = imp(truth(), eq(natFun("f", x, y, z), add(x, y, z)));
         ForallFormula encoded = encoder.encode(f);
@@ -108,7 +112,8 @@ public class FunctionDefinitionEncoderImplTest {
         Variable x = natVar("x");
         FunctionCase c1 = funCase(num(0), eq(x, num(0)));
         FunctionCase c2 = funCase(add(x, natFun("f", sub(x, num(1)))), not(eq(x, num(0))));
-        MathematicalFunctionDefinition f = mathFun("f", Collections.singletonList(x), Arrays.asList(c1, c2));
+        MathematicalFunctionDefinition f = mathFun("f", Collections.singletonList(x), Arrays.asList(c1, c2),
+                Type.NAT);
 
         AndFormula expected = and(
                 gte(x, num(0)),
@@ -133,7 +138,8 @@ public class FunctionDefinitionEncoderImplTest {
         FunctionCase c1 = funCase(num(0), eq(x, num(0)));
         FunctionCase c2 = funCase(num(1), eq(x, num(1)));
         FunctionCase c3 = funCase(add(x, natFun("f", sub(x, num(1)))), and(not(eq(x, num(0))), not(eq(x, num(1)))));
-        MathematicalFunctionDefinition f = mathFun("f", Collections.singletonList(x), Arrays.asList(c1, c2, c3));
+        MathematicalFunctionDefinition f = mathFun("f", Collections.singletonList(x), Arrays.asList(c1, c2, c3),
+                Type.NAT);
 
         ForallFormula encoded = encoder.encode(f);
         Formula formula = encoded.getFormula();

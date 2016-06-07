@@ -5,6 +5,7 @@ import com.ipandora.api.predicate.formula.ForallFormula;
 import com.ipandora.api.predicate.formula.Formula;
 import com.ipandora.api.predicate.function.FunctionDefinition;
 import com.ipandora.api.predicate.function.MathematicalFunctionDefinition;
+import com.ipandora.api.predicate.term.Type;
 import com.ipandora.core.function.FunctionDefinitionEncoder;
 import com.ipandora.core.proof.ProofStepCheckException;
 import com.ipandora.core.util.ProcessTimeoutException;
@@ -53,7 +54,7 @@ public class Z3FunctionEqualityCheckerTest {
     @Test
     public void checkShouldCallEncodeWithFunctionDefinition() throws ProofStepCheckException {
         MathematicalFunctionDefinition f = mathFun("f", Collections.singletonList(natVar("x")),
-                Collections.singletonList(funCase(add(natVar("x"), num(1)), truth())));
+                Collections.singletonList(funCase(add(natVar("x"), num(1)), truth())), Type.NAT);
 
         checker.check(fun("f", natVar("x")), add(natVar("x"), num(1)), f);
         verify(mockEncoder).encode(f);
@@ -62,7 +63,7 @@ public class Z3FunctionEqualityCheckerTest {
     @Test
     public void checkShouldCallGenerateCodeWithCorrectFormula() throws Exception {
         MathematicalFunctionDefinition f = mathFun("f", Arrays.asList(natVar("x"), natVar("y")),
-                Collections.singletonList(funCase(add(natVar("x"), natVar("y")), truth())));
+                Collections.singletonList(funCase(add(natVar("x"), natVar("y")), truth())), Type.NAT);
 
         when(mockEncoder.encode(f))
                 .thenReturn(forall(truth(), natVar("x"), natVar("y")));
@@ -79,7 +80,7 @@ public class Z3FunctionEqualityCheckerTest {
     @Test
     public void checkThrowsProofStepExceptionWithMessageIfCodeGeneratorThrows() throws Exception {
         MathematicalFunctionDefinition f = mathFun("f", Collections.singletonList(natVar("x")),
-                Collections.singletonList(funCase(add(natVar("x"), num(1)), truth())));
+                Collections.singletonList(funCase(add(natVar("x"), num(1)), truth())), Type.NAT);
 
         when(mockCodeGenerator.generateCheckSatCode(any(Formula.class)))
                 .thenThrow(new Z3InvalidProblemException("test-message"));
@@ -95,7 +96,7 @@ public class Z3FunctionEqualityCheckerTest {
     @Test
     public void checkShouldCallZ3ClientWithCorrectProgram() throws Exception {
         MathematicalFunctionDefinition f = mathFun("f", Collections.singletonList(natVar("x")),
-                Collections.singletonList(funCase(add(natVar("x"), num(1)), truth())));
+                Collections.singletonList(funCase(add(natVar("x"), num(1)), truth())), Type.NAT);
 
         when(mockCodeGenerator.generateCheckSatCode(any(Formula.class)))
                 .thenReturn("program-code");
@@ -107,7 +108,7 @@ public class Z3FunctionEqualityCheckerTest {
     @Test
     public void checkShouldReturnNegationOfClientResponse() throws Exception {
         MathematicalFunctionDefinition f = mathFun("f", Collections.singletonList(natVar("x")),
-                Collections.singletonList(funCase(add(natVar("x"), num(1)), truth())));
+                Collections.singletonList(funCase(add(natVar("x"), num(1)), truth())), Type.NAT);
 
         when(mockZ3Client.isSat(anyString())).thenReturn(true);
         boolean result = checker.check(num(0), num(1), f);
@@ -121,7 +122,7 @@ public class Z3FunctionEqualityCheckerTest {
     @Test
     public void checkThrowsProofStepExceptionWithMessageIfZ3ClientThrowsUnknownException() throws Exception {
         MathematicalFunctionDefinition f = mathFun("f", Collections.singletonList(natVar("x")),
-                Collections.singletonList(funCase(add(natVar("x"), num(1)), truth())));
+                Collections.singletonList(funCase(add(natVar("x"), num(1)), truth())), Type.NAT);
 
         when(mockZ3Client.isSat(anyString()))
                 .thenThrow(new Z3UnknownException());
@@ -137,7 +138,7 @@ public class Z3FunctionEqualityCheckerTest {
     @Test
     public void checkThrowsProofStepExceptionWithMessageIfZ3ClientTimesOut() throws Exception {
         MathematicalFunctionDefinition f = mathFun("f", Collections.singletonList(natVar("x")),
-                Collections.singletonList(funCase(add(natVar("x"), num(1)), truth())));
+                Collections.singletonList(funCase(add(natVar("x"), num(1)), truth())), Type.NAT);
 
         when(mockZ3Client.isSat(anyString()))
                 .thenThrow(new ProcessTimeoutException("test", null));

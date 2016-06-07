@@ -47,7 +47,8 @@ public class ANTLRFunctionParserTest {
                 new TruthFormula());
 
         MathematicalFunctionDefinition expected = new MathematicalFunctionDefinition(
-                "Foo", Collections.singletonList(Variable.withTypeNat("x")), Collections.singletonList(functionCase));
+                "Foo", Collections.singletonList(Variable.withTypeNat("x")), Collections.singletonList(functionCase),
+                Type.NAT);
 
         assertThat(function).isEqualTo(expected);
     }
@@ -65,7 +66,8 @@ public class ANTLRFunctionParserTest {
         FunctionCase otherCase = new FunctionCase(new Division(new Number(1), new Number(3)), otherCondition);
 
         MathematicalFunctionDefinition expected = new MathematicalFunctionDefinition(
-                "Foo", Collections.singletonList(Variable.withTypeNat("x")), Arrays.asList(ifCase, otherCase));
+                "Foo", Collections.singletonList(Variable.withTypeNat("x")), Arrays.asList(ifCase, otherCase),
+                Type.NAT);
 
         assertThat(function).isEqualTo(expected);
     }
@@ -88,7 +90,8 @@ public class ANTLRFunctionParserTest {
         FunctionCase otherCase = new FunctionCase(new Division(new Number(1), new Number(8)), otherCondition);
 
         MathematicalFunctionDefinition expected = new MathematicalFunctionDefinition("Foo",
-                Collections.singletonList(Variable.withTypeNat("x")), Arrays.asList(ifCase1, ifCase2, otherCase));
+                Collections.singletonList(Variable.withTypeNat("x")), Arrays.asList(ifCase1, ifCase2, otherCase),
+                Type.NAT);
 
         assertThat(function).isEqualTo(expected);
     }
@@ -104,7 +107,7 @@ public class ANTLRFunctionParserTest {
 
         MathematicalFunctionDefinition expected = new MathematicalFunctionDefinition("Foo",
                 Arrays.asList(Variable.withTypeNat("x"), Variable.withTypeNat("y")),
-                Collections.singletonList(functionCase));
+                Collections.singletonList(functionCase), Type.NAT);
 
         assertThat(function).isEqualTo(expected);
     }
@@ -150,7 +153,8 @@ public class ANTLRFunctionParserTest {
         FunctionCase otherCase = new FunctionCase(new Division(new Number(1), new Number(3)), otherCondition);
 
         MathematicalFunctionDefinition expected = new MathematicalFunctionDefinition(
-                "Foo", Collections.singletonList(Variable.withTypeNat("x")), Arrays.asList(ifCase, otherCase));
+                "Foo", Collections.singletonList(Variable.withTypeNat("x")), Arrays.asList(ifCase, otherCase),
+                Type.NAT);
 
         assertThat(function).isEqualTo(expected);
     }
