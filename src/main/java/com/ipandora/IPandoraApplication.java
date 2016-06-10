@@ -65,6 +65,10 @@ public class IPandoraApplication extends Application<IPandoraConfiguration> {
                 new Z3ClientImpl(new ProcessExecutorImpl(), new EnvironmentVariableProviderImpl()),
                 new FunctionDefinitionEncoderImpl(new FormulaConjunctionReducer()));
 
+        Z3ExhaustiveCaseChecker exhaustiveCaseChecker = new Z3ExhaustiveCaseChecker(
+                new SMTCodeGeneratorImpl(new SMTGeneratingFormulaVisitorCreator()),
+                new Z3ClientImpl(new ProcessExecutorImpl(), new EnvironmentVariableProviderImpl()));
+
         // Schema generator
         MathematicalInductionSchemaGenerator inductionSchemaGenerator = new MathematicalInductionSchemaGenerator(
                 new TermStringBuilder(), new TermSubstitutor());
@@ -80,8 +84,9 @@ public class IPandoraApplication extends Application<IPandoraConfiguration> {
 
         // Resources
         PredicateResource resource = new PredicateResource(formulaParser, termParser, functionParser, impliesChecker,
-                equalityChecker, functionEqualityChecker, proofStreamReaderCreator, inductionSchemaGenerator,
-                formulaStringBuilder, termStringBuilder, termTypeInferrer, prototypeBuildingVisitor);
+                equalityChecker, functionEqualityChecker, exhaustiveCaseChecker, proofStreamReaderCreator,
+                inductionSchemaGenerator, formulaStringBuilder, termStringBuilder, termTypeInferrer,
+                prototypeBuildingVisitor);
 
         environment.jersey().register(resource);
         environment.jersey().register(MultiPartFeature.class);

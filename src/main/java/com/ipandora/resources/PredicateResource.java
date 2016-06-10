@@ -7,10 +7,15 @@ import com.ipandora.api.predicate.function.FunctionPrototype;
 import com.ipandora.api.predicate.function.FunctionPrototypeRequest;
 import com.ipandora.api.predicate.induction.SchemaRequest;
 import com.ipandora.api.predicate.induction.SchemaResponse;
+import com.ipandora.api.predicate.proofstep.ExhaustiveCasesRequest;
+import com.ipandora.api.predicate.proofstep.ExhaustiveCasesResponse;
 import com.ipandora.api.predicate.proofstep.StepRequest;
 import com.ipandora.api.predicate.proofstep.StepResponse;
 import com.ipandora.api.predicate.read.ReadResponse;
-import com.ipandora.api.predicate.term.*;
+import com.ipandora.api.predicate.term.Term;
+import com.ipandora.api.predicate.term.Type;
+import com.ipandora.api.predicate.term.TypeMismatchException;
+import com.ipandora.api.predicate.term.Variable;
 import com.ipandora.api.predicate.validate.ValidateFormulaRequest;
 import com.ipandora.api.predicate.validate.ValidateFormulaResponse;
 import com.ipandora.api.predicate.validate.ValidateFunctionRequest;
@@ -56,6 +61,7 @@ public class PredicateResource {
     private final ImpliesChecker impliesChecker;
     private final ArithmeticEqualityChecker equalityChecker;
     private final FunctionEqualityChecker functionEqualityChecker;
+    private final ExhaustiveCaseChecker exhaustiveCaseChecker;
     private final ProofStreamReaderCreator proofStreamReaderCreator;
     private final InductionSchemaGenerator inductionSchemaGenerator;
     private final PrettyStringBuilder<Formula> formulaStringBuilder;
@@ -67,6 +73,7 @@ public class PredicateResource {
                              ImpliesChecker impliesChecker,
                              ArithmeticEqualityChecker equalityChecker,
                              FunctionEqualityChecker functionEqualityChecker,
+                             ExhaustiveCaseChecker exhaustiveCaseChecker,
                              ProofStreamReaderCreator proofStreamReaderCreator,
                              InductionSchemaGenerator inductionSchemaGenerator,
                              PrettyStringBuilder<Formula> formulaStringBuilder,
@@ -79,6 +86,7 @@ public class PredicateResource {
         this.impliesChecker = impliesChecker;
         this.equalityChecker = equalityChecker;
         this.functionEqualityChecker = functionEqualityChecker;
+        this.exhaustiveCaseChecker = exhaustiveCaseChecker;
         this.proofStreamReaderCreator = proofStreamReaderCreator;
         this.inductionSchemaGenerator = inductionSchemaGenerator;
         this.formulaStringBuilder = formulaStringBuilder;
@@ -137,6 +145,52 @@ public class PredicateResource {
         }
 
         return Response.ok(validateResponse).build();
+    }
+
+    @POST
+    @Path("/step/case")
+    public Response checkCasesExhaustive(ExhaustiveCasesRequest exhaustiveCasesRequest) {
+
+        ExhaustiveCasesResponse response = new ExhaustiveCasesResponse();
+
+        String first = exhaustiveCasesRequest.getFirst();
+        String second = exhaustiveCasesRequest.getSecond();
+
+        if (first == null) {
+            response.setErrorMsg("Required first formula missing");
+            return invalidRequestResponse(response);
+        }
+        if (second == null) {
+            response.setErrorMsg("Required second formula missing");
+            return invalidRequestResponse(response);
+        }
+
+        Formula firstFormula, secondFormula;
+        try {
+            firstFormula = formulaParser.fromString(first);
+        } catch (FormulaParsingException e) {
+            response.setErrorMsg("Invalid first formula");
+            return invalidRequestResponse(response);
+        }
+        try {
+            secondFormula = formulaParser.fromString(second);
+        } catch (FormulaParsingException e) {
+            response.setErrorMsg("Invalid second formula");
+            return invalidRequestResponse(response);
+        }
+
+        boolean result;
+        try {
+            result = exhaustiveCaseChecker.check(firstFormula, secondFormula);
+        } catch (ProofStepCheckException e) {
+            response.setErrorMsg(e.getMessage());
+            return invalidRequestResponse(response);
+        }
+
+        response.setFirst(first);
+        response.setSecond(second);
+        response.setExhaustive(result);
+        return Response.ok(response).build();
     }
 
     @POST
