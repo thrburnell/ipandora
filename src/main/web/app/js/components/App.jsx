@@ -2,8 +2,7 @@ import React from 'react'
 import AppRow from './AppRow'
 import RFunctionInput from '../containers/RFunctionInput'
 import RToShow from '../containers/RToShow' 
-import RBaseCase from '../containers/RBaseCase'
-import RInductiveCase from '../containers/RInductiveCase'
+import RGiven from '../containers/RGiven'
 
     // <AppRow rowClass="top-buffer"><RFunctionInput /></AppRow>
     // <AppRow><RBaseCase /></AppRow>
@@ -12,6 +11,7 @@ import RInductiveCase from '../containers/RInductiveCase'
 const App = () => (
   <div className="container">
     <AppRow rowClass="top-buffer"><RToShow /></AppRow>
+    <AppRow><RGiven /></AppRow>
   </div>
 )
 

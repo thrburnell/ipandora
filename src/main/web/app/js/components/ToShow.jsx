@@ -78,7 +78,7 @@ const ToShow = ({
       <div className="panel-heading">
         <h3 className="panel-title pull-left">To Show</h3>
         <ToggleText mode={ mode } knownValid={ knownValid } onToggleClick={ onToggleClick }/>
-        <div className="clearfix"></div>
+        <div className="clearfix" />
       </div>
       <div className="panel-body">
         { body() }
