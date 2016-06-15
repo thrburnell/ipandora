@@ -4,6 +4,7 @@ export const RECEIVE_FUNCTION_VALIDITY = 'RECEIVE_FUNCTION_VALIDITY'
 export const RECEIVE_INDUCTION_SCHEMA = 'RECEIVE_INDUCTION_SCHEMA'
 export const SAVE_BASE_INITIAL_TERM = 'SAVE_BASE_INITIAL_TERM'
 export const RECEIVE_BASE_PROOF_STEP_VALIDITY = 'RECEIVE_BASE_PROOF_STEP_VALIDITY'
+export const TOGGLE_PROOF_MODE = 'TOGGLE_PROOF_MODE'
 
 export const validateFunction = (fn) => {
   return (dispatch, getState) => {
@@ -118,4 +119,9 @@ export const receiveBaseProofStepValidity = (term, justification, valid) => (
   }
 )
 
+export const toggleProofMode = () => (
+  {
+    type: TOGGLE_PROOF_MODE
+  }
+)
 

@@ -1,0 +1,5 @@
+export const PROOF_MODE = {
+  INDUCTION: "INDUCTION",
+  DIRECT: "DIRECT"
+}
+

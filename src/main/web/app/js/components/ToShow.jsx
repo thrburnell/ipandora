@@ -1,12 +1,18 @@
 import React from 'react'
+import { PROOF_MODE } from '../constants'
 
-const ToShow = ({ active=false, onValidateClick, valid }) => {
+const ToShow = ({ active=true, valid, mode, onToggleClick }) => {
 
   if (!active) {
     return null
   }
 
-  const className = ["panel", "panel-default", valid ? "panel-success" : valid == undefined ? "" : "panel-danger"].join(" ")
+  const className = [
+    "panel", "panel-default", 
+    valid ? "panel-success" : valid == undefined ? "" : "panel-danger"
+  ].join(" ")
+
+  const toggleText = mode == PROOF_MODE.INDUCTION ? "By direct" : "By induction"
 
   let formula
   let variable
@@ -15,18 +21,25 @@ const ToShow = ({ active=false, onValidateClick, valid }) => {
       <div className="panel-heading">
         <h3 className="panel-title pull-left">To Show</h3>
         <p className="panel-title pull-right">
-          <a href="#" onClick={ (e) => { onValidateClick(formula.value, variable.value); e.preventDefault(); } }>Validate</a>
+          <a href="#" onClick={(e) => { onToggleClick(); e.preventDefault(); }}>{ toggleText }</a>
         </p>
         <div className="clearfix"></div>
       </div>
       <div className="panel-body">
         <form className="form-horizontal">
-          <div className="form-group bottom-no-margin">
-            <div className="col-sm-9">
+          <div className="form-group">
+            <div className={["col-sm-", mode == PROOF_MODE.INDUCTION ? "9" : "12"].join("")}>
               <input ref={node => { formula = node }} type="text" className="form-control monospace-font" placeholder="\FORALL n in Nat. ..." />
             </div>
-            <div className="col-sm-3">
-              <input ref={node => { variable = node }} type="text" className="form-control monospace-font" placeholder="by induction on" />
+            { mode == PROOF_MODE.INDUCTION 
+              ? <div className="col-sm-3">
+                <input ref={node => { variable = node }} type="text" className="form-control monospace-font" placeholder="by induction on" />
+              </div>
+              : null }
+          </div>
+          <div className="form-group bottom-no-margin">
+            <div className="col-sm-12 text-center">
+              <button type="button" className="btn btn-primary">Get Started</button>
             </div>
           </div>
         </form>

@@ -1,5 +1,7 @@
 {
 
+  mode: "INDUCTION", // or DIRECT
+
   fn: {
     definition: "SumSq(n) = ...",
     valid: true

@@ -10,13 +10,8 @@ import thunkMiddleware from 'redux-thunk'
 import ipandoraApp from './reducers'
 import App from './components/App'
 
-const initialState = {
-  toShow: { valid: true }
-}
-
 let store = createStore(
   ipandoraApp,
-  initialState,
   applyMiddleware(thunkMiddleware)
 )
 

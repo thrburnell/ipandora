@@ -1,17 +1,17 @@
 import { connect } from 'react-redux'
-import { getInductionSchema } from '../actions'
+import { getInductionSchema, toggleProofMode } from '../actions'
 import ToShow from '../components/ToShow'
 
 const mapStateToProps = (state) => (
   {
     ...state.toShow,
-    active: state.fn.valid
+    mode: state.mode
   }
 )
 
 const mapDispatchToProps = (dispatch) => (
   {
-    onValidateClick: (formula, variable) => dispatch(getInductionSchema(formula, variable))
+    onToggleClick: () => dispatch(toggleProofMode())
   }
 )
 
