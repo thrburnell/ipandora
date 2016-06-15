@@ -1,5 +1,6 @@
 import { connect } from 'react-redux'
-import Given from '../components/Given'
+import Given from '../../components/Given'
+import { addGiven } from '../../actions'
 
 const mapStateToProps = (state) => (
   {
@@ -9,7 +10,6 @@ const mapStateToProps = (state) => (
 
 const mapDispatchToProps = (dispatch) => (
   {
-    
   }
 )
 

@@ -1,8 +1,6 @@
 import React from 'react'
-
-const GivenLine = ({ lineNo, body }) => (
-  <li className="list-group-item">({ lineNo }) { body }</li>
-)
+import GivenLine from './GivenLine'
+import RAddGiven from '../../containers/RGiven/RAddGiven'
 
 const Given = ({ given }) => (
   <div className="panel panel-default">
@@ -11,10 +9,10 @@ const Given = ({ given }) => (
       <div className="clearfix" />
     </div>
     <ul className="list-group">
-      {given.map(g => <GivenLine lineNo={g.lineNo} body={g.body} />)}
+      {given.map((g, i) => <GivenLine key={i} lineNo={g.lineNo} body={g.body} />)}
     </ul>
     <div className="panel-body">
-      Givens will go here
+      <RAddGiven />
     </div>
   </div>
 )

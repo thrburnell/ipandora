@@ -6,6 +6,8 @@ export const SAVE_BASE_INITIAL_TERM = 'SAVE_BASE_INITIAL_TERM'
 export const RECEIVE_BASE_PROOF_STEP_VALIDITY = 'RECEIVE_BASE_PROOF_STEP_VALIDITY'
 export const TOGGLE_PROOF_MODE = 'TOGGLE_PROOF_MODE'
 export const RECEIVE_TO_SHOW_VALIDATION = 'RECEIVE_TO_SHOW_VALIDATION'
+export const ADD_PROOF_NODE = 'ADD_PROOF_NODE'
+export const SAVE_GIVEN_INDEX = 'SAVE_GIVEN_INDEX'
 
 export const validateFunction = (fn) => {
   return (dispatch, getState) => {
@@ -153,6 +155,65 @@ export const receiveToShowValidation = (formula, valid) => (
     type: RECEIVE_TO_SHOW_VALIDATION,
     formula,
     valid
+  }
+)
+
+const makeRequest = (url, body) => {
+  const request = new Request(url, {
+    headers: new Headers({
+      "Content-Type": "application/json"
+    }),
+    method: "post",
+    body: JSON.stringify(body)
+  })
+
+  return fetch(request).then(res => res.json()).catch(err => console.log(err))
+}
+
+export const addGiven = (formula) => {
+  return (dispatch, getState) => {
+
+    return makeRequest("/api/predicate/formula", { formula })
+      .then(json => {
+        
+        if (json.valid) {
+          dispatch(addGivenProofNode(formula))
+          const givenIndex = getState().proof.length - 1
+          dispatch(saveGivenIndex(givenIndex))
+          return Promise.resolve()
+        } else {
+          return Promise.reject()
+        }
+      })
+  }
+}
+
+export const addGivenProofNode = (formula) => {
+  return (dispatch, getState) => {
+
+    const lineNo = getState().proof.length + 1
+    const proofNode = {
+      lineNo,
+      body: formula,
+      type: "GIVEN",
+      valid: true
+    }
+    
+    dispatch(addProofNode(proofNode))
+  }
+}
+
+export const addProofNode = (node) => (
+  {
+    type: ADD_PROOF_NODE,
+    node
+  }
+)
+
+export const saveGivenIndex = (index) => (
+  {
+    type: SAVE_GIVEN_INDEX,
+    index
   }
 )
 

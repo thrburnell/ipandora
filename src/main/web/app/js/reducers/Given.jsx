@@ -1,9 +1,13 @@
-import { } from '../actions'
+import { SAVE_GIVEN_INDEX } from '../actions'
 
 const Given = (state=[], action) => {
 
   switch (action.type) {
-    default: return state
+    case SAVE_GIVEN_INDEX:
+      return [...state, action.index]
+
+    default:
+      return state
   }
 }
 
