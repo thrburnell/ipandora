@@ -2,6 +2,72 @@
 
   mode: "INDUCTION", // or DIRECT
 
+  toShow: {
+    formula: "\\FORALL n in Nat. SumSq(n) = (n/6) * (n+1) * (2*n+1)",
+    valid: true
+  },
+
+  given: [0, 1, 2, 3, 4],  // indices of given proof nodes
+
+  proof: [
+ 
+    {
+      lineNo: "1",
+      body: "\\FORALL x. (dragon(x) & \\FORALL y. (...))"
+      type: "GIVEN",
+      valid: true
+    },
+    // ...
+    {
+      lineNo: "6",
+      body: "Take d1 arbitrary",
+      type: "TAKE_ARBITRARY",
+      element: {
+        name: "d1",
+        domain: undefined
+      }
+    },
+    // ...
+    {
+      lineNo: "8",
+      body: "dragon(d1) & green(d1)",
+      type: "ASSUMPTION",
+      valid: false
+    },
+    // ...
+    {
+      lineNo: "10",
+      body: "parentof(d2, d1)",
+      type: "ASSERTION",
+      justification: {
+        type: "LOGICAL_IMPLICATION",
+        by: [9, 5]
+      },
+      valid: false,
+      nonValidDependencies: [9]
+    },
+    // ...
+    {
+      lineNo: "15",
+      body: "childof(d1, d2) -> fly(d2)",
+      type: "ASSERTION",
+      justification: {
+        type: "ASSUMPTION_CLOSURE",
+        antecedent: 9,
+        consequent: 14
+      },
+      valid: true
+    }
+    // ...
+    // todo: ASSERTION - ARITHMETIC
+    // todo: ASSERTION - FUNCTION_DEF
+    // todo: ASSERTION - CASE_CLOSURE
+    // todo: CASE_ANALYSIS
+  ],
+
+
+  // OLD:
+
   fn: {
     definition: "SumSq(n) = ...",
     valid: true
@@ -14,11 +80,6 @@
       returnType: "Nat"
     }
   ],
-
-  toShow: {
-    formula: "\\FORALL n in Nat. SumSq(n) = (n/6) * (n+1) * (2*n+1)",
-    valid: true
-  },
 
   baseCase: {
     toShow: [
