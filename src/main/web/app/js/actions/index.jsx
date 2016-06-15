@@ -5,6 +5,7 @@ export const RECEIVE_INDUCTION_SCHEMA = 'RECEIVE_INDUCTION_SCHEMA'
 export const SAVE_BASE_INITIAL_TERM = 'SAVE_BASE_INITIAL_TERM'
 export const RECEIVE_BASE_PROOF_STEP_VALIDITY = 'RECEIVE_BASE_PROOF_STEP_VALIDITY'
 export const TOGGLE_PROOF_MODE = 'TOGGLE_PROOF_MODE'
+export const RECEIVE_TO_SHOW_VALIDATION = 'RECEIVE_TO_SHOW_VALIDATION'
 
 export const validateFunction = (fn) => {
   return (dispatch, getState) => {
@@ -122,6 +123,36 @@ export const receiveBaseProofStepValidity = (term, justification, valid) => (
 export const toggleProofMode = () => (
   {
     type: TOGGLE_PROOF_MODE
+  }
+)
+
+export const validateToShow = (formula) => {
+  return (dispatch, getState) => {
+    
+    const request = new Request("/api/predicate/formula", {
+      headers: new Headers({
+        "Content-Type": "application/json"
+      }),
+      method: "post",
+      body: JSON.stringify({
+        formula
+      })
+    })
+
+    return fetch(request)
+      .then(res => res.json())
+      .then(json => {
+        dispatch(receiveToShowValidation(formula, json.valid))
+      })
+      .catch(err => console.log(err))
+  }
+}
+
+export const receiveToShowValidation = (formula, valid) => (
+  {
+    type: RECEIVE_TO_SHOW_VALIDATION,
+    formula,
+    valid
   }
 )
 
