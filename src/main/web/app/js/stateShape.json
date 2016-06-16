@@ -13,6 +13,8 @@
 
   proofStepType: "ASSERT",  // or IDLE, ASSUME, TAKE_ARBITRARY, CASE_ANALYSIS
 
+  selectedLines: [ 0, 2, 3 ],
+
   proof: [
  
     {
