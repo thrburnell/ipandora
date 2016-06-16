@@ -1,7 +1,7 @@
 import { connect } from 'react-redux'
-import { getInductionSchema, toggleProofMode, validateToShow } from '../actions'
-import { PROOF_MODE } from '../constants'
-import ToShow from '../components/ToShow'
+import { getInductionSchema, toggleProofMode, validateToShow } from '../../actions'
+import { PROOF_MODE } from '../../constants'
+import ToShow from '../../components/ToShow'
 
 const mapStateToProps = (state) => (
   {

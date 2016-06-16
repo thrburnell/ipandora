@@ -15,17 +15,16 @@ const Form = ({ mode, knownInvalid, onButtonClick }) => {
   )
 
   const button = () => {
-    const className = ["btn", knownInvalid ? "btn-danger" : "btn-primary"].join(" ")
-    const text = knownInvalid ? "Retry" : "Get Started"
-
-    return (<button type="button" className={ className } onClick={(e) => {
+    return (<button type="button" className="btn btn-primary" onClick={(e) => {
       onButtonClick(formulaEntry.value, variableEntry ? variableEntry.value : undefined)
       e.preventDefault();  
-    }}>{ text }</button>)
+    }}>Get Started</button>)
   }
 
+  const formClassName = ["form-horizontal", knownInvalid ? "has-error" : ""].join(" ")
+
   return (
-    <div className="form-horizontal">
+    <div className={ formClassName }>
       <div className="form-group">
         <div className={["col-sm-", mode == PROOF_MODE.INDUCTION ? "9" : "12"].join("")}>
           <input ref={node => { formulaEntry = node }} type="text" 
