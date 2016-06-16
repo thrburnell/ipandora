@@ -11,6 +11,8 @@
 
   givenEntryComplete: true,
 
+  proofStepType: "ASSERT",  // or IDLE, ASSUME, TAKE_ARBITRARY, CASE_ANALYSIS
+
   proof: [
  
     {

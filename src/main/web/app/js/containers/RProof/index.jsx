@@ -4,7 +4,8 @@ import Proof from '../../components/Proof'
 const mapStateToProps = (state) => (
   {
     lines: [],
-    complete: false
+    complete: false,
+    stepType: state.proofStepType
   }
 )
 

@@ -9,6 +9,7 @@ export const RECEIVE_TO_SHOW_VALIDATION = 'RECEIVE_TO_SHOW_VALIDATION'
 export const ADD_PROOF_NODE = 'ADD_PROOF_NODE'
 export const SAVE_GIVEN_INDEX = 'SAVE_GIVEN_INDEX'
 export const COMPLETE_GIVEN_ENTRY = 'COMPLETE_GIVEN_ENTRY'
+export const SET_PROOF_STEP_TYPE = 'SET_PROOF_STEP_TYPE'
 
 export const validateFunction = (fn) => {
   return (dispatch, getState) => {
@@ -221,6 +222,13 @@ export const saveGivenIndex = (index) => (
 export const completeGivenEntry = () => (
   {
     type: COMPLETE_GIVEN_ENTRY
+  }
+)
+
+export const setProofStepType = (type) => (
+  {
+    type: SET_PROOF_STEP_TYPE,
+    proofStepType: type
   }
 )
 

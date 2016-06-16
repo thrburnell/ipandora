@@ -6,13 +6,14 @@ const AssertLine = ({
   error,
   resetForm,
   handleSubmit,
-  submitting
+  submitting,
+  onCloseClick
 }) => {
 
   return (
     <form className="form-horizontal" onSubmit={ handleSubmit }>
       <div className="form-group bottom-no-margin">
-        <div className="col-sm-7">
+        <div className="col-sm-6">
           <input type="text" {...formula}
            className="form-control monospace-font" placeholder="..." />
         </div>
@@ -22,6 +23,12 @@ const AssertLine = ({
         <div className="col-sm-2 text-right">
           <button type="submit" className="btn btn-primary full-width"
            disabled={ submitting }>Add</button>
+        </div>
+        <div className="col-sm-1 text-right">
+          <button type="button" className="btn btn-default full-width"
+           onClick={ onCloseClick }>
+            x
+          </button>
         </div>
       </div>
     </form>

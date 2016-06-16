@@ -6,6 +6,7 @@ import toShow from './ToShow'
 import proof from './Proof'
 import given from './Given'
 import givenEntryComplete from './GivenEntryComplete'
+import proofStepType from './ProofStepType'
 
 const ipandoraApp = combineReducers({
   mode,
@@ -13,6 +14,7 @@ const ipandoraApp = combineReducers({
   proof,
   given,
   givenEntryComplete,
+  proofStepType,
   form: formReducer
 })
 
