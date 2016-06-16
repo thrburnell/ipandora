@@ -1,15 +1,17 @@
 import { connect } from 'react-redux'
 import Given from '../../components/Given'
-import { addGiven } from '../../actions'
+import { addGiven, completeGivenEntry } from '../../actions'
 
 const mapStateToProps = (state) => (
   {
-    given: state.given.map(i => state.proof[i])
+    given: state.given.map(i => state.proof[i]),
+    complete: state.givenEntryComplete || false
   }
 )
 
 const mapDispatchToProps = (dispatch) => (
   {
+    onFinishClick: () => dispatch(completeGivenEntry())
   }
 )
 

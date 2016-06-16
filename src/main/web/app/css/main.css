@@ -14,3 +14,7 @@ body {
   font-family: monospace;
 }
 
+.full-width {
+  width: 100%;
+}
+

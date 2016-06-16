@@ -9,6 +9,8 @@
 
   given: [0, 1, 2, 3, 4],  // indices of given proof nodes
 
+  givenEntryComplete: true,
+
   proof: [
  
     {

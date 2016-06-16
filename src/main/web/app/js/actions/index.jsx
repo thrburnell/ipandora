@@ -8,6 +8,7 @@ export const TOGGLE_PROOF_MODE = 'TOGGLE_PROOF_MODE'
 export const RECEIVE_TO_SHOW_VALIDATION = 'RECEIVE_TO_SHOW_VALIDATION'
 export const ADD_PROOF_NODE = 'ADD_PROOF_NODE'
 export const SAVE_GIVEN_INDEX = 'SAVE_GIVEN_INDEX'
+export const COMPLETE_GIVEN_ENTRY = 'COMPLETE_GIVEN_ENTRY'
 
 export const validateFunction = (fn) => {
   return (dispatch, getState) => {
@@ -214,6 +215,12 @@ export const saveGivenIndex = (index) => (
   {
     type: SAVE_GIVEN_INDEX,
     index
+  }
+)
+
+export const completeGivenEntry = () => (
+  {
+    type: COMPLETE_GIVEN_ENTRY
   }
 )
 

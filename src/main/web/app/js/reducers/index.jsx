@@ -5,12 +5,14 @@ import mode from './Mode'
 import toShow from './ToShow'
 import proof from './Proof'
 import given from './Given'
+import givenEntryComplete from './GivenEntryComplete'
 
 const ipandoraApp = combineReducers({
   mode,
   toShow,
   proof,
   given,
+  givenEntryComplete,
   form: formReducer
 })
 
