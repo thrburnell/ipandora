@@ -435,10 +435,17 @@ public class PredicateResource {
             return invalidRequestResponse(stepResponse);
         }
 
+        String arbitrary = stepRequest.getArbitrary();
+        stepResponse.setArbitrary(arbitrary);
+
         List<Formula> assumptionFormulas = new ArrayList<>();
         for (String assumption : assumptions) {
             try {
-                assumptionFormulas.add(formulaParser.fromStringWithTypeChecking(assumption, functionPrototypes));
+                Formula f = formulaParser.fromStringWithTypeChecking(assumption, functionPrototypes);
+                if (arbitrary != null) {
+                    f = new ForallFormula(new Variable(arbitrary), f);
+                }
+                assumptionFormulas.add(f);
             } catch (FormulaParsingException e) {
                 stepResponse.setErrorMsg("Invalid assumption formula: " + assumption);
                 return invalidRequestResponse(stepResponse);

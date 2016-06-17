@@ -12,6 +12,7 @@ public class StepResponse {
     private String method;
     private String goal;
     private String from;
+    private String arbitrary;
     private List<String> assumptions;
     private String function;
     private List<FunctionPrototypeRequest> functions;
@@ -46,6 +47,16 @@ public class StepResponse {
     @JsonProperty
     public void setFrom(String from) {
         this.from = from;
+    }
+
+    @JsonProperty
+    public String getArbitrary() {
+        return arbitrary;
+    }
+
+    @JsonProperty
+    public void setArbitrary(String arbitrary) {
+        this.arbitrary = arbitrary;
     }
 
     @JsonProperty

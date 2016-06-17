@@ -10,6 +10,7 @@ public class StepRequest {
     private String method;
     private String goal;
     private String from;
+    private String arbitrary; // todo - needs to be typed
     private List<String> assumptions;
     private String function;
     private List<FunctionPrototypeRequest> functions;
@@ -43,6 +44,16 @@ public class StepRequest {
     @JsonProperty
     public void setFrom(String from) {
         this.from = from;
+    }
+
+    @JsonProperty
+    public String getArbitrary() {
+        return arbitrary;
+    }
+
+    @JsonProperty
+    public void setArbitrary(String arbitrary) {
+        this.arbitrary = arbitrary;
     }
 
     @JsonProperty
