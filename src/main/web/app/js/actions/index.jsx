@@ -294,6 +294,9 @@ export const makeAssertion = (formula, justification) => {
         .then(json => {
           if (json.valid) {
 
+            const by = getState().selectedLines
+            const nonValidDependencies = by.filter(i => !getState().proof[i].valid)
+
             const id = getState().proof.length
             const lineNo = getState().proof.length + 1
             const node = {
@@ -303,9 +306,10 @@ export const makeAssertion = (formula, justification) => {
               type: "ASSERTION",
               justification: {
                 type: "LOGICAL_IMPLICATION",
-                by: getState().selectedLines
+                by
               },
-              valid: true  // to be changed when dealing with assumptions
+              valid: nonValidDependencies.length == 0,
+              nonValidDependencies,
             }
 
             dispatch(addProofNode(node))
@@ -318,6 +322,34 @@ export const makeAssertion = (formula, justification) => {
         .catch(err => console.log(err))
     })
 
+  }
+}
+
+export const makeAssumption = (formula) => {
+  return (dispatch, getState) => {
+    
+    return makeRequest("/api/predicate/formula", { formula })
+      .then(json => {
+        
+        if (json.valid) {
+          const id = getState().proof.length
+          const lineNo = getState().proof.length + 1
+
+          const node = {
+            id,
+            lineNo,
+            body: formula,
+            type: "ASSUMPTION",
+            valid: false
+          }
+
+          dispatch(addProofNode(node))
+          dispatch(closeProofStep())
+          return Promise.resolve()
+        } else {
+          return Promise.reject()
+        }
+      })
   }
 }
 

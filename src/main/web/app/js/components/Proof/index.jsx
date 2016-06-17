@@ -2,7 +2,9 @@ import React from 'react'
 import CentredButton from '../CentredButton'
 import RProofStepSelector from '../../containers/RProof/RProofStepSelector'
 import RAssertLine from '../../containers/RProof/RAssertLine'
+import RAssumeLine from '../../containers/RProof/RAssumeLine'
 import RImplicationLine from '../../containers/RProof/RImplicationLine'
+import AssumptionLine from './AssumptionLine'
 import { PROOF_STEP_TYPE } from '../../constants'
 
 const makeProofLine = (node, i, lineSelectable, onLineSelect) => {
@@ -15,20 +17,35 @@ const makeProofLine = (node, i, lineSelectable, onLineSelect) => {
          selectable={ lineSelectable } onSelect={() => onLineSelect(node.id) } />
       )
 
+    case "ASSUMPTION":
+      return (
+        <AssumptionLine lineNo={ node.lineNo } body={ node.body } key={ i }
+         selectable={ lineSelectable } onSelect={() => onLineSelect(node.id) } />
+      )
+
     default:
       return <p>Not supported yet</p>
   }
 }
 
-const Proof = ({ lines, complete, stepType, lineSelectable, onLineSelect }) => {
+const getFooterComponent = (type) => {
+  switch (type) {
+    case PROOF_STEP_TYPE.ASSERT:
+      return <RAssertLine />
 
-  const footerPanel = 
-    stepType == PROOF_STEP_TYPE.ASSERT ? <RAssertLine />
-    : <RProofStepSelector />
+    case PROOF_STEP_TYPE.ASSUME:
+      return <RAssumeLine />
+
+    default:
+      return <RProofStepSelector />
+  }
+}
+
+const Proof = ({ lines, complete, stepType, lineSelectable, onLineSelect }) => {
 
   const footer = complete ? null : (
       <div className="panel-footer text-center">
-      { footerPanel }
+      { getFooterComponent(stepType) }
       </div>)
 
   return (
