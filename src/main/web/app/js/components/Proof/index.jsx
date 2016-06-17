@@ -27,7 +27,8 @@ const makeProofLine = (node, i, lineSelectable, onLineSelect) => {
 
     case "TAKE_ARBITRARY":
       return (
-        <ArbitraryLine lineNo={ node.lineNo } body={ node.body } key={ i } />
+        <ArbitraryLine lineNo={ node.lineNo } body={ node.body } key={ i }
+         selectable={ lineSelectable } onSelect={() => onLineSelect(node.id) } />
       )
 
     default:
@@ -51,7 +52,9 @@ const getFooterComponent = (type) => {
   }
 }
 
-const Proof = ({ lines, complete, stepType, lineSelectable, onLineSelect }) => {
+const Proof = ({ lines, complete, stepType, 
+  lineSelectable, onLineSelect 
+}) => {
 
   const footer = complete ? null : (
       <div className="panel-footer text-center">
@@ -66,7 +69,8 @@ const Proof = ({ lines, complete, stepType, lineSelectable, onLineSelect }) => {
       </div>
       <table className="table">
         <tbody>
-          {lines.map((g, i) => makeProofLine(g, i, lineSelectable, onLineSelect))}
+          {lines.map((g, i) => 
+            makeProofLine(g, i, lineSelectable, onLineSelect))}
         </tbody>
       </table>
       { footer }

@@ -1,4 +1,5 @@
 import fetch from 'isomorphic-fetch'
+import { ASSERT_JUSTIFICATION_TYPE } from '../constants'
 
 export const RECEIVE_FUNCTION_VALIDITY = 'RECEIVE_FUNCTION_VALIDITY'
 export const RECEIVE_INDUCTION_SCHEMA = 'RECEIVE_INDUCTION_SCHEMA'
@@ -271,13 +272,119 @@ export const deselectLine = (index) => (
 )
 
 export const makeAssertion = (formula, justification) => {
+  switch (justification) {
+    case ASSERT_JUSTIFICATION_TYPE.IMPLICATION:
+      return makeLogicalImplicationAssertion(formula)
+
+    case ASSERT_JUSTIFICATION_TYPE.ASSUMPTION_CLOSURE:
+      return makeAssumptionClosureAssertion(formula)
+  }
+}
+
+const makeAssumptionClosureAssertion = (formula) => {
+
   return (dispatch, getState) => {
-    const assumptions = getState().selectedLines.map(i => getState().proof[i].body)
+    const isChild = (child, parent) => {
+      console.log(child+' '+parent)
+      if (child == parent) {
+        return true
+      }
+
+      const nonVal = getState().proof[child].nonValidDependencies || []
+      for (const p of nonVal) {
+        if (isChild(p, parent)) {
+          return true
+        }
+      }
+
+      return false
+    }
+    
+    const selected = [...getState().selectedLines].sort((a, b) => a - b)
+    console.log('Selected:')
+    console.log(selected)
+
+    if (selected.length != 2) {
+      return Promise.reject()
+    }
+
+    const antecedant = selected[0]
+    const consequent = selected[1]
+    console.log('ant: ' + antecedant)
+    console.log('cons: ' + consequent)
+    if (getState().proof[antecedant].type != "ASSUMPTION") {
+      console.log('not assumption')
+      return Promise.reject()
+    }
+    if (!isChild(consequent, antecedant)) {
+      console.log('not child')
+      return Promise.reject()
+    }
+
+    // We have necessary condition for -> Intro
+    const impliesFormula = getState().proof[antecedant].body + " -> " + 
+      getState().proof[consequent].body
+
+    const body = {
+      first: formula,
+      second: impliesFormula
+    }
+
+    return makeRequest("/api/predicate/equivalent", body)
+      .then(json => {
+       console.log(json) 
+        if (json.equivalent) {
+          const id = getState().proof.length
+          const lineNo = getState().proof.length + 1
+
+          const node = {
+            id,
+            lineNo,
+            body: formula,
+            type: "ASSERTION",
+            justification: {
+              type: "ASSUMPTION_CLOSURE",
+              antecedant,
+              consequent
+            },
+            valid: true
+          }
+
+          dispatch(addProofNode(node))
+          dispatch(closeProofStep())
+          return Promise.resolve()
+        } else {
+          return Promise.reject()
+        }
+      })
+
+
+    return Promise.resolve()
+  }
+}
+
+const makeLogicalImplicationAssertion = (formula) => {
+  return (dispatch, getState) => {
+    const assumptions = getState().selectedLines
+      .filter(i => getState().proof[i].type != "TAKE_ARBITRARY")
+      .map(i => getState().proof[i].body)
+
+    const arbs = getState().selectedLines
+      .filter(i => getState().proof[i].type == "TAKE_ARBITRARY")
+      .map(i => getState().proof[i].element.name)
+
+    if (arbs.length > 1) {
+      return Promise.reject()
+    }
     
     const body = {
-      method: justification,
+      method: "LOGICAL_IMPLICATION",
       goal: formula,
       assumptions
+    }
+
+    if (arbs.length > 0) {
+      body.arbitrary = arbs[0]
     }
 
     const request = new Request('/api/predicate/step', {

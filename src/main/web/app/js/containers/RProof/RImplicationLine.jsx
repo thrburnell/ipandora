@@ -7,7 +7,11 @@ const mapStateToProps = (state, ownProps) => {
     switch (just.type) {
       case "LOGICAL_IMPLICATION":
         return "by " + just.by.map(i => state.proof[i].lineNo).join(", ")
-          
+
+      case "ASSUMPTION_CLOSURE":
+        return "by ass. closure on " + state.proof[just.antecedant].lineNo + 
+          ", " + state.proof[just.consequent].lineNo
+
       default:
         return "unsupported"
     }

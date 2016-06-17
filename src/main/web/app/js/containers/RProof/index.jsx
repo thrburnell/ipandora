@@ -10,7 +10,8 @@ const mapStateToProps = (state) => {
   const lineSelectable = 
     state.proofStepType == "ASSERT" &&
     form &&
-    form.justification == ASSERT_JUSTIFICATION_TYPE.IMPLICATION
+    (form.justification == ASSERT_JUSTIFICATION_TYPE.IMPLICATION ||
+     form.justification == ASSERT_JUSTIFICATION_TYPE.ASSUMPTION_CLOSURE)
 
   return {
     lines: state.proof.filter(node => node.type != "GIVEN"),

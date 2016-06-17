@@ -1,6 +1,6 @@
 import React from 'react'
 
-const ArbitraryLine = ({ lineNo, body, selectable=false, onSelect=() => {} }) => (
+const ArbitraryLine = ({ lineNo, body, selectable, onSelect }) => (
   <tr>
     <td className="col-sm-1 text-center">({ lineNo })</td>
     <td className="col-sm-6">{ body }</td>

@@ -28,7 +28,7 @@ const AssertLine = ({
           <select className="form-control full-width" {...justification}>
             <option></option>
             <option value={ ASSERT_JUSTIFICATION_TYPE.IMPLICATION }>by implication</option>
-            <option value={ null }>by something else</option> 
+            <option value={ ASSERT_JUSTIFICATION_TYPE.ASSUMPTION_CLOSURE }>by assumption closure</option> 
           </select>
         </div>
         <div className="col-sm-2 text-right">

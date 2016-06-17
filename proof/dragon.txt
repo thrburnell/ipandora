@@ -1,0 +1,25 @@
+# GIVEN
+\FORALL x. (dragon(x) & \FORALL y. (childof(x, y) -> fly(y)) -> happy(x))
+\FORALL x. (green(x) & dragon(x) -> fly(x))
+\FORALL x. (\EXISTS y. (parentof(x, y) & green(y)) -> green(x))
+\FORALL x, y. (childof(x, y) & dragon(x) -> dragon(y))
+\FORALL x, y. (childof(x, y) -> parentof(y, x))
+
+# TO SHOW
+\FORALL x. (dragon(x) & green(x) -> happy(x))
+
+# PROOF
+d1 arb
+d2 arb
+dragon(d1) & green(d1)
+childof(d1,d2)
+parentof(d2, d1)
+\EXISTS y. (parentof(d2,y) & green(y))
+green(d2)
+dragon(d2)
+fly(d2)
+childof(d1,d2) -> fly(d2)
+\FORALL y. (childof(d1,y) -> fly(y))
+happy(d1)
+dragon(d1) & green(d1) -> happy(d1)
+\FORALL x. (dragon(x) & green(x) -> happy(x))
