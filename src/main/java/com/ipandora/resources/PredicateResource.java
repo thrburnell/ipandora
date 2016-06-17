@@ -7,10 +7,7 @@ import com.ipandora.api.predicate.function.FunctionPrototype;
 import com.ipandora.api.predicate.function.FunctionPrototypeRequest;
 import com.ipandora.api.predicate.induction.SchemaRequest;
 import com.ipandora.api.predicate.induction.SchemaResponse;
-import com.ipandora.api.predicate.proofstep.ExhaustiveCasesRequest;
-import com.ipandora.api.predicate.proofstep.ExhaustiveCasesResponse;
-import com.ipandora.api.predicate.proofstep.StepRequest;
-import com.ipandora.api.predicate.proofstep.StepResponse;
+import com.ipandora.api.predicate.proofstep.*;
 import com.ipandora.api.predicate.read.ReadResponse;
 import com.ipandora.api.predicate.term.Term;
 import com.ipandora.api.predicate.term.Type;
@@ -328,6 +325,57 @@ public class PredicateResource {
         }
 
         return functionPrototypes;
+    }
+
+    @POST
+    @Path("/equivalent")
+    public Response areFormulasEquivalent(EquivalentRequest equivalentRequest) {
+
+        EquivalentResponse response = new EquivalentResponse();
+
+        String first = equivalentRequest.getFirst();
+        String second = equivalentRequest.getSecond();
+        response.setFirst(first);
+        response.setSecond(second);
+
+        if (first == null) {
+            response.setErrorMsg("Required first missing");
+            return invalidRequestResponse(response);
+        }
+        if (second == null) {
+            response.setErrorMsg("Required second missing");
+            return invalidRequestResponse(response);
+        }
+
+        Formula firstFormula;
+        try {
+            firstFormula = formulaParser.fromString(first);
+        } catch (FormulaParsingException e) {
+            response.setErrorMsg("Invalid first formula");
+            return invalidRequestResponse(response);
+        }
+
+        Formula secondFormula;
+        try {
+            secondFormula = formulaParser.fromString(second);
+        } catch (FormulaParsingException e) {
+            response.setErrorMsg("Invalid second formula");
+            return invalidRequestResponse(response);
+        }
+
+        boolean result;
+        try {
+            boolean lr = impliesChecker.check(Collections.singletonList(firstFormula), secondFormula);
+            boolean rl = impliesChecker.check(Collections.singletonList(secondFormula), firstFormula);
+            result = lr && rl;
+        } catch (ProofStepCheckException e) {
+            response.setErrorMsg(e.getMessage());
+            return invalidRequestResponse(response);
+        }
+
+        response.setEquivalent(result);
+
+        return Response.ok(response).build();
     }
 
     private FunctionPrototypeRequest getFunctionPrototypeRequest(FunctionPrototype prototype) {
