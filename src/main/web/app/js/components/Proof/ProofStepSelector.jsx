@@ -17,6 +17,9 @@ const ProofStepSelector = ({
        onClick={ onMarkCompleteClick } disabled="disabled">Mark Complete</button>
     )
 
+    // <button type="button" className="btn btn-default"
+    //    onClick={ onCaseAnalysisClick } disabled="disabled">Case Analysis</button>
+ 
   return (
     <div className="btn-group" role="group">
       <button type="button" className="btn btn-default"
@@ -25,9 +28,7 @@ const ProofStepSelector = ({
        onClick={ onAssumeClick }>Assume</button>
       <button type="button" className="btn btn-default"
        onClick={ onTakeArbitraryClick }>Take Arbitrary</button>
-      <button type="button" className="btn btn-default"
-       onClick={ onCaseAnalysisClick } disabled="disabled">Case Analysis</button>
-      { completeButton }
+     { completeButton }
     </div>
   )
 }

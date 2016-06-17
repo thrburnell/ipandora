@@ -9,6 +9,7 @@ import givenEntryComplete from './GivenEntryComplete'
 import proofStepType from './ProofStepType'
 import selectedLines from './SelectedLines'
 import arbitrary from './Arbitrary'
+import proofComplete from './ProofComplete'
 
 const ipandoraApp = combineReducers({
   mode,
@@ -19,6 +20,7 @@ const ipandoraApp = combineReducers({
   proofStepType,
   selectedLines,
   arbitrary,
+  proofComplete,
   form: formReducer
 })
 

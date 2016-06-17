@@ -16,6 +16,7 @@ export const DESELECT_LINE = 'DESELECT_LINE'
 export const MAKE_ASSERTION = 'MAKE_ASSERTION'
 export const CLOSE_PROOF_STEP = 'CLOSE_PROOF_STEP'
 export const SAVE_ARBITRARY = 'SAVE_ARBITRARY'
+export const SET_PROOF_COMPLETE = 'SET_PROOF_COMPLETE'
 
 export const validateFunction = (fn) => {
   return (dispatch, getState) => {
@@ -506,3 +507,31 @@ export const saveArbitrary = (name, domain) => (
   }
 )
 
+export const markProofComplete = () => {
+  return (dispatch, getState) => {
+
+    const body = {
+      first: getState().toShow.formula,
+      second: getState().proof[getState().proof.length - 1].body
+    }
+    
+    console.log(body)
+
+    return makeRequest("/api/predicate/equivalent", body)
+      .then(json => {
+        
+        if (json.equivalent) {
+          dispatch(setProofComplete())
+          return Promise.resolve()
+        }
+
+        return Promise.reject()
+      })
+  }
+}
+
+export const setProofComplete = () => (
+  {
+    type: SET_PROOF_COMPLETE
+  }
+)

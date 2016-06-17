@@ -61,8 +61,11 @@ const Proof = ({ lines, complete, stepType,
       { getFooterComponent(stepType) }
       </div>)
 
+  const divClassName = ["panel", "panel-default",
+    complete ? "panel-success" : ""].join(" ")
+
   return (
-    <div className="panel panel-default">
+    <div className={ divClassName }>
       <div className="panel-heading">
         <h3 className="panel-title pull-left">Proof</h3>
         <div className="clearfix" />

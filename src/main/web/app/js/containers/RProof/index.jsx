@@ -15,7 +15,7 @@ const mapStateToProps = (state) => {
 
   return {
     lines: state.proof.filter(node => node.type != "GIVEN"),
-    complete: false,
+    complete: state.proofComplete,
     stepType: state.proofStepType,
     lineSelectable
   }

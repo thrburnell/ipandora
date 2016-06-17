@@ -1,7 +1,7 @@
 import { connect } from 'react-redux'
 import ProofStepSelector from '../../components/Proof/ProofStepSelector'
 import { PROOF_STEP_TYPE } from '../../constants'
-import { setProofStepType } from '../../actions'
+import { setProofStepType, markProofComplete } from '../../actions'
 
 const mapStateToProps = (state) => (
   {
@@ -15,7 +15,7 @@ const mapDispatchToProps = (dispatch) => (
     onAssumeClick: () => dispatch(setProofStepType(PROOF_STEP_TYPE.ASSUME)),
     onTakeArbitraryClick: () => dispatch(setProofStepType(PROOF_STEP_TYPE.TAKE_ARBITRARY)),
     onCaseAnalysisClick: () => dispatch(setProofStepType(PROOF_STEP_TYPE.CASE_ANALYSIS)),
-    onMarkCompleteClick: () => console.log('Mark complete')
+    onMarkCompleteClick: () => dispatch(markProofComplete())
   }
 )
 
