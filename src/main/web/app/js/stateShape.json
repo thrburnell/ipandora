@@ -18,6 +18,7 @@
   proof: [
  
     {
+      id: 0,
       lineNo: "1",
       body: "\\FORALL x. (dragon(x) & \\FORALL y. (...))"
       type: "GIVEN",
@@ -25,6 +26,7 @@
     },
     // ...
     {
+      id: 5,
       lineNo: "6",
       body: "Take d1 arbitrary",
       type: "TAKE_ARBITRARY",
@@ -35,6 +37,7 @@
     },
     // ...
     {
+      id: 7,
       lineNo: "8",
       body: "dragon(d1) & green(d1)",
       type: "ASSUMPTION",
@@ -42,6 +45,7 @@
     },
     // ...
     {
+      id: 9,
       lineNo: "10",
       body: "parentof(d2, d1)",
       type: "ASSERTION",
@@ -54,6 +58,7 @@
     },
     // ...
     {
+      id: 14,
       lineNo: "15",
       body: "childof(d1, d2) -> fly(d2)",
       type: "ASSERTION",

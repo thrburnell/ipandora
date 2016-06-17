@@ -12,6 +12,8 @@ export const COMPLETE_GIVEN_ENTRY = 'COMPLETE_GIVEN_ENTRY'
 export const SET_PROOF_STEP_TYPE = 'SET_PROOF_STEP_TYPE'
 export const SELECT_LINE = 'SELECT_LINE'
 export const DESELECT_LINE = 'DESELECT_LINE'
+export const MAKE_ASSERTION = 'MAKE_ASSERTION'
+export const CLOSE_PROOF_STEP = 'CLOSE_PROOF_STEP'
 
 export const validateFunction = (fn) => {
   return (dispatch, getState) => {
@@ -126,6 +128,11 @@ export const receiveBaseProofStepValidity = (term, justification, valid) => (
   }
 )
 
+
+
+
+
+
 export const toggleProofMode = () => (
   {
     type: TOGGLE_PROOF_MODE
@@ -181,8 +188,9 @@ export const addGiven = (formula) => {
       .then(json => {
         
         if (json.valid) {
-          dispatch(addGivenProofNode(formula))
-          const givenIndex = getState().proof.length - 1
+          const givenIndex = getState().proof.length
+          const lineNo = getState().proof.length + 1
+          dispatch(addGivenProofNode(formula, givenIndex, lineNo))
           dispatch(saveGivenIndex(givenIndex))
           return Promise.resolve()
         } else {
@@ -192,11 +200,11 @@ export const addGiven = (formula) => {
   }
 }
 
-export const addGivenProofNode = (formula) => {
+export const addGivenProofNode = (formula, id, lineNo) => {
   return (dispatch, getState) => {
 
-    const lineNo = getState().proof.length + 1
     const proofNode = {
+      id,
       lineNo,
       body: formula,
       type: "GIVEN",
@@ -258,6 +266,64 @@ export const deselectLine = (index) => (
   {
     type: DESELECT_LINE,
     index
+  }
+)
+
+export const makeAssertion = (formula, justification) => {
+  return (dispatch, getState) => {
+    const assumptions = getState().selectedLines.map(i => getState().proof[i].body)
+    
+    const body = {
+      method: justification,
+      goal: formula,
+      assumptions
+    }
+
+    const request = new Request('/api/predicate/step', {
+      headers: new Headers({
+        'Content-Type': 'application/json'
+      }),
+      method: 'post',
+      body: JSON.stringify(body)
+    })
+
+    return new Promise((resolve, reject) => {
+
+      fetch(request)
+        .then(res => res.json())
+        .then(json => {
+          if (json.valid) {
+
+            const id = getState().proof.length
+            const lineNo = getState().proof.length + 1
+            const node = {
+              id,
+              lineNo,
+              body: formula,
+              type: "ASSERTION",
+              justification: {
+                type: "LOGICAL_IMPLICATION",
+                by: getState().selectedLines
+              },
+              valid: true  // to be changed when dealing with assumptions
+            }
+
+            dispatch(addProofNode(node))
+            dispatch(closeProofStep())
+            resolve()
+          } else {
+            reject()
+          }
+        })
+        .catch(err => console.log(err))
+    })
+
+  }
+}
+
+export const closeProofStep = () => (
+  {
+    type: CLOSE_PROOF_STEP
   }
 )
 

@@ -13,7 +13,7 @@ const Given = ({ given, onFinishClick, complete, selectable, onSelect }) => (
       <tbody>
         {given.map((g, i) => 
           <GivenLine key={i} lineNo={g.lineNo} body={g.body} 
-           selectable={selectable} onSelect={() => onSelect(i)} />
+           selectable={selectable} onSelect={() => onSelect(g.id)} />
         )}
       </tbody>
     </table>

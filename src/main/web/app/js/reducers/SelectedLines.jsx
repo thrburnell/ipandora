@@ -1,4 +1,4 @@
-import { SELECT_LINE, DESELECT_LINE } from '../actions'
+import { SELECT_LINE, DESELECT_LINE, CLOSE_PROOF_STEP } from '../actions'
 
 const SelectedLines = (state=[], action) => {
 
@@ -8,7 +8,10 @@ const SelectedLines = (state=[], action) => {
     
     case DESELECT_LINE:
       return state.filter(id => id != action.index)
-    
+   
+    case CLOSE_PROOF_STEP:
+      return []
+
     default:
       return state
   }
