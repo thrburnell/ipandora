@@ -14,6 +14,7 @@ export const SELECT_LINE = 'SELECT_LINE'
 export const DESELECT_LINE = 'DESELECT_LINE'
 export const MAKE_ASSERTION = 'MAKE_ASSERTION'
 export const CLOSE_PROOF_STEP = 'CLOSE_PROOF_STEP'
+export const SAVE_ARBITRARY = 'SAVE_ARBITRARY'
 
 export const validateFunction = (fn) => {
   return (dispatch, getState) => {
@@ -356,6 +357,45 @@ export const makeAssumption = (formula) => {
 export const closeProofStep = () => (
   {
     type: CLOSE_PROOF_STEP
+  }
+)
+
+export const takeArbitrary = (name, domain) => {
+  return (dispatch, getState) => {
+    
+    return new Promise((resolve, reject) => {
+      const clash = getState().arbitrary.find(arb => arb.name == name)
+      if (clash) {
+        reject()
+      } else {
+        
+        const id = getState().proof.length
+        const lineNo = getState().proof.length + 1
+        const node = {
+          id,
+          lineNo,
+          body: "Take " + name + " from " + domain + " arbitrary",
+          type: "TAKE_ARBITRARY",
+          element: {
+            name: name,
+            domain: domain
+          }
+        }
+
+        dispatch(saveArbitrary(name, domain))
+        dispatch(addProofNode(node))
+        dispatch(closeProofStep())
+        resolve()
+      }
+    })
+  }
+}
+
+export const saveArbitrary = (name, domain) => (
+  {
+    type: SAVE_ARBITRARY,
+    name,
+    domain
   }
 )
 

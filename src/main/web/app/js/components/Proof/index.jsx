@@ -3,8 +3,10 @@ import CentredButton from '../CentredButton'
 import RProofStepSelector from '../../containers/RProof/RProofStepSelector'
 import RAssertLine from '../../containers/RProof/RAssertLine'
 import RAssumeLine from '../../containers/RProof/RAssumeLine'
+import RTakeArbitraryLine from '../../containers/RProof/RTakeArbitraryLine'
 import RImplicationLine from '../../containers/RProof/RImplicationLine'
 import AssumptionLine from './AssumptionLine'
+import ArbitraryLine from './ArbitraryLine'
 import { PROOF_STEP_TYPE } from '../../constants'
 
 const makeProofLine = (node, i, lineSelectable, onLineSelect) => {
@@ -23,6 +25,11 @@ const makeProofLine = (node, i, lineSelectable, onLineSelect) => {
          selectable={ lineSelectable } onSelect={() => onLineSelect(node.id) } />
       )
 
+    case "TAKE_ARBITRARY":
+      return (
+        <ArbitraryLine lineNo={ node.lineNo } body={ node.body } key={ i } />
+      )
+
     default:
       return <p>Not supported yet</p>
   }
@@ -35,6 +42,9 @@ const getFooterComponent = (type) => {
 
     case PROOF_STEP_TYPE.ASSUME:
       return <RAssumeLine />
+
+    case PROOF_STEP_TYPE.TAKE_ARBITRARY:
+      return <RTakeArbitraryLine />
 
     default:
       return <RProofStepSelector />

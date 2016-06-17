@@ -24,7 +24,7 @@ const ProofStepSelector = ({
       <button type="button" className="btn btn-default"
        onClick={ onAssumeClick }>Assume</button>
       <button type="button" className="btn btn-default"
-       onClick={ onTakeArbitraryClick } disabled="disabled">Take Arbitrary</button>
+       onClick={ onTakeArbitraryClick }>Take Arbitrary</button>
       <button type="button" className="btn btn-default"
        onClick={ onCaseAnalysisClick } disabled="disabled">Case Analysis</button>
       { completeButton }

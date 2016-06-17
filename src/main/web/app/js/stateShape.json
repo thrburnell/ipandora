@@ -15,6 +15,13 @@
 
   selectedLines: [ 0, 2, 3 ],
 
+  arbitrary: [
+    {
+      name: "x",
+      domain: "Unknown"
+    }
+  ],
+
   proof: [
  
     {
