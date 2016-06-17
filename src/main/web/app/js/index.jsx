@@ -8,7 +8,7 @@ import { Provider } from 'react-redux'
 import { createStore, applyMiddleware } from 'redux'
 import thunkMiddleware from 'redux-thunk'
 import ipandoraApp from './reducers'
-import App from './components/App'
+import RApp from './containers/RApp'
 
 let store = createStore(
   ipandoraApp,
@@ -17,7 +17,7 @@ let store = createStore(
 
 render(
   <Provider store={store}>
-    <App />
+    <RApp />
   </Provider>,
   document.getElementById('app')
 )

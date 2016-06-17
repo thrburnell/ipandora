@@ -6,6 +6,7 @@ import toShow from './ToShow'
 import proof from './Proof'
 import given from './Given'
 import givenEntryComplete from './GivenEntryComplete'
+import toShowEntryComplete from './ToShowEntryComplete'
 import proofStepType from './ProofStepType'
 import selectedLines from './SelectedLines'
 import arbitrary from './Arbitrary'
@@ -17,6 +18,7 @@ const ipandoraApp = combineReducers({
   proof,
   given,
   givenEntryComplete,
+  toShowEntryComplete,
   proofStepType,
   selectedLines,
   arbitrary,

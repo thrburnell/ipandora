@@ -10,6 +10,7 @@ export const RECEIVE_TO_SHOW_VALIDATION = 'RECEIVE_TO_SHOW_VALIDATION'
 export const ADD_PROOF_NODE = 'ADD_PROOF_NODE'
 export const SAVE_GIVEN_INDEX = 'SAVE_GIVEN_INDEX'
 export const COMPLETE_GIVEN_ENTRY = 'COMPLETE_GIVEN_ENTRY'
+export const COMPLETE_TO_SHOW_ENTRY = 'COMPLETE_TO_SHOW_ENTRY'
 export const SET_PROOF_STEP_TYPE = 'SET_PROOF_STEP_TYPE'
 export const SELECT_LINE = 'SELECT_LINE'
 export const DESELECT_LINE = 'DESELECT_LINE'
@@ -159,6 +160,7 @@ export const validateToShow = (formula) => {
       .then(res => res.json())
       .then(json => {
         dispatch(receiveToShowValidation(formula, json.valid))
+        dispatch(completeToShowEntry())
       })
       .catch(err => console.log(err))
   }
@@ -235,6 +237,12 @@ export const saveGivenIndex = (index) => (
 export const completeGivenEntry = () => (
   {
     type: COMPLETE_GIVEN_ENTRY
+  }
+)
+
+export const completeToShowEntry = () => (
+  {
+    type: COMPLETE_TO_SHOW_ENTRY
   }
 )
 

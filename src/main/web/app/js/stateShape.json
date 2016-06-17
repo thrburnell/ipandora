@@ -9,6 +9,7 @@
 
   given: [0, 1, 2, 3, 4],  // indices of given proof nodes
 
+  toShowEntryComplete: true,
   givenEntryComplete: true,
 
   proofStepType: "ASSERT",  // or IDLE, ASSUME, TAKE_ARBITRARY, CASE_ANALYSIS

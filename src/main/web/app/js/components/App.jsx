@@ -9,11 +9,11 @@ import RProof from '../containers/RProof'
     // <AppRow><RBaseCase /></AppRow>
     // <AppRow><RInductiveCase /></AppRow>
 
-const App = () => (
+const App = ({ showGiven, showProof }) => (
   <div className="container">
     <AppRow rowClass="top-buffer"><RToShow /></AppRow>
-    <AppRow><RGiven /></AppRow>
-    <AppRow><RProof /></AppRow>
+    { showGiven ? (<AppRow><RGiven /></AppRow>) : null }
+    { showProof ? (<AppRow><RProof /></AppRow>) : null }
   </div>
 )
 
