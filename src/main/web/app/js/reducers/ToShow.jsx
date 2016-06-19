@@ -1,4 +1,4 @@
-import { RECEIVE_INDUCTION_SCHEMA, RECEIVE_TO_SHOW_VALIDATION } from '../actions'
+import { RECEIVE_TO_SHOW_VALIDATION } from '../actions'
 
 const ToShow = (state={}, action) => {
   

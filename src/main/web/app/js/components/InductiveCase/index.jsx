@@ -5,8 +5,8 @@ import RAssertLine from '../../containers/RProof/RAssertLine'
 import RAssumeLine from '../../containers/RProof/RAssumeLine'
 import RTakeArbitraryLine from '../../containers/RProof/RTakeArbitraryLine'
 import RImplicationLine from '../../containers/RProof/RImplicationLine'
-import AssumptionLine from './AssumptionLine'
-import ArbitraryLine from './ArbitraryLine'
+import AssumptionLine from '../Proof/AssumptionLine'
+import ArbitraryLine from '../Proof/ArbitraryLine'
 import { PROOF_STEP_TYPE } from '../../constants'
 
 const makeProofLine = (node, i, lineSelectable, onLineSelect) => {
@@ -52,8 +52,9 @@ const getFooterComponent = (type) => {
   }
 }
 
-const Proof = ({ lines, complete, stepType, 
-  lineSelectable, onLineSelect
+const InductiveCase = ({ lines, complete, stepType, 
+  lineSelectable, onLineSelect,
+  arbitrary, hypothesis, toShow
 }) => {
 
   const footer = complete ? null : (
@@ -67,9 +68,24 @@ const Proof = ({ lines, complete, stepType,
   return (
     <div className={ divClassName }>
       <div className="panel-heading">
-        <h3 className="panel-title pull-left">Proof</h3>
+        <h3 className="panel-title pull-left">Inductive Case</h3>
         <div className="clearfix" />
       </div>
+      <table className="table">
+        <tbody>
+          <tr>
+            <td colspan="2">Take an arbitrary <strong>{ arbitrary.name }</strong> in  <strong>{ arbitrary.domain }</strong></td>
+          </tr>
+          <tr>
+            <td><strong>Inductive Hypothesis:</strong></td>
+            <td>{ hypothesis }</td>
+          </tr>
+          <tr>
+            <td><strong>To Show:</strong></td>
+            <td>{ toShow }</td>
+          </tr>
+        </tbody>
+      </table>
       <table className="table">
         <tbody>
           {lines.map((g, i) => 
@@ -81,5 +97,5 @@ const Proof = ({ lines, complete, stepType,
   )
 }
 
-export default Proof
+export default InductiveCase
 

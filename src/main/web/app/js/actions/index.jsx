@@ -68,6 +68,8 @@ export const getInductionSchema = (formula, variable) => {
       .then(res => res.json())
       .then(json => {
         dispatch(receiveInductionSchema(json.goal, json.baseCase, json.inductiveCase))
+        dispatch(receiveToShowValidation(formula, true))
+        dispatch(completeToShowEntry())
       })
       .catch(err => console.log(err))
   }
@@ -294,7 +296,6 @@ const makeAssumptionClosureAssertion = (formula) => {
 
   return (dispatch, getState) => {
     const isChild = (child, parent) => {
-      console.log(child+' '+parent)
       if (child == parent) {
         return true
       }
@@ -310,8 +311,6 @@ const makeAssumptionClosureAssertion = (formula) => {
     }
     
     const selected = [...getState().selectedLines].sort((a, b) => a - b)
-    console.log('Selected:')
-    console.log(selected)
 
     if (selected.length != 2) {
       return Promise.reject()
@@ -319,14 +318,10 @@ const makeAssumptionClosureAssertion = (formula) => {
 
     const antecedant = selected[0]
     const consequent = selected[1]
-    console.log('ant: ' + antecedant)
-    console.log('cons: ' + consequent)
     if (getState().proof[antecedant].type != "ASSUMPTION") {
-      console.log('not assumption')
       return Promise.reject()
     }
     if (!isChild(consequent, antecedant)) {
-      console.log('not child')
       return Promise.reject()
     }
 
@@ -341,7 +336,6 @@ const makeAssumptionClosureAssertion = (formula) => {
 
     return makeRequest("/api/predicate/equivalent", body)
       .then(json => {
-       console.log(json) 
         if (json.equivalent) {
           const id = getState().proof.length
           const lineNo = getState().proof.length + 1
@@ -518,13 +512,15 @@ export const saveArbitrary = (name, domain) => (
 export const markProofComplete = () => {
   return (dispatch, getState) => {
 
+    if (!getState().proof[getState().proof.length - 1].valid) {
+      return Promise.reject()
+    }
+
     const body = {
       first: getState().toShow.formula,
       second: getState().proof[getState().proof.length - 1].body
     }
     
-    console.log(body)
-
     return makeRequest("/api/predicate/equivalent", body)
       .then(json => {
         

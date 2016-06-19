@@ -4,7 +4,8 @@ import App from '../components/App'
 const mapStateToProps = (state) => (
   {
     showGiven: state.toShowEntryComplete,
-    showProof: state.givenEntryComplete
+    showProof: state.givenEntryComplete,
+    mode: state.mode
   }
 )
 

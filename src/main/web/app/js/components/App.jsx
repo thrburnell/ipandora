@@ -4,16 +4,19 @@ import RFunctionInput from '../containers/RFunctionInput'
 import RToShow from '../containers/RToShow' 
 import RGiven from '../containers/RGiven'
 import RProof from '../containers/RProof'
+import RBaseCase from '../containers/RBaseCase'
+import RInductiveCase from '../containers/RInductiveCase'
+import { PROOF_MODE } from '../constants'
 
-    // <AppRow rowClass="top-buffer"><RFunctionInput /></AppRow>
-    // <AppRow><RBaseCase /></AppRow>
-    // <AppRow><RInductiveCase /></AppRow>
-
-const App = ({ showGiven, showProof }) => (
+const App = ({ showGiven, showProof, mode }) => (
   <div className="container">
     <AppRow rowClass="top-buffer"><RToShow /></AppRow>
     { showGiven ? (<AppRow><RGiven /></AppRow>) : null }
-    { showProof ? (<AppRow><RProof /></AppRow>) : null }
+    { showProof && mode == PROOF_MODE.DIRECT ? (<AppRow><RProof /></AppRow>) : null }
+    { showProof && mode == PROOF_MODE.INDUCTION ? 
+      (<AppRow><RBaseCase /></AppRow>) : null }
+    { showProof && mode == PROOF_MODE.INDUCTION ? 
+      (<AppRow><RInductiveCase /></AppRow>) : null }
   </div>
 )
 

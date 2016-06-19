@@ -16,7 +16,7 @@ const dispatchButtonClick = (formula, variable) => (
 
     switch (getState().mode) {
       case PROOF_MODE.INDUCTION:
-        console.log("Induction not yet supported")
+        dispatch(getInductionSchema(formula, variable))
         return
       case PROOF_MODE.DIRECT:
         dispatch(validateToShow(formula))
