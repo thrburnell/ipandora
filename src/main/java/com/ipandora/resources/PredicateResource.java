@@ -1,5 +1,6 @@
 package com.ipandora.resources;
 
+import com.ipandora.api.predicate.formula.EqualToFormula;
 import com.ipandora.api.predicate.formula.ForallFormula;
 import com.ipandora.api.predicate.formula.Formula;
 import com.ipandora.api.predicate.function.FunctionDefinition;
@@ -205,6 +206,9 @@ public class PredicateResource {
 
             case ProofStepMethods.FUNCTION_DEFINITION:
                 return checkProofStepFunctionDefinition(stepRequest);
+
+            case ProofStepMethods.INDUCTIVE_HYPOTHESIS:
+                return checkProofStepInductiveHypothesis(stepRequest);
         }
 
         StepResponse unknownMethodResponse = new StepResponse();
@@ -606,6 +610,77 @@ public class PredicateResource {
         stepResponse.setFunction(function);
         stepResponse.setFunctions(prototypes);
         stepResponse.setValid(result);
+
+        return Response.ok(stepResponse).build();
+    }
+
+    private Response checkProofStepInductiveHypothesis(StepRequest stepRequest) {
+
+        StepResponse stepResponse = new StepResponse();
+
+        String goal = stepRequest.getGoal();
+        String from = stepRequest.getFrom();
+        String inductiveHypothesis = stepRequest.getInductiveHypothesis();
+        String arbitrary = stepRequest.getArbitrary();
+
+        List<FunctionPrototypeRequest> prototypes = stepRequest.getFunctions();
+        if (prototypes == null) {
+            prototypes = new ArrayList<>();
+        }
+
+        List<FunctionPrototype> functionPrototypes;
+        try {
+            functionPrototypes = getFunctionPrototypes(prototypes);
+        } catch (FormulaParsingException e) {
+            stepResponse.setErrorMsg("Invalid function prototype: " + e.getMessage());
+            return invalidRequestResponse(stepResponse);
+        }
+
+        Term fromTerm;
+        try {
+            fromTerm = termParser.fromString(from, functionPrototypes);
+            termTypeInferrer.infer(fromTerm);
+        } catch (TermParsingException | TypeMismatchException e) {
+            stepResponse.setErrorMsg("Invalid from term: " + from);
+            return invalidRequestResponse(stepResponse);
+        }
+
+        Term goalTerm;
+        try {
+            goalTerm = termParser.fromString(goal, functionPrototypes);
+            termTypeInferrer.infer(goalTerm);
+        } catch (TermParsingException | TypeMismatchException e) {
+            stepResponse.setErrorMsg("Invalid goal term: " + goal);
+            return invalidRequestResponse(stepResponse);
+        }
+
+        Formula indHypFormula;
+        try {
+            indHypFormula = formulaParser.fromStringWithTypeChecking(
+                    String.format("\\FORALL %s in Nat. %s", arbitrary, inductiveHypothesis), functionPrototypes);
+        } catch (FormulaParsingException e) {
+            stepResponse.setErrorMsg("Invalid inductive hypothesis: " + goal);
+            return invalidRequestResponse(stepResponse);
+        }
+
+        boolean result;
+        try {
+            result = impliesChecker.check(Collections.singletonList(indHypFormula),
+                    new EqualToFormula(fromTerm, goalTerm));
+        } catch (ProofStepCheckException e) {
+            stepResponse.setErrorMsg(e.getMessage());
+            return invalidRequestResponse(stepResponse);
+        }
+
+        stepResponse.setGoal(goal);
+        stepResponse.setFrom(from);
+        stepResponse.setInductiveHypothesis(inductiveHypothesis);
+        stepRequest.setArbitrary(arbitrary);
+        stepResponse.setValid(result);
+
+        if (!result) {
+            stepResponse.setErrorMsg("Error messages not yet implemented.");
+        }
 
         return Response.ok(stepResponse).build();
     }

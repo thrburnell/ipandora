@@ -5,5 +5,6 @@ public class ProofStepMethods {
     public static final String LOGICAL_IMPLICATION = "LOGICAL_IMPLICATION";
     public static final String ARITHMETIC = "ARITHMETIC";
     public static final String FUNCTION_DEFINITION = "FUNCTION_DEFINITION";
+    public static final String INDUCTIVE_HYPOTHESIS = "INDUCTIVE_HYPOTHESIS";
 
 }

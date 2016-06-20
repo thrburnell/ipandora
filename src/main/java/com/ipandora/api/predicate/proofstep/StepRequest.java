@@ -10,6 +10,7 @@ public class StepRequest {
     private String method;
     private String goal;
     private String from;
+    private String inductiveHypothesis;
     private String arbitrary; // todo - needs to be typed
     private List<String> assumptions;
     private String function;
@@ -44,6 +45,16 @@ public class StepRequest {
     @JsonProperty
     public void setFrom(String from) {
         this.from = from;
+    }
+
+    @JsonProperty
+    public String getInductiveHypothesis() {
+        return inductiveHypothesis;
+    }
+
+    @JsonProperty
+    public void setInductiveHypothesis(String inductiveHypothesis) {
+        this.inductiveHypothesis = inductiveHypothesis;
     }
 
     @JsonProperty
