@@ -3,11 +3,14 @@ import React from 'react'
 const ProofStepSelector = ({
   onEqualityClick,
   onMarkCompleteClick,
-  canMarkComplete
+  canMarkComplete,
+  markCompleteError
 }) => {
   
+  const buttonClassName = ["btn", markCompleteError ? "btn-danger" : "btn-primary"].join(" ")
+
   const completeButton = canMarkComplete ? (
-      <button type="button" className="btn btn-primary"
+      <button type="button" className={ buttonClassName }
        onClick={ onMarkCompleteClick }>Mark Complete</button>
     ) : (
       <button type="button" className="btn btn-primary"

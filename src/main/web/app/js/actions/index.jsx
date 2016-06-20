@@ -9,7 +9,7 @@ export const TOGGLE_PROOF_MODE = 'TOGGLE_PROOF_MODE'
 export const RECEIVE_TO_SHOW_VALIDATION = 'RECEIVE_TO_SHOW_VALIDATION'
 export const ADD_PROOF_NODE = 'ADD_PROOF_NODE'
 export const ADD_BASE_CASE_PROOF_NODE = 'ADD_BASE_CASE_PROOF_NODE'
-export const ADD_INDUCTIVE_CASE_PROOF_NODE = 'ADD_BASE_CASE_PROOF_NODE'
+export const ADD_INDUCTIVE_CASE_PROOF_NODE = 'ADD_INDUCTIVE_CASE_PROOF_NODE'
 export const SAVE_GIVEN_INDEX = 'SAVE_GIVEN_INDEX'
 export const COMPLETE_GIVEN_ENTRY = 'COMPLETE_GIVEN_ENTRY'
 export const COMPLETE_TO_SHOW_ENTRY = 'COMPLETE_TO_SHOW_ENTRY'
@@ -22,7 +22,10 @@ export const CLOSE_BASE_CASE_PROOF_STEP = 'CLOSE_BASE_CASE_PROOF_STEP'
 export const CLOSE_INDUCTIVE_CASE_PROOF_STEP = 'CLOSE_INDUCTIVE_CASE_PROOF_STEP'
 export const SAVE_ARBITRARY = 'SAVE_ARBITRARY'
 export const SET_PROOF_COMPLETE = 'SET_PROOF_COMPLETE'
+export const SET_BASE_CASE_PROOF_COMPLETE = 'SET_BASE_CASE_PROOF_COMPLETE'
+export const SET_BASE_CASE_PROOF_COMPLETE_ERROR = 'SET_BASE_CASE_PROOF_COMPLETE_ERROR'
 export const SET_BASE_CASE_PROOF_STEP_TYPE = 'SET_BASE_CASE_PROOF_STEP_TYPE'
+export const SET_INDUCTIVE_CASE_PROOF_COMPLETE = 'SET_INDUCTIVE_CASE_PROOF_COMPLETE'
 export const SET_INDUCTIVE_CASE_PROOF_STEP_TYPE = 'SET_INDUCTIVE_CASE_PROOF_STEP_TYPE'
 
 export const validateFunction = (fn) => {
@@ -568,14 +571,83 @@ export const markProofComplete = () => {
 
 export const markBaseCaseProofComplete = () => {
   return (dispatch, getState) => {
-    console.log("Not yet implemented")
-    return Promise.reject()
+
+    if (getState().baseCaseProof.length < 2) {
+      return Promise.reject()
+    }
+
+    const body = {
+      first: getState().baseCase.toShow[0].split("=")[1],
+      second: getState().baseCaseProof[getState().baseCaseProof.length-1].body
+    }
+
+    console.log(body)
+
+    return makeRequest("/api/predicate/equalstructure", body)
+      .then(json => {
+
+        console.log("Action")
+        if (json.equal) {
+          console.log("Action 1")
+          dispatch(setBaseCaseProofComplete())
+          return Promise.resolve()
+        } else {
+          console.log("Action 2")
+          dispatch(setBaseCaseProofCompleteError())
+          return Promise.reject()
+        }
+      })
+  }
+}
+
+export const markInductiveCaseProofComplete = () => {
+  return (dispatch, getState) => {
+
+    if (getState().inductiveCaseProof.length < 2) {
+      return Promise.reject()
+    }
+
+    const body = {
+      first: getState().inductiveCase.toShow[0].split("=")[1],
+      second: getState().inductiveCaseProof[getState().inductiveCaseProof.length-1].body
+    }
+
+    console.log(body)
+
+    return makeRequest("/api/predicate/equalstructure", body)
+      .then(json => {
+
+        if (json.equal) {
+          dispatch(setInductiveCaseProofComplete())
+          return Promise.resolve()
+        }
+
+        return Promise.reject()
+      })
   }
 }
 
 export const setProofComplete = () => (
   {
     type: SET_PROOF_COMPLETE
+  }
+)
+
+export const setBaseCaseProofComplete = () => (
+  {
+    type: SET_BASE_CASE_PROOF_COMPLETE
+  }
+)
+
+export const setBaseCaseProofCompleteError = () => (
+  {
+    type: SET_BASE_CASE_PROOF_COMPLETE_ERROR
+  }
+)
+
+export const setInductiveCaseProofComplete = () => (
+  {
+    type: SET_INDUCTIVE_CASE_PROOF_COMPLETE
   }
 )
 

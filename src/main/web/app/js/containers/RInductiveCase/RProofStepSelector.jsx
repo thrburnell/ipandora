@@ -12,7 +12,7 @@ const mapStateToProps = (state) => (
 const mapDispatchToProps = (dispatch) => (
   {
     onEqualityClick: () => dispatch(setInductiveCaseProofStepType(PROOF_STEP_TYPE.EQUALITY)),
-    onMarkCompleteClick: () => dispatch(markInductiveCaseProofCompleted())
+    onMarkCompleteClick: () => dispatch(markInductiveCaseProofComplete())
   }
 )
 

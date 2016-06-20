@@ -5,14 +5,15 @@ import { setBaseCaseProofStepType, markBaseCaseProofComplete } from '../../actio
 
 const mapStateToProps = (state) => (
   {
-    canMarkComplete: state.baseCaseProof.length > 0
+    canMarkComplete: state.baseCaseProof.length > 1,
+    markCompleteError: state.baseCaseProofCompleteError
   }
 )
 
 const mapDispatchToProps = (dispatch) => (
   {
     onEqualityClick: () => dispatch(setBaseCaseProofStepType(PROOF_STEP_TYPE.EQUALITY)),
-    onMarkCompleteClick: () => dispatch(markBaseCaseProofCompleted())
+    onMarkCompleteClick: () => dispatch(markBaseCaseProofComplete())
   }
 )
 
