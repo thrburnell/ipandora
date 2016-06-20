@@ -6,7 +6,8 @@ const Fn = (state={}, action) => {
     case RECEIVE_FUNCTION_VALIDITY:
       return {
         definition: action.fn,
-        valid: action.valid
+        valid: action.valid,
+        prototype: action.prototype
       }
     default:
       return state

@@ -113,15 +113,60 @@
 
   fn: {
     definition: "SumSq :: Nat -> Nat \n SumSq(n) = ...",
-    valid: true
+    valid: true,
+    prototype: {
+      name: "SumSq",
+      argTypes: [ "Nat" ],
+      returnType: "Nat"
+    }
   },
 
+  // These are terms!
   baseCaseProof: [
-
+    {
+      id: 0,
+      body: "SumSq(0)",
+      type: "INITIAL_TERM"
+    },
+    {
+      id: 1,
+      body: "0",
+      type: "FUNCTION_DEFINITION"
+    },
+    {
+      id: 2,
+      body: "0 * 1 * 1",
+      type: "ARITHMETIC"
+    },
+    {
+      id: 3,
+      body: "(0/6) * (0 + 1) * (2 * 0 + 1)",
+      type: "ARITHMETIC"
+    }
   ],
 
   inductiveCaseProof: [
-
+    {
+      id: 0,
+      body: "SumSq(k+1)",
+      type: "INITIAL_TERM",
+    },
+    {
+      id: 1,
+      body: "(k+1)^2 + SumSq(k)",
+      type: "FUNCTION_DEFINITION"
+    },
+    {
+      id: 2,
+      body: "(k+1)^2 + (k/6)*(k+1)*(2*k+1)",
+      type: "INDUCTIVE_HYPOTHESIS"
+    },
+    {
+      id: 3,
+      body: "((k+1)/6) * (6*(k+1) + k*(2*k+1))",
+      type: "ARITHMETIC"
+    },
+    // ...
   ],
 
 

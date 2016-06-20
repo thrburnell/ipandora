@@ -1,35 +1,24 @@
 import React from 'react'
 import CentredButton from '../CentredButton'
 import RProofStepSelector from '../../containers/RBaseCase/RProofStepSelector'
-import RAssertLine from '../../containers/RBaseCase/RAssertLine'
-import RAssumeLine from '../../containers/RBaseCase/RAssumeLine'
-import RTakeArbitraryLine from '../../containers/RBaseCase/RTakeArbitraryLine'
+import REqualityLine from '../../containers/RBaseCase/REqualityLine'
 import RImplicationLine from '../../containers/RBaseCase/RImplicationLine'
-import AssumptionLine from './AssumptionLine'
-import ArbitraryLine from './ArbitraryLine'
+import InitialTermLine from './InitialTermLine'
+import FunctionDefinitionLine from './FunctionDefinitionLine'
+import ArithmeticLine from './ArithmeticLine'
 import { PROOF_STEP_TYPE } from '../../constants'
 
-const makeProofLine = (node, i, lineSelectable, onLineSelect) => {
+const makeProofLine = (node, i) => {
 
   switch (node.type) {
-    case "ASSERTION":
-      return (
-        <RImplicationLine lineNo={ node.lineNo } body={ node.body }
-         justification={ node.justification } key={ i }
-         selectable={ lineSelectable } onSelect={() => onLineSelect(node.id) } />
-      )
+    case "INITIAL_TERM":
+      return <InitialTermLine key={i} body={ node.body } />
 
-    case "ASSUMPTION":
-      return (
-        <AssumptionLine lineNo={ node.lineNo } body={ node.body } key={ i }
-         selectable={ lineSelectable } onSelect={() => onLineSelect(node.id) } />
-      )
+    case "FUNCTION_DEFINITION":
+      return <FunctionDefinitionLine key={i} body={ node.body } />
 
-    case "TAKE_ARBITRARY":
-      return (
-        <ArbitraryLine lineNo={ node.lineNo } body={ node.body } key={ i }
-         selectable={ lineSelectable } onSelect={() => onLineSelect(node.id) } />
-      )
+    case "ARITHMETIC":
+      return <ArithmeticLine key={i} body={ node.body } />
 
     default:
       return <p>Not supported yet</p>
@@ -38,14 +27,8 @@ const makeProofLine = (node, i, lineSelectable, onLineSelect) => {
 
 const getFooterComponent = (type) => {
   switch (type) {
-    case PROOF_STEP_TYPE.ASSERT:
-      return <RAssertLine />
-
-    case PROOF_STEP_TYPE.ASSUME:
-      return <RAssumeLine />
-
-    case PROOF_STEP_TYPE.TAKE_ARBITRARY:
-      return <RTakeArbitraryLine />
+    case PROOF_STEP_TYPE.EQUALITY:
+      return <REqualityLine />
 
     default:
       return <RProofStepSelector />
@@ -81,7 +64,7 @@ const BaseCase = ({ lines, complete, stepType,
       <table className="table">
         <tbody>
           {lines.map((g, i) => 
-            makeProofLine(g, i, lineSelectable, onLineSelect))}
+            makeProofLine(g, i))}
         </tbody>
       </table>
       { footer }

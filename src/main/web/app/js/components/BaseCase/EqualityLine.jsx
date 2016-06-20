@@ -1,5 +1,5 @@
 import React from 'react'
-import { ASSERT_JUSTIFICATION_TYPE } from '../../constants'
+import { EQUALITY_JUSTIFICATION } from '../../constants'
 
 const AssertLine = ({
   fields: { formula, justification },
@@ -21,14 +21,17 @@ const AssertLine = ({
     <form className="form-horizontal" onSubmit={ handleSubmit }>
       <div className="form-group bottom-no-margin">
         <div className={ formulaClassName }>
-          <input type="text" {...formula}
-           className="form-control monospace-font" placeholder="..." />
+          <div className="input-group">
+            <span className="input-group-addon" id="basic-addon1">=</span>
+            <input type="text" {...formula}
+             className="form-control monospace-font" placeholder="..." />
+          </div>
         </div>
         <div className={ justClassName }>
           <select className="form-control full-width" {...justification}>
             <option></option>
-            <option value={ ASSERT_JUSTIFICATION_TYPE.IMPLICATION }>by implication</option>
-            <option value={ ASSERT_JUSTIFICATION_TYPE.ASSUMPTION_CLOSURE }>by assumption closure</option> 
+            <option value={ EQUALITY_JUSTIFICATION.ARITHMETIC }>by arithmetic</option>
+            <option value={ EQUALITY_JUSTIFICATION.FUNCTION_DEFINITION }>by function def.</option>
           </select>
         </div>
         <div className="col-sm-2 text-right">

@@ -11,10 +11,7 @@ const mapStateToProps = (state) => (
 
 const mapDispatchToProps = (dispatch) => (
   {
-    onAssertClick: () => dispatch(setBaseCaseProofStepType(PROOF_STEP_TYPE.ASSERT)),
-    onAssumeClick: () => dispatch(setBaseCaseProofStepType(PROOF_STEP_TYPE.ASSUME)),
-    onTakeArbitraryClick: () => dispatch(setBaseCaseProofStepType(PROOF_STEP_TYPE.TAKE_ARBITRARY)),
-    onCaseAnalysisClick: () => dispatch(setBaseCaseProofStepType(PROOF_STEP_TYPE.CASE_ANALYSIS)),
+    onEqualityClick: () => dispatch(setBaseCaseProofStepType(PROOF_STEP_TYPE.EQUALITY)),
     onMarkCompleteClick: () => dispatch(markBaseCaseProofCompleted())
   }
 )

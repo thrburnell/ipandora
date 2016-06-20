@@ -1,5 +1,5 @@
 import fetch from 'isomorphic-fetch'
-import { ASSERT_JUSTIFICATION_TYPE } from '../constants'
+import { ASSERT_JUSTIFICATION_TYPE, EQUALITY_JUSTIFICATION } from '../constants'
 
 export const RECEIVE_FUNCTION_VALIDITY = 'RECEIVE_FUNCTION_VALIDITY'
 export const RECEIVE_INDUCTION_SCHEMA = 'RECEIVE_INDUCTION_SCHEMA'
@@ -8,6 +8,7 @@ export const RECEIVE_BASE_PROOF_STEP_VALIDITY = 'RECEIVE_BASE_PROOF_STEP_VALIDIT
 export const TOGGLE_PROOF_MODE = 'TOGGLE_PROOF_MODE'
 export const RECEIVE_TO_SHOW_VALIDATION = 'RECEIVE_TO_SHOW_VALIDATION'
 export const ADD_PROOF_NODE = 'ADD_PROOF_NODE'
+export const ADD_BASE_CASE_PROOF_NODE = 'ADD_BASE_CASE_PROOF_NODE'
 export const SAVE_GIVEN_INDEX = 'SAVE_GIVEN_INDEX'
 export const COMPLETE_GIVEN_ENTRY = 'COMPLETE_GIVEN_ENTRY'
 export const COMPLETE_TO_SHOW_ENTRY = 'COMPLETE_TO_SHOW_ENTRY'
@@ -571,10 +572,128 @@ export const markBaseCaseProofComplete = () => {
   }
 }
 
-
-
 export const setProofComplete = () => (
   {
     type: SET_PROOF_COMPLETE
   }
 )
+
+export const makeBaseCaseEquality = (term, justification) => {
+  switch (justification) {
+    case EQUALITY_JUSTIFICATION.ARITHMETIC:
+      return makeBaseCaseEqualityArithmetic(term)
+ 
+    case EQUALITY_JUSTIFICATION.FUNCTION_DEFINITION:
+      return makeBaseCaseEqualityFunctionDefinition(term)
+  }
+}
+
+const makeBaseCaseEqualityFunctionDefinition = (term) => {
+  return (dispatch, getState) => {
+    const body = {
+      method: "FUNCTION_DEFINITION",
+      goal: term,
+      from: getState().baseCaseProof[getState().baseCaseProof.length - 1].body,
+      function: getState().fn.definition,
+      functions: [ getState().fn.prototype ]
+    }
+
+    console.log("Request")
+    console.log(body)
+
+    const request = new Request('/api/predicate/step', {
+      headers: new Headers({
+        'Content-Type': 'application/json'
+      }),
+      method: 'post',
+      body: JSON.stringify(body)
+    })
+
+    return new Promise((resolve, reject) => {
+
+      fetch(request)
+        .then(res => res.json())
+        .then(json => {
+          console.log("Response")
+          console.log(json)
+          if (json.valid) {
+
+            const node = {
+              id: getState().baseCaseProof.length,
+              body: term,
+              type: "FUNCTION_DEFINITION"
+            }
+
+            console.log("Node")
+            console.log(node)
+
+            dispatch(addBaseCaseProofNode(node))
+            dispatch(closeBaseCaseProofStep())
+            resolve()
+          } else {
+            reject()
+          }
+        })
+        .catch(err => console.log(err))
+    })
+  }
+}
+
+const makeBaseCaseEqualityArithmetic = (term) => {
+  return (dispatch, getState) => {
+
+    const body = {
+      method: "ARITHMETIC",
+      goal: term,
+      from: getState().baseCaseProof[getState().baseCaseProof.length - 1].body
+    }
+
+    console.log("Request")
+    console.log(body)
+
+    const request = new Request('/api/predicate/step', {
+      headers: new Headers({
+        'Content-Type': 'application/json'
+      }),
+      method: 'post',
+      body: JSON.stringify(body)
+    })
+
+    return new Promise((resolve, reject) => {
+
+      fetch(request)
+        .then(res => res.json())
+        .then(json => {
+          console.log("Response")
+          console.log(json)
+          if (json.valid) {
+
+            const node = {
+              id: getState().baseCaseProof.length,
+              body: term,
+              type: "ARITHMETIC"
+            }
+
+            console.log("Node")
+            console.log(node)
+
+            dispatch(addBaseCaseProofNode(node))
+            dispatch(closeBaseCaseProofStep())
+            resolve()
+          } else {
+            reject()
+          }
+        })
+        .catch(err => console.log(err))
+    })
+  }
+}
+
+export const addBaseCaseProofNode = (node) => (
+  {
+    type: ADD_BASE_CASE_PROOF_NODE,
+    node
+  }
+)
+
+
