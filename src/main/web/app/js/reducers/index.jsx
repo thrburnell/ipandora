@@ -18,6 +18,8 @@ import selectedLines from './SelectedLines'
 import arbitrary from './Arbitrary'
 import baseCaseProofComplete from './BaseCaseProofComplete'
 import baseCaseProofStepType from './BaseCaseProofStepType'
+import inductiveCaseProofComplete from './InductiveCaseProofComplete'
+import inductiveCaseProofStepType from './InductiveCaseProofStepType'
 
 const ipandoraApp = combineReducers({
   mode,
@@ -40,6 +42,8 @@ const ipandoraApp = combineReducers({
 
   baseCaseProofComplete,
   baseCaseProofStepType,
+  inductiveCaseProofComplete,
+  inductiveCaseProofStepType,
 
   selectedLines,
   arbitrary,

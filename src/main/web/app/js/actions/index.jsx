@@ -17,9 +17,11 @@ export const DESELECT_LINE = 'DESELECT_LINE'
 export const MAKE_ASSERTION = 'MAKE_ASSERTION'
 export const CLOSE_PROOF_STEP = 'CLOSE_PROOF_STEP'
 export const CLOSE_BASE_CASE_PROOF_STEP = 'CLOSE_BASE_CASE_PROOF_STEP'
+export const CLOSE_INDUCTIVE_CASE_PROOF_STEP = 'CLOSE_INDUCTIVE_CASE_PROOF_STEP'
 export const SAVE_ARBITRARY = 'SAVE_ARBITRARY'
 export const SET_PROOF_COMPLETE = 'SET_PROOF_COMPLETE'
 export const SET_BASE_CASE_PROOF_STEP_TYPE = 'SET_BASE_CASE_PROOF_STEP_TYPE'
+export const SET_INDUCTIVE_CASE_PROOF_STEP_TYPE = 'SET_INDUCTIVE_CASE_PROOF_STEP_TYPE'
 
 export const validateFunction = (fn) => {
   return (dispatch, getState) => {
@@ -264,6 +266,13 @@ export const setBaseCaseProofStepType = (type) => (
   }
 )
 
+export const setInductiveCaseProofStepType = (type) => (
+  {
+    type: SET_INDUCTIVE_CASE_PROOF_STEP_TYPE,
+    proofStepType: type
+  }
+)
+
 export const toggleLine = (index) => {
   return (dispatch, getState) => {
 
@@ -482,6 +491,12 @@ export const closeProofStep = () => (
 export const closeBaseCaseProofStep = () => (
   {
     type: CLOSE_BASE_CASE_PROOF_STEP
+  }
+)
+
+export const closeInductiveCaseProofStep = () => (
+  {
+    type: CLOSE_INDUCTIVE_CASE_PROOF_STEP
   }
 )
 

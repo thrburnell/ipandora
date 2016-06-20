@@ -1,6 +1,6 @@
-const BaseCaseProof = (state=false, action) => {
+const BaseCaseProofComplete = (state=false, action) => {
   return state
 }
 
-export default BaseCaseProof
+export default BaseCaseProofComplete
 
