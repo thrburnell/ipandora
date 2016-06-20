@@ -1,35 +1,27 @@
 import React from 'react'
 import CentredButton from '../CentredButton'
 import RProofStepSelector from '../../containers/RInductiveCase/RProofStepSelector'
-import RAssertLine from '../../containers/RInductiveCase/RAssertLine'
-import RAssumeLine from '../../containers/RInductiveCase/RAssumeLine'
-import RTakeArbitraryLine from '../../containers/RInductiveCase/RTakeArbitraryLine'
-import RImplicationLine from '../../containers/RInductiveCase/RImplicationLine'
-import AssumptionLine from './AssumptionLine'
-import ArbitraryLine from './ArbitraryLine'
+import REqualityLine from '../../containers/RInductiveCase/REqualityLine'
+import InitialTermLine from './InitialTermLine'
+import FunctionDefinitionLine from './FunctionDefinitionLine'
+import ArithmeticLine from './ArithmeticLine'
+import InductiveHypothesisLine from './InductiveHypothesisLine'
 import { PROOF_STEP_TYPE } from '../../constants'
 
 const makeProofLine = (node, i, lineSelectable, onLineSelect) => {
 
   switch (node.type) {
-    case "ASSERTION":
-      return (
-        <RImplicationLine lineNo={ node.lineNo } body={ node.body }
-         justification={ node.justification } key={ i }
-         selectable={ lineSelectable } onSelect={() => onLineSelect(node.id) } />
-      )
+    case "INITIAL_TERM":
+      return <InitialTermLine key={i} body={ node.body } />
 
-    case "ASSUMPTION":
-      return (
-        <AssumptionLine lineNo={ node.lineNo } body={ node.body } key={ i }
-         selectable={ lineSelectable } onSelect={() => onLineSelect(node.id) } />
-      )
+    case "FUNCTION_DEFINITION":
+      return <FunctionDefinitionLine key={i} body={ node.body } />
 
-    case "TAKE_ARBITRARY":
-      return (
-        <ArbitraryLine lineNo={ node.lineNo } body={ node.body } key={ i }
-         selectable={ lineSelectable } onSelect={() => onLineSelect(node.id) } />
-      )
+    case "ARITHMETIC":
+      return <ArithmeticLine key={i} body={ node.body } />
+
+    case "INDUCTIVE_HYPOTHESIS":
+      return <InductiveHypothesisLine key={i} body={ node.body } />
 
     default:
       return <p>Not supported yet</p>
@@ -38,14 +30,8 @@ const makeProofLine = (node, i, lineSelectable, onLineSelect) => {
 
 const getFooterComponent = (type) => {
   switch (type) {
-    case PROOF_STEP_TYPE.ASSERT:
-      return <RAssertLine />
-
-    case PROOF_STEP_TYPE.ASSUME:
-      return <RAssumeLine />
-
-    case PROOF_STEP_TYPE.TAKE_ARBITRARY:
-      return <RTakeArbitraryLine />
+    case PROOF_STEP_TYPE.EQUALITY:
+      return <REqualityLine />
 
     default:
       return <RProofStepSelector />

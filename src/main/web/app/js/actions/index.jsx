@@ -9,6 +9,7 @@ export const TOGGLE_PROOF_MODE = 'TOGGLE_PROOF_MODE'
 export const RECEIVE_TO_SHOW_VALIDATION = 'RECEIVE_TO_SHOW_VALIDATION'
 export const ADD_PROOF_NODE = 'ADD_PROOF_NODE'
 export const ADD_BASE_CASE_PROOF_NODE = 'ADD_BASE_CASE_PROOF_NODE'
+export const ADD_INDUCTIVE_CASE_PROOF_NODE = 'ADD_BASE_CASE_PROOF_NODE'
 export const SAVE_GIVEN_INDEX = 'SAVE_GIVEN_INDEX'
 export const COMPLETE_GIVEN_ENTRY = 'COMPLETE_GIVEN_ENTRY'
 export const COMPLETE_TO_SHOW_ENTRY = 'COMPLETE_TO_SHOW_ENTRY'
@@ -692,6 +693,179 @@ const makeBaseCaseEqualityArithmetic = (term) => {
 export const addBaseCaseProofNode = (node) => (
   {
     type: ADD_BASE_CASE_PROOF_NODE,
+    node
+  }
+)
+
+export const makeInductiveCaseEquality = (term, justification) => {
+  switch (justification) {
+    case EQUALITY_JUSTIFICATION.ARITHMETIC:
+      return makeInductiveCaseEqualityArithmetic(term)
+ 
+    case EQUALITY_JUSTIFICATION.FUNCTION_DEFINITION:
+      return makeInductiveCaseEqualityFunctionDefinition(term)
+  
+    case EQUALITY_JUSTIFICATION.INDUCTIVE_HYPOTHESIS:
+      return makeInductiveCaseEqualityInductiveHypothesis(term)
+  }
+}
+
+const makeInductiveCaseEqualityFunctionDefinition = (term) => {
+  return (dispatch, getState) => {
+    const body = {
+      method: "FUNCTION_DEFINITION",
+      goal: term,
+      from: getState().inductiveCaseProof[getState().inductiveCaseProof.length - 1].body,
+      function: getState().fn.definition,
+      functions: [ getState().fn.prototype ]
+    }
+
+    console.log("Request")
+    console.log(body)
+
+    const request = new Request('/api/predicate/step', {
+      headers: new Headers({
+        'Content-Type': 'application/json'
+      }),
+      method: 'post',
+      body: JSON.stringify(body)
+    })
+
+    return new Promise((resolve, reject) => {
+
+      fetch(request)
+        .then(res => res.json())
+        .then(json => {
+          console.log("Response")
+          console.log(json)
+          if (json.valid) {
+
+            const node = {
+              id: getState().inductiveCaseProof.length,
+              body: term,
+              type: "FUNCTION_DEFINITION"
+            }
+
+            console.log("Node")
+            console.log(node)
+
+            dispatch(addInductiveCaseProofNode(node))
+            dispatch(closeInductiveCaseProofStep())
+            resolve()
+          } else {
+            reject()
+          }
+        })
+        .catch(err => console.log(err))
+    })
+  }
+}
+
+const makeInductiveCaseEqualityArithmetic = (term) => {
+  return (dispatch, getState) => {
+
+    const body = {
+      method: "ARITHMETIC",
+      goal: term,
+      from: getState().inductiveCaseProof[getState().inductiveCaseProof.length - 1].body
+    }
+
+    console.log("Request")
+    console.log(body)
+
+    const request = new Request('/api/predicate/step', {
+      headers: new Headers({
+        'Content-Type': 'application/json'
+      }),
+      method: 'post',
+      body: JSON.stringify(body)
+    })
+
+    return new Promise((resolve, reject) => {
+
+      fetch(request)
+        .then(res => res.json())
+        .then(json => {
+          console.log("Response")
+          console.log(json)
+          if (json.valid) {
+
+            const node = {
+              id: getState().inductiveCaseProof.length,
+              body: term,
+              type: "ARITHMETIC"
+            }
+
+            console.log("Node")
+            console.log(node)
+
+            dispatch(addInductiveCaseProofNode(node))
+            dispatch(closeInductiveCaseProofStep())
+            resolve()
+          } else {
+            reject()
+          }
+        })
+        .catch(err => console.log(err))
+    })
+  }
+}
+
+const makeInductiveCaseEqualityInductiveHypothesis = (term) => {
+  return (dispatch, getState) => {
+    const body = {
+      method: "INDUCTIVE_HYPOTHESIS",
+      goal: term,
+      from: getState().inductiveCaseProof[getState().inductiveCaseProof.length - 1].body,
+      inductiveHypothesis: getState().inductiveCase.hypothesis,
+      arbitrary: getState().inductiveCase.arbitrary.name,
+      functions: [ getState().fn.prototype ]
+    }
+
+    console.log("Request")
+    console.log(body)
+
+    const request = new Request('/api/predicate/step', {
+      headers: new Headers({
+        'Content-Type': 'application/json'
+      }),
+      method: 'post',
+      body: JSON.stringify(body)
+    })
+
+    return new Promise((resolve, reject) => {
+
+      fetch(request)
+        .then(res => res.json())
+        .then(json => {
+          console.log("Response")
+          console.log(json)
+          if (json.valid) {
+
+            const node = {
+              id: getState().inductiveCaseProof.length,
+              body: term,
+              type: "INDUCTIVE_HYPOTHESIS"
+            }
+
+            console.log("Node")
+            console.log(node)
+
+            dispatch(addInductiveCaseProofNode(node))
+            dispatch(closeInductiveCaseProofStep())
+            resolve()
+          } else {
+            reject()
+          }
+        })
+        .catch(err => console.log(err))
+    })
+  }
+}
+
+export const addInductiveCaseProofNode = (node) => (
+  {
+    type: ADD_INDUCTIVE_CASE_PROOF_NODE,
     node
   }
 )

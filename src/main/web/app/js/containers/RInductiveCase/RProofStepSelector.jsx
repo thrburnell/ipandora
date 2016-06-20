@@ -5,16 +5,13 @@ import { setInductiveCaseProofStepType, markInductiveCaseProofComplete } from '.
 
 const mapStateToProps = (state) => (
   {
-    canMarkComplete: state.inductiveCaseProof.length > 0
+    canMarkComplete: state.inductiveCaseProof.length > 1
   }
 )
 
 const mapDispatchToProps = (dispatch) => (
   {
-    onAssertClick: () => dispatch(setInductiveCaseProofStepType(PROOF_STEP_TYPE.ASSERT)),
-    onAssumeClick: () => dispatch(setInductiveCaseProofStepType(PROOF_STEP_TYPE.ASSUME)),
-    onTakeArbitraryClick: () => dispatch(setInductiveCaseProofStepType(PROOF_STEP_TYPE.TAKE_ARBITRARY)),
-    onCaseAnalysisClick: () => dispatch(setInductiveCaseProofStepType(PROOF_STEP_TYPE.CASE_ANALYSIS)),
+    onEqualityClick: () => dispatch(setInductiveCaseProofStepType(PROOF_STEP_TYPE.EQUALITY)),
     onMarkCompleteClick: () => dispatch(markInductiveCaseProofCompleted())
   }
 )
