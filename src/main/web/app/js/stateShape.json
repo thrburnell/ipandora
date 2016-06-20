@@ -116,6 +116,14 @@
     valid: true
   },
 
+  baseCaseProof: [
+
+  ],
+
+  inductiveCaseProof: [
+
+  ],
+
 
   // old
   prototypes: [

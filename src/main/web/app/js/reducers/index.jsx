@@ -10,10 +10,14 @@ import givenEntryComplete from './GivenEntryComplete'
 import baseCase from './BaseCase'
 import inductiveCase from './InductiveCase'
 import proof from './Proof'
+import baseCaseProof from './BaseCaseProof'
+import inductiveCaseProof from './InductiveCaseProof'
 import proofStepType from './ProofStepType'
 import proofComplete from './ProofComplete'
 import selectedLines from './SelectedLines'
 import arbitrary from './Arbitrary'
+import baseCaseProofComplete from './BaseCaseProofComplete'
+import baseCaseProofStepType from './BaseCaseProofStepType'
 
 const ipandoraApp = combineReducers({
   mode,
@@ -29,8 +33,13 @@ const ipandoraApp = combineReducers({
   inductiveCase,
   
   proof,
+  baseCaseProof,
+  inductiveCaseProof,
   proofStepType,
   proofComplete,
+
+  baseCaseProofComplete,
+  baseCaseProofStepType,
 
   selectedLines,
   arbitrary,

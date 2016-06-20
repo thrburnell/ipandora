@@ -16,8 +16,10 @@ export const SELECT_LINE = 'SELECT_LINE'
 export const DESELECT_LINE = 'DESELECT_LINE'
 export const MAKE_ASSERTION = 'MAKE_ASSERTION'
 export const CLOSE_PROOF_STEP = 'CLOSE_PROOF_STEP'
+export const CLOSE_BASE_CASE_PROOF_STEP = 'CLOSE_BASE_CASE_PROOF_STEP'
 export const SAVE_ARBITRARY = 'SAVE_ARBITRARY'
 export const SET_PROOF_COMPLETE = 'SET_PROOF_COMPLETE'
+export const SET_BASE_CASE_PROOF_STEP_TYPE = 'SET_BASE_CASE_PROOF_STEP_TYPE'
 
 export const validateFunction = (fn) => {
   return (dispatch, getState) => {
@@ -255,6 +257,13 @@ export const setProofStepType = (type) => (
   }
 )
 
+export const setBaseCaseProofStepType = (type) => (
+  {
+    type: SET_BASE_CASE_PROOF_STEP_TYPE,
+    proofStepType: type
+  }
+)
+
 export const toggleLine = (index) => {
   return (dispatch, getState) => {
 
@@ -282,17 +291,17 @@ export const deselectLine = (index) => (
   }
 )
 
-export const makeAssertion = (formula, justification) => {
+export const makeAssertion = (formula, justification, area) => {
   switch (justification) {
     case ASSERT_JUSTIFICATION_TYPE.IMPLICATION:
-      return makeLogicalImplicationAssertion(formula)
+      return makeLogicalImplicationAssertion(formula, area)
 
     case ASSERT_JUSTIFICATION_TYPE.ASSUMPTION_CLOSURE:
-      return makeAssumptionClosureAssertion(formula)
+      return makeAssumptionClosureAssertion(formula, area)
   }
 }
 
-const makeAssumptionClosureAssertion = (formula) => {
+const makeAssumptionClosureAssertion = (formula, area) => {
 
   return (dispatch, getState) => {
     const isChild = (child, parent) => {
@@ -366,7 +375,7 @@ const makeAssumptionClosureAssertion = (formula) => {
   }
 }
 
-const makeLogicalImplicationAssertion = (formula) => {
+const makeLogicalImplicationAssertion = (formula, area) => {
   return (dispatch, getState) => {
     const assumptions = getState().selectedLines
       .filter(i => getState().proof[i].type != "TAKE_ARBITRARY")
@@ -436,7 +445,7 @@ const makeLogicalImplicationAssertion = (formula) => {
   }
 }
 
-export const makeAssumption = (formula) => {
+export const makeAssumption = (formula, area) => {
   return (dispatch, getState) => {
     
     return makeRequest("/api/predicate/formula", { formula })
@@ -470,7 +479,13 @@ export const closeProofStep = () => (
   }
 )
 
-export const takeArbitrary = (name, domain) => {
+export const closeBaseCaseProofStep = () => (
+  {
+    type: CLOSE_BASE_CASE_PROOF_STEP
+  }
+)
+
+export const takeArbitrary = (name, domain, area) => {
   return (dispatch, getState) => {
     
     return new Promise((resolve, reject) => {
@@ -533,6 +548,15 @@ export const markProofComplete = () => {
       })
   }
 }
+
+export const markBaseCaseProofComplete = () => {
+  return (dispatch, getState) => {
+    console.log("Not yet implemented")
+    return Promise.reject()
+  }
+}
+
+
 
 export const setProofComplete = () => (
   {
