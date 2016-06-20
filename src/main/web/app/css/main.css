@@ -18,3 +18,7 @@ body {
   width: 100%;
 }
 
+.left-padding {
+  padding-left: 30px !important;
+}
+
