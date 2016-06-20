@@ -430,7 +430,9 @@ const makeLogicalImplicationAssertion = (formula, area) => {
           if (json.valid) {
 
             const by = getState().selectedLines
-            const nonValidDependencies = by.filter(i => !getState().proof[i].valid)
+            const nonValidDependencies = by.filter(i => 
+              getState().proof[i].type != "TAKE_ARBITRARY" && !getState().proof[i].valid
+            )
 
             const id = getState().proof.length
             const lineNo = getState().proof.length + 1
@@ -582,18 +584,13 @@ export const markBaseCaseProofComplete = () => {
       second: getState().baseCaseProof[getState().baseCaseProof.length-1].body
     }
 
-    console.log(body)
-
     return makeRequest("/api/predicate/equalstructure", body)
       .then(json => {
 
-        console.log("Action")
         if (json.equal) {
-          console.log("Action 1")
           dispatch(setBaseCaseProofComplete())
           return Promise.resolve()
         } else {
-          console.log("Action 2")
           dispatch(setBaseCaseProofCompleteError())
           return Promise.reject()
         }
@@ -612,8 +609,6 @@ export const markInductiveCaseProofComplete = () => {
       first: getState().inductiveCase.toShow[0].split("=")[1],
       second: getState().inductiveCaseProof[getState().inductiveCaseProof.length-1].body
     }
-
-    console.log(body)
 
     return makeRequest("/api/predicate/equalstructure", body)
       .then(json => {
@@ -679,9 +674,6 @@ const makeBaseCaseEqualityFunctionDefinition = (term) => {
       functions: [ getState().fn.prototype ]
     }
 
-    console.log("Request")
-    console.log(body)
-
     const request = new Request('/api/predicate/step', {
       headers: new Headers({
         'Content-Type': 'application/json'
@@ -695,8 +687,6 @@ const makeBaseCaseEqualityFunctionDefinition = (term) => {
       fetch(request)
         .then(res => res.json())
         .then(json => {
-          console.log("Response")
-          console.log(json)
           if (json.valid) {
 
             const node = {
@@ -704,9 +694,6 @@ const makeBaseCaseEqualityFunctionDefinition = (term) => {
               body: term,
               type: "FUNCTION_DEFINITION"
             }
-
-            console.log("Node")
-            console.log(node)
 
             dispatch(addBaseCaseProofNode(node))
             dispatch(closeBaseCaseProofStep())
@@ -729,9 +716,6 @@ const makeBaseCaseEqualityArithmetic = (term) => {
       from: getState().baseCaseProof[getState().baseCaseProof.length - 1].body
     }
 
-    console.log("Request")
-    console.log(body)
-
     const request = new Request('/api/predicate/step', {
       headers: new Headers({
         'Content-Type': 'application/json'
@@ -745,8 +729,6 @@ const makeBaseCaseEqualityArithmetic = (term) => {
       fetch(request)
         .then(res => res.json())
         .then(json => {
-          console.log("Response")
-          console.log(json)
           if (json.valid) {
 
             const node = {
@@ -754,9 +736,6 @@ const makeBaseCaseEqualityArithmetic = (term) => {
               body: term,
               type: "ARITHMETIC"
             }
-
-            console.log("Node")
-            console.log(node)
 
             dispatch(addBaseCaseProofNode(node))
             dispatch(closeBaseCaseProofStep())
@@ -800,9 +779,6 @@ const makeInductiveCaseEqualityFunctionDefinition = (term) => {
       functions: [ getState().fn.prototype ]
     }
 
-    console.log("Request")
-    console.log(body)
-
     const request = new Request('/api/predicate/step', {
       headers: new Headers({
         'Content-Type': 'application/json'
@@ -816,8 +792,6 @@ const makeInductiveCaseEqualityFunctionDefinition = (term) => {
       fetch(request)
         .then(res => res.json())
         .then(json => {
-          console.log("Response")
-          console.log(json)
           if (json.valid) {
 
             const node = {
@@ -825,9 +799,6 @@ const makeInductiveCaseEqualityFunctionDefinition = (term) => {
               body: term,
               type: "FUNCTION_DEFINITION"
             }
-
-            console.log("Node")
-            console.log(node)
 
             dispatch(addInductiveCaseProofNode(node))
             dispatch(closeInductiveCaseProofStep())
@@ -850,9 +821,6 @@ const makeInductiveCaseEqualityArithmetic = (term) => {
       from: getState().inductiveCaseProof[getState().inductiveCaseProof.length - 1].body
     }
 
-    console.log("Request")
-    console.log(body)
-
     const request = new Request('/api/predicate/step', {
       headers: new Headers({
         'Content-Type': 'application/json'
@@ -866,8 +834,6 @@ const makeInductiveCaseEqualityArithmetic = (term) => {
       fetch(request)
         .then(res => res.json())
         .then(json => {
-          console.log("Response")
-          console.log(json)
           if (json.valid) {
 
             const node = {
@@ -875,9 +841,6 @@ const makeInductiveCaseEqualityArithmetic = (term) => {
               body: term,
               type: "ARITHMETIC"
             }
-
-            console.log("Node")
-            console.log(node)
 
             dispatch(addInductiveCaseProofNode(node))
             dispatch(closeInductiveCaseProofStep())
@@ -902,9 +865,6 @@ const makeInductiveCaseEqualityInductiveHypothesis = (term) => {
       functions: [ getState().fn.prototype ]
     }
 
-    console.log("Request")
-    console.log(body)
-
     const request = new Request('/api/predicate/step', {
       headers: new Headers({
         'Content-Type': 'application/json'
@@ -918,8 +878,6 @@ const makeInductiveCaseEqualityInductiveHypothesis = (term) => {
       fetch(request)
         .then(res => res.json())
         .then(json => {
-          console.log("Response")
-          console.log(json)
           if (json.valid) {
 
             const node = {
@@ -927,9 +885,6 @@ const makeInductiveCaseEqualityInductiveHypothesis = (term) => {
               body: term,
               type: "INDUCTIVE_HYPOTHESIS"
             }
-
-            console.log("Node")
-            console.log(node)
 
             dispatch(addInductiveCaseProofNode(node))
             dispatch(closeInductiveCaseProofStep())

@@ -6,7 +6,7 @@
 \FORALL x, y. (childof(x, y) -> parentof(y, x))
 
 # TO SHOW
-\FORALL x. (dragon(x) & green(x) -> happy(x))
+\FORALL x. (dragon(x) -> (green(x) -> happy(x)))
 
 # PROOF
 d1 arb

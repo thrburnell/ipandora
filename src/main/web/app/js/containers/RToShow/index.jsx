@@ -12,8 +12,6 @@ const mapStateToProps = (state) => (
 
 const dispatchButtonClick = (formula, variable) => (
   (dispatch, getState) => {
-    console.log(formula)
-
     switch (getState().mode) {
       case PROOF_MODE.INDUCTION:
         dispatch(getInductionSchema(formula, variable))
