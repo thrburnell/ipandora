@@ -26,6 +26,7 @@ export const SET_BASE_CASE_PROOF_COMPLETE = 'SET_BASE_CASE_PROOF_COMPLETE'
 export const SET_BASE_CASE_PROOF_COMPLETE_ERROR = 'SET_BASE_CASE_PROOF_COMPLETE_ERROR'
 export const SET_BASE_CASE_PROOF_STEP_TYPE = 'SET_BASE_CASE_PROOF_STEP_TYPE'
 export const SET_INDUCTIVE_CASE_PROOF_COMPLETE = 'SET_INDUCTIVE_CASE_PROOF_COMPLETE'
+export const SET_INDUCTIVE_CASE_PROOF_COMPLETE_ERROR = 'SET_INDUCTIVE_CASE_PROOF_COMPLETE_ERROR'
 export const SET_INDUCTIVE_CASE_PROOF_STEP_TYPE = 'SET_INDUCTIVE_CASE_PROOF_STEP_TYPE'
 
 export const validateFunction = (fn) => {
@@ -620,9 +621,10 @@ export const markInductiveCaseProofComplete = () => {
         if (json.equal) {
           dispatch(setInductiveCaseProofComplete())
           return Promise.resolve()
+        } else {
+          dispatch(setInductiveCaseProofCompleteError())
+          return Promise.reject()
         }
-
-        return Promise.reject()
       })
   }
 }
@@ -648,6 +650,12 @@ export const setBaseCaseProofCompleteError = () => (
 export const setInductiveCaseProofComplete = () => (
   {
     type: SET_INDUCTIVE_CASE_PROOF_COMPLETE
+  }
+)
+
+export const setInductiveCaseProofCompleteError = () => (
+  {
+    type: SET_INDUCTIVE_CASE_PROOF_COMPLETE_ERROR
   }
 )
 

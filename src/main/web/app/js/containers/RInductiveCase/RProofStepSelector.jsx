@@ -5,7 +5,8 @@ import { setInductiveCaseProofStepType, markInductiveCaseProofComplete } from '.
 
 const mapStateToProps = (state) => (
   {
-    canMarkComplete: state.inductiveCaseProof.length > 1
+    canMarkComplete: state.inductiveCaseProof.length > 1,
+    markCompleteError: state.inductiveCaseProofCompleteError
   }
 )
 

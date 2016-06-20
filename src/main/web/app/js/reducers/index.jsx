@@ -20,6 +20,7 @@ import baseCaseProofComplete from './BaseCaseProofComplete'
 import baseCaseProofCompleteError from './BaseCaseProofCompleteError'
 import baseCaseProofStepType from './BaseCaseProofStepType'
 import inductiveCaseProofComplete from './InductiveCaseProofComplete'
+import inductiveCaseProofCompleteError from './InductiveCaseProofCompleteError'
 import inductiveCaseProofStepType from './InductiveCaseProofStepType'
 
 const ipandoraApp = combineReducers({
@@ -45,6 +46,7 @@ const ipandoraApp = combineReducers({
   baseCaseProofCompleteError,
   baseCaseProofStepType,
   inductiveCaseProofComplete,
+  inductiveCaseProofCompleteError,
   inductiveCaseProofStepType,
 
   selectedLines,
