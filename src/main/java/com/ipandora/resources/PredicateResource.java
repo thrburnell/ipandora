@@ -382,6 +382,48 @@ public class PredicateResource {
         return Response.ok(response).build();
     }
 
+    @POST
+    @Path("/equalstructure")
+    public Response areTermsEqualStructure(TermEqualStructureRequest equalStructureRequest) {
+
+        TermEqualStructureResponse response = new TermEqualStructureResponse();
+
+        String first = equalStructureRequest.getFirst();
+        String second = equalStructureRequest.getSecond();
+        response.setFirst(first);
+        response.setSecond(second);
+
+        if (first == null) {
+            response.setErrorMsg("Required first missing");
+            return invalidRequestResponse(response);
+        }
+        if (second == null) {
+            response.setErrorMsg("Required second missing");
+            return invalidRequestResponse(response);
+        }
+
+        Term firstTerm;
+        try {
+            firstTerm = termParser.fromString(first);
+        } catch (TermParsingException e) {
+            response.setErrorMsg("Invalid first term: " + first);
+            return invalidRequestResponse(response);
+        }
+
+        Term secondTerm;
+        try {
+            secondTerm = termParser.fromString(second);
+        } catch (TermParsingException e) {
+            response.setErrorMsg("Invalid second term: " + second);
+            return invalidRequestResponse(response);
+        }
+
+        boolean equal = firstTerm.equals(secondTerm);
+        response.setEqual(equal);
+
+        return Response.ok(response).build();
+    }
+
     private FunctionPrototypeRequest getFunctionPrototypeRequest(FunctionPrototype prototype) {
         FunctionPrototypeRequest functionPrototypeRequest = new FunctionPrototypeRequest();
 
