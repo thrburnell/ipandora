@@ -5,6 +5,7 @@ import mode from './Mode'
 import toShow from './ToShow'
 import toShowEntryComplete from './ToShowEntryComplete'
 import given from './Given'
+import fn from './Fn'
 import givenEntryComplete from './GivenEntryComplete'
 import baseCase from './BaseCase'
 import inductiveCase from './InductiveCase'
@@ -21,6 +22,7 @@ const ipandoraApp = combineReducers({
   toShowEntryComplete,
   
   given,
+  fn,
   givenEntryComplete,
 
   baseCase,

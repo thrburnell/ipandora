@@ -111,15 +111,13 @@
     ]
   },
 
-
-
-  // OLD:
-
   fn: {
-    definition: "SumSq(n) = ...",
+    definition: "SumSq :: Nat -> Nat \n SumSq(n) = ...",
     valid: true
   },
 
+
+  // old
   prototypes: [
     {
       name: "SumSq",
